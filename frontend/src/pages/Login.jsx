@@ -10,7 +10,8 @@ import {
   Button,
   MessageStrip,
   BusyIndicator,
-  Icon
+  Icon,
+  Text
 } from '@ui5/webcomponents-react';
 import '@ui5/webcomponents/dist/Assets.js';
 import '@ui5/webcomponents-fiori/dist/Assets.js';
@@ -40,7 +41,6 @@ const Login = () => {
     e.preventDefault();
     setError('');
 
-    // Validation
     if (!formData.username.trim()) {
       setError('Le nom d\'utilisateur est requis');
       return;
@@ -74,13 +74,10 @@ const Login = () => {
         throw new Error(data.detail || data.error || 'Identifiants incorrects');
       }
 
-      // Stocker les tokens
       if (data.access) {
         localStorage.setItem('access_token', data.access);
         localStorage.setItem('refresh_token', data.refresh);
         localStorage.setItem('user', JSON.stringify(data.user));
-
-        // Rediriger vers le dashboard
         navigate('/dashboard');
       } else {
         throw new Error('Réponse invalide du serveur');
@@ -96,63 +93,61 @@ const Login = () => {
   return (
     <ThemeProvider>
       <div className="login-container">
-        <FlexBox
-          direction="Column"
-          justifyContent="Center"
-          alignItems="Center"
-          style={{ maxWidth: '400px', width: '100%' }}
-        >
-          <Card>
-            <FlexBox direction="Column" alignItems="Center" style={{ marginBottom: '2rem' }}>
-              <Icon name="business-suite" style={{ fontSize: '4rem', marginBottom: '1rem' }} />
-              <Title level="H2">OpsFlux</Title>
-              <span>ERP Modulaire Intelligent</span>
-            </FlexBox>
+        <Card style={{ width: '28rem', padding: '2rem' }}>
+          <FlexBox direction="Column" alignItems="Center" style={{ marginBottom: '2rem' }}>
+            <Icon name="business-suite" style={{ fontSize: '3rem', color: 'var(--sapBrandColor)', marginBottom: '1rem' }} />
+            <Title level="H2" style={{ marginBottom: '0.5rem' }}>OpsFlux</Title>
+            <Text>Connectez-vous à votre espace</Text>
+          </FlexBox>
 
-            {error && (
-              <MessageStrip
-                design="Negative"
-                style={{ marginBottom: '1rem' }}
-                onClose={() => setError('')}
-              >
-                {error}
-              </MessageStrip>
-            )}
+          {error && (
+            <MessageStrip
+              design="Negative"
+              style={{ marginBottom: '1rem' }}
+              onClose={() => setError('')}
+            >
+              {error}
+            </MessageStrip>
+          )}
 
-            <form onSubmit={handleSubmit}>
-              <div className="form-field">
-                <Label required>Nom d'utilisateur</Label>
+          <form onSubmit={handleSubmit}>
+            <FlexBox direction="Column" style={{ gap: '1rem' }}>
+              <div>
+                <Label required showColon>Nom d'utilisateur</Label>
                 <Input
                   name="username"
                   value={formData.username}
                   onInput={handleInputChange}
                   placeholder="Entrez votre nom d'utilisateur"
-                  icon={<Icon name="employee" />}
                   disabled={loading}
                   required
-                  style={{ width: '100%' }}
+                  style={{ width: '100%', marginTop: '0.25rem' }}
                 />
               </div>
 
-              <div className="form-field">
-                <Label required>Mot de passe</Label>
+              <div>
+                <Label required showColon>Mot de passe</Label>
                 <Input
                   name="password"
-                  type={showPassword ? 'text' : 'password'}
+                  type={showPassword ? 'Text' : 'Password'}
                   value={formData.password}
                   onInput={handleInputChange}
                   placeholder="Entrez votre mot de passe"
-                  icon={<Icon name="locked" />}
                   disabled={loading}
                   required
-                  style={{ width: '100%' }}
+                  style={{ width: '100%', marginTop: '0.25rem' }}
                 />
               </div>
 
-              <FlexBox justifyContent="SpaceBetween" alignItems="Center" style={{ marginBottom: '1rem' }}>
-                <Label>
-                  <input type="checkbox" onChange={() => setShowPassword(!showPassword)} />
-                  {' '}Afficher le mot de passe
+              <FlexBox alignItems="Center" style={{ gap: '0.5rem' }}>
+                <input
+                  type="checkbox"
+                  id="showPassword"
+                  onChange={() => setShowPassword(!showPassword)}
+                  style={{ cursor: 'pointer' }}
+                />
+                <Label for="showPassword" style={{ cursor: 'pointer' }}>
+                  Afficher le mot de passe
                 </Label>
               </FlexBox>
 
@@ -160,23 +155,31 @@ const Login = () => {
                 design="Emphasized"
                 type="submit"
                 disabled={loading}
-                className="login-button"
+                style={{ width: '100%', marginTop: '0.5rem' }}
               >
-                {loading ? 'Connexion...' : 'Se connecter'}
+                {loading && <BusyIndicator active size="Small" style={{ marginRight: '0.5rem' }} />}
+                {loading ? 'Connexion en cours...' : 'Se connecter'}
               </Button>
 
               <FlexBox justifyContent="Center" style={{ marginTop: '1rem' }}>
-                <a href="http://72.60.188.156:3002" style={{ textDecoration: 'none' }}>
-                  Pas encore de compte ? En savoir plus
+                <a
+                  href="http://72.60.188.156:3002"
+                  style={{
+                    color: 'var(--sapLinkColor)',
+                    textDecoration: 'none',
+                    fontSize: '0.875rem'
+                  }}
+                >
+                  Découvrir OpsFlux →
                 </a>
               </FlexBox>
-            </form>
-          </Card>
+            </FlexBox>
+          </form>
+        </Card>
 
-          <FlexBox justifyContent="Center" style={{ marginTop: '2rem', color: '#666' }}>
-            <span>&copy; 2025 OpsFlux - ERP Modulaire | 3MH-CCAI</span>
-          </FlexBox>
-        </FlexBox>
+        <Text style={{ marginTop: '2rem', color: 'var(--sapNeutralTextColor)', fontSize: '0.875rem' }}>
+          © 2025 OpsFlux · 3MH-CCAI
+        </Text>
       </div>
     </ThemeProvider>
   );

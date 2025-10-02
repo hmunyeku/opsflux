@@ -6,15 +6,14 @@ import {
   SideNavigation,
   SideNavigationItem,
   SideNavigationSubItem,
-  Page,
   Card,
   CardHeader,
   Title,
   FlexBox,
-  AnalyticalTable,
   Icon,
   Avatar,
-  Button
+  Button,
+  Text
 } from '@ui5/webcomponents-react';
 import '@ui5/webcomponents/dist/Assets.js';
 import '@ui5/webcomponents-fiori/dist/Assets.js';
@@ -27,7 +26,6 @@ const Dashboard = () => {
   const [selectedItem, setSelectedItem] = useState('dashboard');
 
   useEffect(() => {
-    // Vérifier l'authentification
     const token = localStorage.getItem('access_token');
     const userData = localStorage.getItem('user');
 
@@ -54,7 +52,6 @@ const Dashboard = () => {
 
   const handleNavigation = (itemId) => {
     setSelectedItem(itemId);
-    // Navigation logic here
   };
 
   if (!user) {
@@ -70,7 +67,7 @@ const Dashboard = () => {
           logo={<Icon name="business-suite" />}
           profile={
             <Avatar>
-              {user.username?.charAt(0).toUpperCase() || 'U'}
+              <Text>{user.username?.charAt(0).toUpperCase() || 'U'}</Text>
             </Avatar>
           }
           onProfileClick={handleProfileClick}
@@ -85,177 +82,188 @@ const Dashboard = () => {
           </Button>
         </ShellBar>
 
-        <FlexBox style={{ flex: 1 }}>
+        <FlexBox style={{ height: 'calc(100vh - 44px)' }}>
           <SideNavigation
             onSelectionChange={(e) => handleNavigation(e.detail.item.id)}
-            style={{ width: '250px' }}
+            style={{ width: '15rem', borderRight: '1px solid var(--sapGroup_ContentBorderColor)' }}
           >
-              <SideNavigationItem
-                id="dashboard"
-                text="Tableau de bord"
-                icon="home"
-                selected={selectedItem === 'dashboard'}
-              />
+            <SideNavigationItem
+              id="dashboard"
+              text="Tableau de bord"
+              icon="home"
+              selected={selectedItem === 'dashboard'}
+            />
 
-              <SideNavigationItem
-                id="modules"
-                text="Modules"
-                icon="grid"
-                expanded
-              >
-                <SideNavigationSubItem
-                  id="finance"
-                  text="Finance & Comptabilité"
-                  icon="wallet"
-                />
-                <SideNavigationSubItem
-                  id="hr"
-                  text="Ressources Humaines"
-                  icon="employee"
-                />
-                <SideNavigationSubItem
-                  id="inventory"
-                  text="Gestion des Stocks"
-                  icon="product"
-                />
-                <SideNavigationSubItem
-                  id="sales"
-                  text="Ventes & CRM"
-                  icon="sales-order"
-                />
-                <SideNavigationSubItem
-                  id="production"
-                  text="Production"
-                  icon="factory"
-                />
-              </SideNavigationItem>
-
-              <SideNavigationItem
-                id="ai"
-                text="Assistant IA"
-                icon="bot"
+            <SideNavigationItem
+              id="modules"
+              text="Modules"
+              icon="grid"
+              expanded
+            >
+              <SideNavigationSubItem
+                id="finance"
+                text="Finance"
+                icon="wallet"
               />
-
-              <SideNavigationItem
-                id="reports"
-                text="Rapports"
-                icon="chart-table-view"
+              <SideNavigationSubItem
+                id="hr"
+                text="RH"
+                icon="employee"
               />
-
-              <SideNavigationItem
-                id="settings"
-                text="Paramètres"
-                icon="action-settings"
+              <SideNavigationSubItem
+                id="inventory"
+                text="Stocks"
+                icon="product"
               />
+              <SideNavigationSubItem
+                id="sales"
+                text="CRM"
+                icon="sales-order"
+              />
+            </SideNavigationItem>
+
+            <SideNavigationItem
+              id="ai"
+              text="Assistant IA"
+              icon="bot"
+            />
+
+            <SideNavigationItem
+              id="reports"
+              text="Rapports"
+              icon="chart-table-view"
+            />
+
+            <SideNavigationItem
+              id="settings"
+              text="Paramètres"
+              icon="action-settings"
+            />
           </SideNavigation>
 
-          <div style={{ flex: 1, padding: '1.5rem', overflow: 'auto' }}>
-            <Page
-              header={
-                <Title level="H3">
-                  Bienvenue, {user.username}!
-                </Title>
-              }
-            >
-              <FlexBox direction="Column" style={{ gap: '1.5rem' }}>
-                <FlexBox wrap="Wrap" style={{ gap: '1.5rem' }}>
-                  <Card
-                    header={
-                      <CardHeader
-                        titleText="Statistiques rapides"
-                        subtitleText="Vue d'ensemble"
-                        avatar={<Icon name="Chart-Tree-Map" />}
-                      />
-                    }
-                    style={{ minWidth: '300px', flex: 1 }}
-                  >
-                    <FlexBox direction="Column" style={{ padding: '1rem', gap: '0.5rem' }}>
-                      <FlexBox justifyContent="SpaceBetween">
-                        <span>Modules actifs</span>
-                        <strong>5</strong>
-                      </FlexBox>
-                      <FlexBox justifyContent="SpaceBetween">
-                        <span>Utilisateurs</span>
-                        <strong>12</strong>
-                      </FlexBox>
-                      <FlexBox justifyContent="SpaceBetween">
-                        <span>Tâches en cours</span>
-                        <strong>24</strong>
-                      </FlexBox>
-                    </FlexBox>
-                  </Card>
+          <div style={{ flex: 1, padding: '2rem', overflow: 'auto', backgroundColor: 'var(--sapBackgroundColor)' }}>
+            <Title level="H3" style={{ marginBottom: '2rem' }}>
+              Bienvenue, {user.username} 👋
+            </Title>
 
-                  <Card
-                    header={
-                      <CardHeader
-                        titleText="Activité récente"
-                        subtitleText="Dernières 24h"
-                        avatar={<Icon name="activities" />}
-                      />
-                    }
-                    style={{ minWidth: '300px', flex: 1 }}
-                  >
-                    <div style={{ padding: '1rem' }}>
-                      <p>Aucune activité récente</p>
-                    </div>
-                  </Card>
-
-                  <Card
-                    header={
-                      <CardHeader
-                        titleText="Assistant IA"
-                        subtitleText="Powered by Claude"
-                        avatar={<Icon name="bot" />}
-                      />
-                    }
-                    style={{ minWidth: '300px', flex: 1 }}
-                  >
-                    <div style={{ padding: '1rem' }}>
-                      <p>Assistant IA prêt à vous aider</p>
-                      <Button design="Emphasized" style={{ marginTop: '1rem' }}>
-                        Démarrer une conversation
-                      </Button>
-                    </div>
-                  </Card>
-                </FlexBox>
-
-                <Card
-                  header={
-                    <CardHeader
-                      titleText="Modules disponibles"
-                      subtitleText="Activez les modules dont vous avez besoin"
-                    />
-                  }
-                >
-                  <FlexBox wrap="Wrap" style={{ padding: '1rem', gap: '1rem' }}>
-                    <FlexBox direction="Column" alignItems="Center" style={{ minWidth: '150px', padding: '1rem', border: '1px solid #e0e0e0', borderRadius: '8px' }}>
-                      <Icon name="wallet" style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }} />
-                      <strong>Comptabilité</strong>
-                      <span style={{ fontSize: '0.9rem', color: '#666', marginBottom: '0.5rem' }}>Gestion financière</span>
-                      <Button design="Transparent">Activer</Button>
+            <FlexBox wrap="Wrap" style={{ gap: '1rem', marginBottom: '2rem' }}>
+              <Card
+                header={
+                  <CardHeader
+                    titleText="Statistiques"
+                    subtitleText="Vue d'ensemble"
+                    avatar={<Icon name="chart-table-view" />}
+                  />
+                }
+                style={{ minWidth: '20rem', flex: '1' }}
+              >
+                <div style={{ padding: '1rem' }}>
+                  <FlexBox direction="Column" style={{ gap: '1rem' }}>
+                    <FlexBox justifyContent="SpaceBetween">
+                      <Text>Modules actifs</Text>
+                      <Text style={{ fontWeight: 'bold', color: 'var(--sapPositiveColor)' }}>5</Text>
                     </FlexBox>
-                    <FlexBox direction="Column" alignItems="Center" style={{ minWidth: '150px', padding: '1rem', border: '1px solid #e0e0e0', borderRadius: '8px' }}>
-                      <Icon name="employee" style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }} />
-                      <strong>RH</strong>
-                      <span style={{ fontSize: '0.9rem', color: '#666', marginBottom: '0.5rem' }}>Ressources Humaines</span>
-                      <Button design="Transparent">Activer</Button>
+                    <FlexBox justifyContent="SpaceBetween">
+                      <Text>Utilisateurs</Text>
+                      <Text style={{ fontWeight: 'bold', color: 'var(--sapInformationColor)' }}>12</Text>
                     </FlexBox>
-                    <FlexBox direction="Column" alignItems="Center" style={{ minWidth: '150px', padding: '1rem', border: '1px solid #e0e0e0', borderRadius: '8px' }}>
-                      <Icon name="product" style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }} />
-                      <strong>Stocks</strong>
-                      <span style={{ fontSize: '0.9rem', color: '#666', marginBottom: '0.5rem' }}>Inventaire</span>
-                      <Button design="Transparent">Activer</Button>
-                    </FlexBox>
-                    <FlexBox direction="Column" alignItems="Center" style={{ minWidth: '150px', padding: '1rem', border: '1px solid #e0e0e0', borderRadius: '8px' }}>
-                      <Icon name="sales-order" style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }} />
-                      <strong>CRM</strong>
-                      <span style={{ fontSize: '0.9rem', color: '#666', marginBottom: '0.5rem' }}>Gestion clients</span>
-                      <Button design="Transparent">Activer</Button>
+                    <FlexBox justifyContent="SpaceBetween">
+                      <Text>Tâches</Text>
+                      <Text style={{ fontWeight: 'bold', color: 'var(--sapNeutralColor)' }}>24</Text>
                     </FlexBox>
                   </FlexBox>
-                </Card>
-              </FlexBox>
-            </Page>
+                </div>
+              </Card>
+
+              <Card
+                header={
+                  <CardHeader
+                    titleText="Activité"
+                    subtitleText="Dernières 24h"
+                    avatar={<Icon name="activities" />}
+                  />
+                }
+                style={{ minWidth: '20rem', flex: '1' }}
+              >
+                <div style={{ padding: '1rem' }}>
+                  <Text style={{ color: 'var(--sapNeutralTextColor)' }}>
+                    Aucune activité récente
+                  </Text>
+                </div>
+              </Card>
+
+              <Card
+                header={
+                  <CardHeader
+                    titleText="Assistant IA"
+                    subtitleText="Powered by Claude"
+                    avatar={<Icon name="bot" />}
+                  />
+                }
+                style={{ minWidth: '20rem', flex: '1' }}
+              >
+                <div style={{ padding: '1rem' }}>
+                  <Text style={{ marginBottom: '1rem', display: 'block' }}>
+                    L'assistant IA est prêt à vous aider
+                  </Text>
+                  <Button design="Emphasized" icon="conversation">
+                    Nouvelle conversation
+                  </Button>
+                </div>
+              </Card>
+            </FlexBox>
+
+            <Card
+              header={
+                <CardHeader
+                  titleText="Modules disponibles"
+                  subtitleText="Activez les modules dont vous avez besoin"
+                />
+              }
+            >
+              <div style={{ padding: '1rem' }}>
+                <FlexBox wrap="Wrap" style={{ gap: '1.5rem' }}>
+                  {[
+                    { icon: 'wallet', title: 'Comptabilité', desc: 'Gestion financière' },
+                    { icon: 'employee', title: 'RH', desc: 'Ressources humaines' },
+                    { icon: 'product', title: 'Stocks', desc: 'Inventaire' },
+                    { icon: 'sales-order', title: 'CRM', desc: 'Gestion clients' },
+                    { icon: 'factory', title: 'Production', desc: 'Manufacturing' },
+                    { icon: 'business-objects-experience', title: 'Analytics', desc: 'Reporting' }
+                  ].map((module, index) => (
+                    <Card
+                      key={index}
+                      style={{
+                        minWidth: '12rem',
+                        textAlign: 'center',
+                        cursor: 'pointer',
+                        transition: 'transform 0.2s',
+                      }}
+                    >
+                      <div style={{ padding: '1.5rem' }}>
+                        <Icon
+                          name={module.icon}
+                          style={{
+                            fontSize: '2.5rem',
+                            color: 'var(--sapBrandColor)',
+                            marginBottom: '0.75rem'
+                          }}
+                        />
+                        <Title level="H5" style={{ marginBottom: '0.25rem' }}>
+                          {module.title}
+                        </Title>
+                        <Text style={{ fontSize: '0.875rem', color: 'var(--sapNeutralTextColor)', marginBottom: '1rem', display: 'block' }}>
+                          {module.desc}
+                        </Text>
+                        <Button design="Transparent" icon="add">
+                          Activer
+                        </Button>
+                      </div>
+                    </Card>
+                  ))}
+                </FlexBox>
+              </div>
+            </Card>
           </div>
         </FlexBox>
       </div>
