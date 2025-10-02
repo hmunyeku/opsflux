@@ -1,0 +1,328 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: opsflux_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-opsflux}
+      POSTGRES_USER: ${POSTGRES_USER:-opsflux_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_INITDB_ARGS: --encoding=UTF8 --locale=fr_FR.UTF-8
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./postgres/init:/docker-entrypoint-initdb.d
+      - ./postgres/backup:/backups
+      - ./logs/postgres:/var/log/postgresql
+    ports:
+      - ${POSTGRES_PORT:-5432}:5432
+    networks:
+      - opsflux_network
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready -U ${POSTGRES_USER:-opsflux_user} -d ${POSTGRES_DB:-opsflux}
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  redis:
+    image: redis:7-alpine
+    container_name: opsflux_redis
+    restart: unless-stopped
+    command: redis-server /usr/local/etc/redis/redis.conf
+    volumes:
+      - redis_data:/data
+      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf:ro
+    ports:
+      - ${REDIS_PORT:-6379}:6379
+    networks:
+      - opsflux_network
+    healthcheck:
+      test:
+        - CMD
+        - redis-cli
+        - ping
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      args:
+        - PYTHON_VERSION=${PYTHON_VERSION:-3.12}
+    container_name: opsflux_backend
+    restart: unless-stopped
+    environment:
+      - ENVIRONMENT=${ENVIRONMENT:-development}
+      - DJANGO_SETTINGS_MODULE=config.settings.${ENVIRONMENT:-development}
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-opsflux_user}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-opsflux}
+      - REDIS_URL=redis://redis:6379/0
+      - SECRET_KEY=${SECRET_KEY}
+      - DEBUG=${DEBUG:-True}
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS:-localhost,127.0.0.1}
+      - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS:-http://localhost:3000}
+      - CELERY_BROKER_URL=redis://redis:6379/1
+      - CELERY_RESULT_BACKEND=redis://redis:6379/2
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - CLAUDE_CODE_WORKSPACE=/opt/claude-code/workspace
+    volumes:
+      - ./backend:/app
+      - backend_static:/app/staticfiles
+      - backend_media:/app/media
+      - ./logs/backend:/app/logs
+      - claude_code_backend:/opt/claude-code
+    ports:
+      - ${BACKEND_PORT:-8000}:8000
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - opsflux_network
+      - dokploy-network
+    stdin_open: true
+    tty: true
+    labels:
+      - traefik.http.routers.opsflux-all-dg1ntq-7-web.rule=Host(`opsflux-all-dg1ntq-f85e76-72-60-188-156.traefik.me`)
+      - traefik.http.routers.opsflux-all-dg1ntq-7-web.entrypoints=web
+      - traefik.http.services.opsflux-all-dg1ntq-7-web.loadbalancer.server.port=8000
+      - traefik.http.routers.opsflux-all-dg1ntq-7-web.service=opsflux-all-dg1ntq-7-web
+      - traefik.http.routers.opsflux-all-dg1ntq-7-web.middlewares=redirect-to-https@file
+      - traefik.http.routers.opsflux-all-dg1ntq-7-websecure.rule=Host(`opsflux-all-dg1ntq-f85e76-72-60-188-156.traefik.me`)
+      - traefik.http.routers.opsflux-all-dg1ntq-7-websecure.entrypoints=websecure
+      - traefik.http.services.opsflux-all-dg1ntq-7-websecure.loadbalancer.server.port=8000
+      - traefik.http.routers.opsflux-all-dg1ntq-7-websecure.service=opsflux-all-dg1ntq-7-websecure
+      - traefik.http.routers.opsflux-all-dg1ntq-7-websecure.tls.certresolver=letsencrypt
+      - traefik.http.routers.opsflux-all-dg1ntq-7-web.rule=Host(`opsflux-all-dg1ntq-f85e76-72-60-188-156.traefik.me`)
+      - traefik.http.routers.opsflux-all-dg1ntq-7-web.entrypoints=web
+      - traefik.http.services.opsflux-all-dg1ntq-7-web.loadbalancer.server.port=8000
+      - traefik.http.routers.opsflux-all-dg1ntq-7-web.service=opsflux-all-dg1ntq-7-web
+      - traefik.http.routers.opsflux-all-dg1ntq-7-web.middlewares=redirect-to-https@file
+      - traefik.http.routers.opsflux-all-dg1ntq-7-websecure.rule=Host(`opsflux-all-dg1ntq-f85e76-72-60-188-156.traefik.me`)
+      - traefik.http.routers.opsflux-all-dg1ntq-7-websecure.entrypoints=websecure
+      - traefik.http.services.opsflux-all-dg1ntq-7-websecure.loadbalancer.server.port=8000
+      - traefik.http.routers.opsflux-all-dg1ntq-7-websecure.service=opsflux-all-dg1ntq-7-websecure
+      - traefik.http.routers.opsflux-all-dg1ntq-7-websecure.tls.certresolver=letsencrypt
+      - traefik.http.routers.opsflux-all-dg1ntq-7-web.rule=Host(`opsflux-all-dg1ntq-f85e76-72-60-188-156.traefik.me`)
+      - traefik.http.routers.opsflux-all-dg1ntq-7-web.entrypoints=web
+      - traefik.http.services.opsflux-all-dg1ntq-7-web.loadbalancer.server.port=8000
+      - traefik.http.routers.opsflux-all-dg1ntq-7-web.service=opsflux-all-dg1ntq-7-web
+      - traefik.http.routers.opsflux-all-dg1ntq-7-web.middlewares=redirect-to-https@file
+      - traefik.http.routers.opsflux-all-dg1ntq-7-websecure.rule=Host(`opsflux-all-dg1ntq-f85e76-72-60-188-156.traefik.me`)
+      - traefik.http.routers.opsflux-all-dg1ntq-7-websecure.entrypoints=websecure
+      - traefik.http.services.opsflux-all-dg1ntq-7-websecure.loadbalancer.server.port=8000
+      - traefik.http.routers.opsflux-all-dg1ntq-7-websecure.service=opsflux-all-dg1ntq-7-websecure
+      - traefik.http.routers.opsflux-all-dg1ntq-7-websecure.tls.certresolver=letsencrypt
+      - traefik.http.routers.opsflux-all-dg1ntq-7-web.rule=Host(`opsflux-all-dg1ntq-f85e76-72-60-188-156.traefik.me`)
+      - traefik.http.routers.opsflux-all-dg1ntq-7-web.entrypoints=web
+      - traefik.http.services.opsflux-all-dg1ntq-7-web.loadbalancer.server.port=8000
+      - traefik.http.routers.opsflux-all-dg1ntq-7-web.service=opsflux-all-dg1ntq-7-web
+      - traefik.http.routers.opsflux-all-dg1ntq-7-web.middlewares=redirect-to-https@file
+      - traefik.http.routers.opsflux-all-dg1ntq-7-websecure.rule=Host(`opsflux-all-dg1ntq-f85e76-72-60-188-156.traefik.me`)
+      - traefik.http.routers.opsflux-all-dg1ntq-7-websecure.entrypoints=websecure
+      - traefik.http.services.opsflux-all-dg1ntq-7-websecure.loadbalancer.server.port=8000
+      - traefik.http.routers.opsflux-all-dg1ntq-7-websecure.service=opsflux-all-dg1ntq-7-websecure
+      - traefik.http.routers.opsflux-all-dg1ntq-7-websecure.tls.certresolver=letsencrypt
+      - traefik.http.routers.opsflux-all-dg1ntq-7-web.rule=Host(`opsflux-all-dg1ntq-f85e76-72-60-188-156.traefik.me`)
+      - traefik.http.routers.opsflux-all-dg1ntq-7-web.entrypoints=web
+      - traefik.http.services.opsflux-all-dg1ntq-7-web.loadbalancer.server.port=8000
+      - traefik.http.routers.opsflux-all-dg1ntq-7-web.service=opsflux-all-dg1ntq-7-web
+      - traefik.http.routers.opsflux-all-dg1ntq-7-web.middlewares=redirect-to-https@file
+      - traefik.http.routers.opsflux-all-dg1ntq-7-websecure.rule=Host(`opsflux-all-dg1ntq-f85e76-72-60-188-156.traefik.me`)
+      - traefik.http.routers.opsflux-all-dg1ntq-7-websecure.entrypoints=websecure
+      - traefik.http.services.opsflux-all-dg1ntq-7-websecure.loadbalancer.server.port=8000
+      - traefik.http.routers.opsflux-all-dg1ntq-7-websecure.service=opsflux-all-dg1ntq-7-websecure
+      - traefik.http.routers.opsflux-all-dg1ntq-7-websecure.tls.certresolver=letsencrypt
+      - traefik.docker.network=dokploy-network
+      - traefik.http.routers.opsflux-all-dg1ntq-7-web.rule=Host(`opsflux-all-dg1ntq-f85e76-72-60-188-156.traefik.me`)
+      - traefik.http.routers.opsflux-all-dg1ntq-7-web.entrypoints=web
+      - traefik.http.services.opsflux-all-dg1ntq-7-web.loadbalancer.server.port=8000
+      - traefik.http.routers.opsflux-all-dg1ntq-7-web.service=opsflux-all-dg1ntq-7-web
+      - traefik.http.routers.opsflux-all-dg1ntq-7-web.middlewares=redirect-to-https@file
+      - traefik.http.routers.opsflux-all-dg1ntq-7-websecure.rule=Host(`opsflux-all-dg1ntq-f85e76-72-60-188-156.traefik.me`)
+      - traefik.http.routers.opsflux-all-dg1ntq-7-websecure.entrypoints=websecure
+      - traefik.http.services.opsflux-all-dg1ntq-7-websecure.loadbalancer.server.port=8000
+      - traefik.http.routers.opsflux-all-dg1ntq-7-websecure.service=opsflux-all-dg1ntq-7-websecure
+      - traefik.http.routers.opsflux-all-dg1ntq-7-websecure.tls.certresolver=letsencrypt
+      - traefik.enable=true
+  celery_worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: opsflux_celery_worker
+    restart: unless-stopped
+    environment:
+      - ENVIRONMENT=${ENVIRONMENT:-development}
+      - DJANGO_SETTINGS_MODULE=config.settings.${ENVIRONMENT:-development}
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-opsflux_user}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-opsflux}
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/1
+      - CELERY_RESULT_BACKEND=redis://redis:6379/2
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - CLAUDE_CODE_WORKSPACE=/opt/claude-code/workspace
+    volumes:
+      - ./backend:/app
+      - backend_media:/app/media
+      - ./logs/backend:/app/logs
+      - claude_code_celery:/opt/claude-code
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      backend:
+        condition: service_started
+    networks:
+      - opsflux_network
+    command: celery -A config worker -l info --concurrency=4
+    stdin_open: true
+    tty: true
+  celery_beat:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: opsflux_celery_beat
+    restart: unless-stopped
+    environment:
+      - ENVIRONMENT=${ENVIRONMENT:-development}
+      - DJANGO_SETTINGS_MODULE=config.settings.${ENVIRONMENT:-development}
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-opsflux_user}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-opsflux}
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/1
+      - CELERY_RESULT_BACKEND=redis://redis:6379/2
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - CLAUDE_CODE_WORKSPACE=/opt/claude-code/workspace
+    volumes:
+      - ./backend:/app
+      - ./logs/backend:/app/logs
+      - claude_code_beat:/opt/claude-code
+    depends_on:
+      - postgres
+      - redis
+      - backend
+    networks:
+      - opsflux_network
+    command: celery -A config beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
+    stdin_open: true
+    tty: true
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        - NODE_VERSION=${NODE_VERSION:-22}
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://72.60.188.156:8000}
+    container_name: opsflux_frontend
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=${NODE_ENV:-development}
+      - REACT_APP_API_URL=${REACT_APP_API_URL:-http://72.60.188.156:8000}
+      - REACT_APP_WS_URL=${REACT_APP_WS_URL:-ws://72.60.188.156:8000}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - CLAUDE_CODE_WORKSPACE=/opt/claude-code/workspace
+      - SKIP_PREFLIGHT_CHECK=true
+      - GENERATE_SOURCEMAP=false
+      - DISABLE_ESLINT_PLUGIN=true
+    volumes:
+      - ./frontend/src:/app/src
+      - ./logs/frontend:/app/logs
+      - claude_code_frontend:/opt/claude-code
+    ports:
+      - ${FRONTEND_PORT:-3001}:3000
+    depends_on:
+      - backend
+    networks:
+      - opsflux_network
+      - dokploy-network
+    command: npm start
+    stdin_open: true
+    tty: true
+    labels:
+      - traefik.docker.network=dokploy-network
+      - traefik.http.routers.opsflux-all-dg1ntq-8-web.rule=Host(`opsflux-all-dg1ntq-deea8b-72-60-188-156.traefik.me`)
+      - traefik.http.routers.opsflux-all-dg1ntq-8-web.entrypoints=web
+      - traefik.http.services.opsflux-all-dg1ntq-8-web.loadbalancer.server.port=3001
+      - traefik.http.routers.opsflux-all-dg1ntq-8-web.service=opsflux-all-dg1ntq-8-web
+      - traefik.http.routers.opsflux-all-dg1ntq-8-web.middlewares=redirect-to-https@file
+      - traefik.http.routers.opsflux-all-dg1ntq-8-websecure.rule=Host(`opsflux-all-dg1ntq-deea8b-72-60-188-156.traefik.me`)
+      - traefik.http.routers.opsflux-all-dg1ntq-8-websecure.entrypoints=websecure
+      - traefik.http.services.opsflux-all-dg1ntq-8-websecure.loadbalancer.server.port=3001
+      - traefik.http.routers.opsflux-all-dg1ntq-8-websecure.service=opsflux-all-dg1ntq-8-websecure
+      - traefik.http.routers.opsflux-all-dg1ntq-8-websecure.tls.certresolver=letsencrypt
+      - traefik.enable=true
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    container_name: opsflux_nginx
+    restart: unless-stopped
+    environment:
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - CLAUDE_CODE_WORKSPACE=/opt/claude-code/workspace
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - backend_static:/usr/share/nginx/html/static:ro
+      - backend_media:/usr/share/nginx/html/media:ro
+      - ./logs/nginx:/var/log/nginx
+      - claude_code_nginx:/opt/claude-code
+    ports:
+      - ${HTTP_PORT:-83}:80
+      - ${HTTPS_PORT:-445}:443
+    depends_on:
+      - backend
+      - frontend
+    networks:
+      - opsflux_network
+    stdin_open: true
+    tty: true
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: opsflux_pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@opsflux.io}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    ports:
+      - ${PGADMIN_PORT:-5050}:80
+    depends_on:
+      - postgres
+    networks:
+      - opsflux_network
+    profiles:
+      - dev
+networks:
+  opsflux_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.21.0.0/16
+  dokploy-network:
+    external: true
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  backend_static:
+    driver: local
+  backend_media:
+    driver: local
+  pgadmin_data:
+    driver: local
+  claude_code_backend:
+    driver: local
+  claude_code_celery:
+    driver: local
+  claude_code_beat:
+    driver: local
+  claude_code_frontend:
+    driver: local
+  claude_code_nginx:
+    driver: local
