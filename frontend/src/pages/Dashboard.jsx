@@ -85,11 +85,11 @@ const Dashboard = () => {
           </Button>
         </ShellBar>
 
-        <FlexBox className="dashboard-layout">
-          <div className="sidebar">
-            <SideNavigation
-              onSelectionChange={(e) => handleNavigation(e.detail.item.id)}
-            >
+        <FlexBox style={{ flex: 1 }}>
+          <SideNavigation
+            onSelectionChange={(e) => handleNavigation(e.detail.item.id)}
+            style={{ width: '250px' }}
+          >
               <SideNavigationItem
                 id="dashboard"
                 text="Tableau de bord"
@@ -147,10 +147,9 @@ const Dashboard = () => {
                 text="Paramètres"
                 icon="action-settings"
               />
-            </SideNavigation>
-          </div>
+          </SideNavigation>
 
-          <div className="main-content">
+          <div style={{ flex: 1, padding: '1.5rem', overflow: 'auto' }}>
             <Page
               header={
                 <Title level="H3">
@@ -158,8 +157,8 @@ const Dashboard = () => {
                 </Title>
               }
             >
-              <FlexBox direction="Column" className="dashboard-content">
-                <FlexBox wrap="Wrap" className="cards-grid">
+              <FlexBox direction="Column" style={{ gap: '1.5rem' }}>
+                <FlexBox wrap="Wrap" style={{ gap: '1.5rem' }}>
                   <Card
                     header={
                       <CardHeader
@@ -168,24 +167,22 @@ const Dashboard = () => {
                         avatar={<Icon name="Chart-Tree-Map" />}
                       />
                     }
-                    className="dashboard-card"
+                    style={{ minWidth: '300px', flex: 1 }}
                   >
-                    <div className="card-content">
-                      <FlexBox direction="Column">
-                        <div className="stat-item">
-                          <span className="stat-label">Modules actifs</span>
-                          <span className="stat-value">5</span>
-                        </div>
-                        <div className="stat-item">
-                          <span className="stat-label">Utilisateurs</span>
-                          <span className="stat-value">12</span>
-                        </div>
-                        <div className="stat-item">
-                          <span className="stat-label">Tâches en cours</span>
-                          <span className="stat-value">24</span>
-                        </div>
+                    <FlexBox direction="Column" style={{ padding: '1rem', gap: '0.5rem' }}>
+                      <FlexBox justifyContent="SpaceBetween">
+                        <span>Modules actifs</span>
+                        <strong>5</strong>
                       </FlexBox>
-                    </div>
+                      <FlexBox justifyContent="SpaceBetween">
+                        <span>Utilisateurs</span>
+                        <strong>12</strong>
+                      </FlexBox>
+                      <FlexBox justifyContent="SpaceBetween">
+                        <span>Tâches en cours</span>
+                        <strong>24</strong>
+                      </FlexBox>
+                    </FlexBox>
                   </Card>
 
                   <Card
@@ -196,9 +193,9 @@ const Dashboard = () => {
                         avatar={<Icon name="activities" />}
                       />
                     }
-                    className="dashboard-card"
+                    style={{ minWidth: '300px', flex: 1 }}
                   >
-                    <div className="card-content">
+                    <div style={{ padding: '1rem' }}>
                       <p>Aucune activité récente</p>
                     </div>
                   </Card>
@@ -211,9 +208,9 @@ const Dashboard = () => {
                         avatar={<Icon name="bot" />}
                       />
                     }
-                    className="dashboard-card"
+                    style={{ minWidth: '300px', flex: 1 }}
                   >
-                    <div className="card-content">
+                    <div style={{ padding: '1rem' }}>
                       <p>Assistant IA prêt à vous aider</p>
                       <Button design="Emphasized" style={{ marginTop: '1rem' }}>
                         Démarrer une conversation
@@ -229,35 +226,33 @@ const Dashboard = () => {
                       subtitleText="Activez les modules dont vous avez besoin"
                     />
                   }
-                  className="modules-card"
-                  style={{ marginTop: '2rem' }}
                 >
-                  <div className="modules-grid">
-                    <div className="module-item">
-                      <Icon name="wallet" className="module-icon" />
-                      <h4>Comptabilité</h4>
-                      <p>Gestion financière complète</p>
+                  <FlexBox wrap="Wrap" style={{ padding: '1rem', gap: '1rem' }}>
+                    <FlexBox direction="Column" alignItems="Center" style={{ minWidth: '150px', padding: '1rem', border: '1px solid #e0e0e0', borderRadius: '8px' }}>
+                      <Icon name="wallet" style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }} />
+                      <strong>Comptabilité</strong>
+                      <span style={{ fontSize: '0.9rem', color: '#666', marginBottom: '0.5rem' }}>Gestion financière</span>
                       <Button design="Transparent">Activer</Button>
-                    </div>
-                    <div className="module-item">
-                      <Icon name="employee" className="module-icon" />
-                      <h4>RH</h4>
-                      <p>Ressources Humaines</p>
+                    </FlexBox>
+                    <FlexBox direction="Column" alignItems="Center" style={{ minWidth: '150px', padding: '1rem', border: '1px solid #e0e0e0', borderRadius: '8px' }}>
+                      <Icon name="employee" style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }} />
+                      <strong>RH</strong>
+                      <span style={{ fontSize: '0.9rem', color: '#666', marginBottom: '0.5rem' }}>Ressources Humaines</span>
                       <Button design="Transparent">Activer</Button>
-                    </div>
-                    <div className="module-item">
-                      <Icon name="product" className="module-icon" />
-                      <h4>Stocks</h4>
-                      <p>Gestion d'inventaire</p>
+                    </FlexBox>
+                    <FlexBox direction="Column" alignItems="Center" style={{ minWidth: '150px', padding: '1rem', border: '1px solid #e0e0e0', borderRadius: '8px' }}>
+                      <Icon name="product" style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }} />
+                      <strong>Stocks</strong>
+                      <span style={{ fontSize: '0.9rem', color: '#666', marginBottom: '0.5rem' }}>Inventaire</span>
                       <Button design="Transparent">Activer</Button>
-                    </div>
-                    <div className="module-item">
-                      <Icon name="sales-order" className="module-icon" />
-                      <h4>CRM</h4>
-                      <p>Gestion clients</p>
+                    </FlexBox>
+                    <FlexBox direction="Column" alignItems="Center" style={{ minWidth: '150px', padding: '1rem', border: '1px solid #e0e0e0', borderRadius: '8px' }}>
+                      <Icon name="sales-order" style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }} />
+                      <strong>CRM</strong>
+                      <span style={{ fontSize: '0.9rem', color: '#666', marginBottom: '0.5rem' }}>Gestion clients</span>
                       <Button design="Transparent">Activer</Button>
-                    </div>
-                  </div>
+                    </FlexBox>
+                  </FlexBox>
                 </Card>
               </FlexBox>
             </Page>

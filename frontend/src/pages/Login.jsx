@@ -96,34 +96,30 @@ const Login = () => {
   return (
     <ThemeProvider>
       <div className="login-container">
-        <div className="login-background">
-          <div className="login-overlay"></div>
-        </div>
-
         <FlexBox
           direction="Column"
           justifyContent="Center"
           alignItems="Center"
-          className="login-content"
+          style={{ maxWidth: '400px', width: '100%' }}
         >
-          <Card className="login-card">
-            <div className="login-header">
-              <Icon name="business-suite" className="login-logo" />
-              <Title level="H2" className="login-title">OpsFlux</Title>
-              <p className="login-subtitle">ERP Modulaire Intelligent</p>
-            </div>
+          <Card>
+            <FlexBox direction="Column" alignItems="Center" style={{ marginBottom: '2rem' }}>
+              <Icon name="business-suite" style={{ fontSize: '4rem', marginBottom: '1rem' }} />
+              <Title level="H2">OpsFlux</Title>
+              <span>ERP Modulaire Intelligent</span>
+            </FlexBox>
 
             {error && (
               <MessageStrip
                 design="Negative"
-                className="login-error"
+                style={{ marginBottom: '1rem' }}
                 onClose={() => setError('')}
               >
                 {error}
               </MessageStrip>
             )}
 
-            <form onSubmit={handleSubmit} className="login-form">
+            <form onSubmit={handleSubmit}>
               <div className="form-field">
                 <Label required>Nom d'utilisateur</Label>
                 <Input
@@ -134,7 +130,7 @@ const Login = () => {
                   icon={<Icon name="employee" />}
                   disabled={loading}
                   required
-                  className="login-input"
+                  style={{ width: '100%' }}
                 />
               </div>
 
@@ -149,49 +145,37 @@ const Login = () => {
                   icon={<Icon name="locked" />}
                   disabled={loading}
                   required
-                  className="login-input"
-                />
-                <Button
-                  design="Transparent"
-                  icon={showPassword ? 'hide' : 'show'}
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="password-toggle"
-                  type="button"
-                  disabled={loading}
+                  style={{ width: '100%' }}
                 />
               </div>
 
-              <div className="form-actions">
-                <Button
-                  design="Emphasized"
-                  type="submit"
-                  disabled={loading}
-                  className="login-button"
-                >
-                  {loading ? (
-                    <>
-                      <BusyIndicator active size="Small" className="button-loader" />
-                      Connexion...
-                    </>
-                  ) : (
-                    'Se connecter'
-                  )}
-                </Button>
-              </div>
+              <FlexBox justifyContent="SpaceBetween" alignItems="Center" style={{ marginBottom: '1rem' }}>
+                <Label>
+                  <input type="checkbox" onChange={() => setShowPassword(!showPassword)} />
+                  {' '}Afficher le mot de passe
+                </Label>
+              </FlexBox>
 
-              <div className="login-links">
-                <a href="/forgot-password" className="link">Mot de passe oublié ?</a>
-              </div>
+              <Button
+                design="Emphasized"
+                type="submit"
+                disabled={loading}
+                className="login-button"
+              >
+                {loading ? 'Connexion...' : 'Se connecter'}
+              </Button>
+
+              <FlexBox justifyContent="Center" style={{ marginTop: '1rem' }}>
+                <a href="http://72.60.188.156:3002" style={{ textDecoration: 'none' }}>
+                  Pas encore de compte ? En savoir plus
+                </a>
+              </FlexBox>
             </form>
-
-            <div className="login-footer">
-              <p>Pas encore de compte ? <a href="http://72.60.188.156:3002">En savoir plus</a></p>
-            </div>
           </Card>
 
-          <div className="login-info">
-            <p>&copy; 2025 OpsFlux - ERP Modulaire | 3MH-CCAI</p>
-          </div>
+          <FlexBox justifyContent="Center" style={{ marginTop: '2rem', color: '#666' }}>
+            <span>&copy; 2025 OpsFlux - ERP Modulaire | 3MH-CCAI</span>
+          </FlexBox>
         </FlexBox>
       </div>
     </ThemeProvider>
