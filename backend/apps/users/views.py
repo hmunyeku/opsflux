@@ -18,6 +18,7 @@ from .serializers import (
     UserRoleSerializer
 )
 from core.utils import get_client_ip
+from core.ratelimit import api_ratelimit, RateLimits
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -72,8 +73,10 @@ class UserViewSet(viewsets.ModelViewSet):
         return Response(profile_serializer.data)
     
     @action(detail=False, methods=['post'], permission_classes=[IsAuthenticated])
+    @api_ratelimit(rate=RateLimits.AUTH_PASSWORD_RESET, method='POST')
     def change_password(self, request):
-        """Change le mot de passe de l'utilisateur connecté"""
+        """Change le mot de passe de l'utilisateur connecté
+        Rate limit: 3 par heure"""
         serializer = ChangePasswordSerializer(
             data=request.data,
             context={'request': request}
@@ -228,10 +231,12 @@ class UserRoleViewSet(viewsets.ModelViewSet):
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
+@api_ratelimit(rate=RateLimits.AUTH_LOGIN, method='POST')
 def login_view(request):
     """
     Login endpoint
     Retourne JWT tokens
+    Rate limit: 5 tentatives par minute par IP
     """
     serializer = LoginSerializer(data=request.data, context={'request': request})
     serializer.is_valid(raise_exception=True)

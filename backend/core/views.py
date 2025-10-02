@@ -30,22 +30,28 @@ def health_check(request):
     """
     Endpoint de health check
     Vérifie que l'application est opérationnelle
+    En production, limite les informations exposées
     """
     from django.db import connection
-    
+
     try:
         # Vérifier la connexion à la base de données
         connection.ensure_connection()
         db_status = 'ok'
     except Exception as e:
-        db_status = f'error: {str(e)}'
-    
-    return Response({
+        db_status = 'error' if not settings.DEBUG else f'error: {str(e)}'
+
+    response_data = {
         'status': 'ok',
         'timestamp': timezone.now().isoformat(),
         'database': db_status,
-        'version': settings.OPSFLUX_CONFIG.get('VERSION', '1.0.0'),
-    })
+    }
+
+    # N'exposer la version qu'en développement
+    if settings.DEBUG:
+        response_data['version'] = settings.OPSFLUX_CONFIG.get('VERSION', '1.0.0')
+
+    return Response(response_data)
 
 
 @api_view(['GET'])

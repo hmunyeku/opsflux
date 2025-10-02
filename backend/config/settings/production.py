@@ -17,7 +17,11 @@ DATABASES['default']['OPTIONS'] = {
 
 # CORS - Restrictif en production
 CORS_ALLOW_ALL_ORIGINS = False
-CORS_ALLOWED_ORIGINS = os.environ.get('CORS_ALLOWED_ORIGINS', '').split(',')
+# Filtrer et valider que seules les origines HTTPS sont autorisées
+cors_origins = os.environ.get('CORS_ALLOWED_ORIGINS', '').split(',')
+CORS_ALLOWED_ORIGINS = [origin for origin in cors_origins if origin.startswith('https://')]
+if not CORS_ALLOWED_ORIGINS:
+    CORS_ALLOWED_ORIGINS = ['https://app.opsflux.io']  # Fallback sécurisé
 
 # Email Backend - SMTP réel en production
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -85,6 +89,17 @@ REST_FRAMEWORK['DEFAULT_RENDERER_CLASSES'] = [
 
 # Désactiver les opérations risquées
 OPSFLUX_CONFIG['ALLOW_DANGEROUS_OPERATIONS'] = False
+
+# Content Security Policy
+CSP_DEFAULT_SRC = ("'self'",)
+CSP_SCRIPT_SRC = ("'self'", "'unsafe-inline'")  # unsafe-inline pour DRF browsable API
+CSP_STYLE_SRC = ("'self'", "'unsafe-inline'")
+CSP_IMG_SRC = ("'self'", "data:", "https:")
+CSP_FONT_SRC = ("'self'", "data:")
+CSP_CONNECT_SRC = ("'self'",)
+CSP_FRAME_ANCESTORS = ("'none'",)  # Équivalent X-Frame-Options: DENY
+CSP_BASE_URI = ("'self'",)
+CSP_FORM_ACTION = ("'self'",)
 
 # AWS S3 Configuration (si utilisé)
 USE_S3 = os.environ.get('USE_S3', 'False') == 'True'

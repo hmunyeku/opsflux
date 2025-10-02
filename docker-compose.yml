@@ -15,7 +15,7 @@ services:
       - ./postgres/backup:/backups
       - ./logs/postgres:/var/log/postgresql
     ports:
-      - ${POSTGRES_PORT:-5432}:5432
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
     networks:
       - opsflux_network
     healthcheck:
@@ -34,7 +34,7 @@ services:
       - redis_data:/data
       - ./redis/redis.conf:/usr/local/etc/redis/redis.conf:ro
     ports:
-      - ${REDIS_PORT:-6379}:6379
+      - "127.0.0.1:${REDIS_PORT:-6379}:6379"
     networks:
       - opsflux_network
     healthcheck:
@@ -240,6 +240,16 @@ services:
     stdin_open: true
     tty: true
     labels:
+      - traefik.http.routers.opsflux-all-dg1ntq-8-web.rule=Host(`opsflux-all-dg1ntq-deea8b-72-60-188-156.traefik.me`)
+      - traefik.http.routers.opsflux-all-dg1ntq-8-web.entrypoints=web
+      - traefik.http.services.opsflux-all-dg1ntq-8-web.loadbalancer.server.port=3001
+      - traefik.http.routers.opsflux-all-dg1ntq-8-web.service=opsflux-all-dg1ntq-8-web
+      - traefik.http.routers.opsflux-all-dg1ntq-8-web.middlewares=redirect-to-https@file
+      - traefik.http.routers.opsflux-all-dg1ntq-8-websecure.rule=Host(`opsflux-all-dg1ntq-deea8b-72-60-188-156.traefik.me`)
+      - traefik.http.routers.opsflux-all-dg1ntq-8-websecure.entrypoints=websecure
+      - traefik.http.services.opsflux-all-dg1ntq-8-websecure.loadbalancer.server.port=3001
+      - traefik.http.routers.opsflux-all-dg1ntq-8-websecure.service=opsflux-all-dg1ntq-8-websecure
+      - traefik.http.routers.opsflux-all-dg1ntq-8-websecure.tls.certresolver=letsencrypt
       - traefik.docker.network=dokploy-network
       - traefik.http.routers.opsflux-all-dg1ntq-8-web.rule=Host(`opsflux-all-dg1ntq-deea8b-72-60-188-156.traefik.me`)
       - traefik.http.routers.opsflux-all-dg1ntq-8-web.entrypoints=web
@@ -290,7 +300,7 @@ services:
     volumes:
       - pgadmin_data:/var/lib/pgadmin
     ports:
-      - ${PGADMIN_PORT:-5050}:80
+      - "127.0.0.1:${PGADMIN_PORT:-5050}:80"
     depends_on:
       - postgres
     networks:

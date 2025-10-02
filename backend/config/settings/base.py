@@ -31,6 +31,7 @@ THIRD_PARTY_APPS = [
     'drf_spectacular',
     'django_celery_beat',
     'django_celery_results',
+    'django_ratelimit',
 ]
 
 LOCAL_APPS = [
@@ -45,6 +46,7 @@ INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'csp.middleware.CSPMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -241,6 +243,11 @@ EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
 DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'noreply@opsflux.io')
 SERVER_EMAIL = DEFAULT_FROM_EMAIL
+
+# Rate Limiting Configuration
+RATELIMIT_ENABLE = True
+RATELIMIT_USE_CACHE = 'default'
+RATELIMIT_VIEW = 'django_ratelimit.decorators.ratelimit'
 
 # Logging Configuration
 LOGGING = {
