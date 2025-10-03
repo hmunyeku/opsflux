@@ -12,7 +12,7 @@
 |-------|------|-------------|------------|----------|
 | **Phase 0 - Infrastructure** | ✅ Terminé | 100% | 02/10/2025 | 03/10/2025 |
 | **Phase 1 - Authentification Base** | ✅ Terminé | 100% | 03/10/2025 | 03/10/2025 |
-| **Phase 2 - Gestion Utilisateurs** | 🚧 En cours | 0% | 03/10/2025 | - |
+| **Phase 2 - Gestion Utilisateurs** | 🚧 En cours | 40% | 03/10/2025 | - |
 | **Phase 3 - Rôles & Permissions** | ⏳ À venir | 0% | - | - |
 | **Phase 4 - Audit & Logs** | ⏳ À venir | 0% | - | - |
 | **Phase 5 - Groupes** | ⏳ À venir | 0% | - | - |
@@ -136,10 +136,10 @@ OpsFlux est une plateforme entreprise modulaire et intelligente qui centralise t
 ## 🚧 **PHASE 2 - GESTION UTILISATEURS** (En cours)
 
 ### Objectifs
-- [ ] Mon profil (consultation + édition)
-- [ ] Changement mot de passe
-- [ ] Gestion photo de profil
-- [ ] Préférences utilisateur
+- [x] Mon profil (consultation + édition)
+- [x] Changement mot de passe
+- [x] Gestion photo de profil
+- [x] Préférences utilisateur (langue, timezone, thème, notifications)
 - [ ] 2FA (SMS + App mobile)
 - [ ] Sessions actives
 - [ ] Liste utilisateurs (admin)
@@ -153,6 +153,64 @@ OpsFlux est une plateforme entreprise modulaire et intelligente qui centralise t
 - **Notifications :** Email + Push navigateur (via système core)
 - **Multi-langue :** Prévu pour plus tard
 - **LDAP/AD :** Synchronisation prévue pour plus tard
+
+### Fonctionnalités Développées
+
+#### Mon Profil - Consultation et Édition (03 Oct 2025)
+- **Description :** Page complète de gestion du profil utilisateur
+- **Backend :**
+  - Endpoint : `GET /api/users/users/me/` - Récupération du profil
+  - Endpoint : `PATCH /api/users/users/update_profile/` - Mise à jour du profil
+  - Serializers : `ProfileSerializer`, `UserUpdateSerializer`
+  - Support upload d'images (avatar)
+- **Frontend :**
+  - Page `/profile` avec formulaires UI5
+  - Formulaire informations personnelles (nom, prénom, email, téléphone, mobile)
+  - Formulaire préférences (langue, timezone, thème)
+  - Gestion notifications (email, push navigateur)
+  - Upload et preview d'avatar
+  - Messages de succès/erreur
+  - Navigation depuis Dashboard (clic avatar ou menu latéral)
+- **Champs éditables :**
+  - Prénom, Nom
+  - Email, Téléphone, Mobile
+  - Langue (FR, EN, ES)
+  - Fuseau horaire (UTC, Europe/Paris, America/New_York, Asia/Tokyo)
+  - Thème (Clair, Sombre, Automatique)
+  - Notifications email et push
+  - Avatar (JPG, PNG, GIF, max 2MB)
+- **Fichiers :**
+  - `frontend/src/pages/Profile.jsx`
+  - `frontend/src/App.js`
+  - `frontend/src/pages/Dashboard.jsx`
+  - `backend/apps/users/views.py:53-73` (endpoint me + update_profile)
+  - `backend/apps/users/serializers.py:279-302` (ProfileSerializer)
+- **Statut :** ✅ Fonctionnel
+- **Commit :** `927296b`
+
+#### Changement de Mot de Passe (03 Oct 2025)
+- **Description :** Formulaire sécurisé de changement de mot de passe
+- **Backend :**
+  - Endpoint : `POST /api/users/users/change_password/`
+  - Serializer : `ChangePasswordSerializer`
+  - Validation ancien mot de passe
+  - Validation force nouveau mot de passe (Django password validators)
+  - Rate limiting : 3 tentatives par heure
+- **Frontend :**
+  - Formulaire dans page Mon Profil
+  - Champs : ancien mot de passe, nouveau, confirmation
+  - Validation côté client (correspondance)
+  - Messages d'erreur détaillés
+- **Sécurité :**
+  - Vérification obligatoire ancien mot de passe
+  - Validation force (longueur, complexité)
+  - Rate limiting pour éviter brute force
+- **Fichiers :**
+  - `frontend/src/pages/Profile.jsx:241-265`
+  - `backend/apps/users/views.py:75-92`
+  - `backend/apps/users/serializers.py:181-214`
+- **Statut :** ✅ Fonctionnel
+- **Commit :** `927296b`
 
 ---
 
