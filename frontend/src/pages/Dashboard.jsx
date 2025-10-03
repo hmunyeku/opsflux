@@ -47,7 +47,7 @@ const Dashboard = () => {
   };
 
   const handleProfileClick = () => {
-    console.log('Profile clicked');
+    navigate('/profile');
   };
 
   const handleNavigation = (itemId) => {
@@ -88,6 +88,14 @@ const Dashboard = () => {
               text="Tableau de bord"
               icon="home"
               selected={selectedItem === 'dashboard'}
+            />
+
+            <SideNavigationItem
+              id="profile"
+              text="Mon profil"
+              icon="account"
+              selected={selectedItem === 'profile'}
+              onClick={() => navigate('/profile')}
             />
 
             <SideNavigationItem
