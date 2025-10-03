@@ -2,16 +2,12 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   ThemeProvider,
-  FlexBox,
-  Card,
-  Title,
   Label,
   Input,
   Button,
   MessageStrip,
   BusyIndicator,
-  Icon,
-  Text
+  Icon
 } from '@ui5/webcomponents-react';
 import '@ui5/webcomponents/dist/Assets.js';
 import '@ui5/webcomponents-fiori/dist/Assets.js';
@@ -106,94 +102,108 @@ const Login = () => {
 
   return (
     <ThemeProvider>
-      <div className="login-container">
-        <Card style={{ width: '28rem', padding: '2rem' }}>
-          <FlexBox direction="Column" alignItems="Center" style={{ marginBottom: '2rem' }}>
-            <Icon name="business-suite" style={{ fontSize: '3rem', color: 'var(--sapBrandColor)', marginBottom: '1rem' }} />
-            <Title level="H2" style={{ marginBottom: '0.5rem' }}>OpsFlux</Title>
-            <Text>Connectez-vous à votre espace</Text>
-          </FlexBox>
-
-          {error && (
-            <MessageStrip
-              design="Negative"
-              style={{ marginBottom: '1rem' }}
-              onClose={() => setError('')}
-            >
-              {error}
-            </MessageStrip>
-          )}
-
-          <form onSubmit={handleSubmit}>
-            <FlexBox direction="Column" style={{ gap: '1rem' }}>
-              <div>
-                <Label required showColon>Nom d'utilisateur</Label>
-                <Input
-                  name="username"
-                  value={formData.username}
-                  onInput={handleInputChange}
-                  placeholder="Entrez votre nom d'utilisateur"
-                  disabled={loading}
-                  required
-                  style={{ width: '100%', marginTop: '0.25rem' }}
-                />
+      <div className="login-page">
+        <div className="login-container">
+          <div className="login-card">
+            {/* Header avec logo */}
+            <div className="login-header">
+              <div className="login-logo-container">
+                <Icon name="business-suite" className="login-logo-icon" />
               </div>
+              <h1 className="login-title">OpsFlux</h1>
+              <p className="login-subtitle">Plateforme Entreprise Intelligente</p>
+            </div>
 
-              <div>
-                <Label required showColon>Mot de passe</Label>
-                <Input
-                  name="password"
-                  type={showPassword ? 'Text' : 'Password'}
-                  value={formData.password}
-                  onInput={handleInputChange}
-                  placeholder="Entrez votre mot de passe"
+            {/* Formulaire */}
+            <div className="login-form">
+              {error && (
+                <div className="login-error">
+                  <MessageStrip
+                    design="Negative"
+                    onClose={() => setError('')}
+                  >
+                    {error}
+                  </MessageStrip>
+                </div>
+              )}
+
+              <form onSubmit={handleSubmit}>
+                <div className="login-form-group">
+                  <Label required className="login-label">
+                    Nom d'utilisateur
+                  </Label>
+                  <div className="login-input-wrapper">
+                    <Input
+                      name="username"
+                      value={formData.username}
+                      onInput={handleInputChange}
+                      placeholder="Entrez votre identifiant"
+                      disabled={loading}
+                      required
+                      className="login-input"
+                    />
+                  </div>
+                </div>
+
+                <div className="login-form-group">
+                  <Label required className="login-label">
+                    Mot de passe
+                  </Label>
+                  <div className="login-input-wrapper">
+                    <Input
+                      name="password"
+                      type={showPassword ? 'Text' : 'Password'}
+                      value={formData.password}
+                      onInput={handleInputChange}
+                      placeholder="Entrez votre mot de passe"
+                      disabled={loading}
+                      required
+                      className="login-input"
+                    />
+                  </div>
+                </div>
+
+                <div className="login-checkbox-wrapper">
+                  <input
+                    type="checkbox"
+                    id="showPassword"
+                    onChange={() => setShowPassword(!showPassword)}
+                    style={{ cursor: 'pointer' }}
+                  />
+                  <label htmlFor="showPassword" className="login-checkbox-label">
+                    Afficher le mot de passe
+                  </label>
+                </div>
+
+                <Button
+                  design="Emphasized"
+                  onClick={handleSubmit}
                   disabled={loading}
-                  required
-                  style={{ width: '100%', marginTop: '0.25rem' }}
-                />
-              </div>
-
-              <FlexBox alignItems="Center" style={{ gap: '0.5rem' }}>
-                <input
-                  type="checkbox"
-                  id="showPassword"
-                  onChange={() => setShowPassword(!showPassword)}
-                  style={{ cursor: 'pointer' }}
-                />
-                <Label for="showPassword" style={{ cursor: 'pointer' }}>
-                  Afficher le mot de passe
-                </Label>
-              </FlexBox>
-
-              <Button
-                design="Emphasized"
-                onClick={handleSubmit}
-                disabled={loading}
-                style={{ width: '100%', marginTop: '0.5rem' }}
-              >
-                {loading && <BusyIndicator active size="Small" style={{ marginRight: '0.5rem' }} />}
-                {loading ? 'Connexion en cours...' : 'Se connecter'}
-              </Button>
-
-              <FlexBox justifyContent="Center" style={{ marginTop: '1rem' }}>
-                <a
-                  href="http://72.60.188.156:3002"
-                  style={{
-                    color: 'var(--sapLinkColor)',
-                    textDecoration: 'none',
-                    fontSize: '0.875rem'
-                  }}
+                  className="login-submit-btn"
                 >
-                  Découvrir OpsFlux →
-                </a>
-              </FlexBox>
-            </FlexBox>
-          </form>
-        </Card>
+                  {loading && <BusyIndicator active size="Small" style={{ marginRight: '0.5rem' }} />}
+                  {loading ? 'Connexion en cours...' : 'Se connecter'}
+                </Button>
+              </form>
+            </div>
 
-        <Text style={{ marginTop: '2rem', color: 'var(--sapNeutralTextColor)', fontSize: '0.875rem' }}>
-          © 2025 OpsFlux · 3MH-CCAI
-        </Text>
+            {/* Footer */}
+            <div className="login-footer">
+              <a
+                href="http://72.60.188.156:3002"
+                className="login-link"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Découvrir OpsFlux →
+              </a>
+            </div>
+          </div>
+
+          <div className="login-copyright">
+            © 2025 OpsFlux · Plateforme Entreprise Intelligente
+          </div>
+        </div>
       </div>
     </ThemeProvider>
   );

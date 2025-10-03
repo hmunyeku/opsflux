@@ -6,14 +6,11 @@ import {
   ShellBarItem,
   SideNavigation,
   SideNavigationItem,
-  SideNavigationSubItem,
   Card,
   CardHeader,
-  Title,
-  FlexBox,
+  Button,
   Icon,
-  Avatar,
-  Button
+  Avatar
 } from '@ui5/webcomponents-react';
 import '@ui5/webcomponents/dist/Assets.js';
 import '@ui5/webcomponents-fiori/dist/Assets.js';
@@ -52,25 +49,40 @@ const Dashboard = () => {
 
   const handleNavigation = (itemId) => {
     setSelectedItem(itemId);
+    if (itemId === 'profile') {
+      navigate('/profile');
+    }
   };
 
   if (!user) {
     return null;
   }
 
+  const displayName = user.display_name || user.username || 'Utilisateur';
+  const initials = user.username?.substring(0, 2).toUpperCase() || 'U';
+
   return (
     <ThemeProvider>
       <div className="dashboard-container">
+        {/* ShellBar Header */}
         <ShellBar
           primaryTitle="OpsFlux"
           secondaryTitle="Plateforme Entreprise"
           logo={<Icon name="business-suite" />}
-          profile={
-            <Avatar initials={user.username?.charAt(0).toUpperCase() || 'U'} />
-          }
+          profile={<Avatar initials={initials} />}
           onProfileClick={handleProfileClick}
           onLogoClick={() => handleNavigation('dashboard')}
         >
+          <ShellBarItem
+            icon="home"
+            text="Accueil"
+            onClick={() => handleNavigation('dashboard')}
+          />
+          <ShellBarItem
+            icon="customer"
+            text="Profil"
+            onClick={handleProfileClick}
+          />
           <ShellBarItem
             icon="log"
             text="Déconnexion"
@@ -78,131 +90,190 @@ const Dashboard = () => {
           />
         </ShellBar>
 
-        <FlexBox style={{ height: 'calc(100vh - 44px)' }}>
-          <SideNavigation
-            onSelectionChange={(e) => handleNavigation(e.detail.item.id)}
-            style={{ width: '15rem', borderRight: '1px solid var(--sapGroup_ContentBorderColor)' }}
-          >
-            <SideNavigationItem
-              id="dashboard"
-              text="Tableau de bord"
-              icon="home"
-              selected={selectedItem === 'dashboard'}
-            />
+        {/* Layout Principal */}
+        <div className="dashboard-layout">
+          {/* Sidebar Navigation */}
+          <div className="dashboard-sidebar">
+            <SideNavigation
+              onSelectionChange={(e) => handleNavigation(e.detail.item.id)}
+            >
+              <SideNavigationItem
+                id="dashboard"
+                text="Tableau de bord"
+                icon="home"
+                selected={selectedItem === 'dashboard'}
+              />
+              <SideNavigationItem
+                id="profile"
+                text="Mon profil"
+                icon="account"
+                selected={selectedItem === 'profile'}
+              />
+              <SideNavigationItem
+                id="users"
+                text="Utilisateurs"
+                icon="group"
+                selected={selectedItem === 'users'}
+              />
+              <SideNavigationItem
+                id="modules"
+                text="Modules"
+                icon="puzzle"
+                selected={selectedItem === 'modules'}
+              />
+              <SideNavigationItem
+                id="settings"
+                text="Paramètres"
+                icon="action-settings"
+                selected={selectedItem === 'settings'}
+              />
+            </SideNavigation>
+          </div>
 
-            <SideNavigationItem
-              id="profile"
-              text="Mon profil"
-              icon="account"
-              selected={selectedItem === 'profile'}
-              onClick={() => navigate('/profile')}
-            />
+          {/* Content Area */}
+          <div className="dashboard-content">
+            <div className="dashboard-content-inner">
+              {/* Welcome Section */}
+              <div className="dashboard-welcome">
+                <h1 className="dashboard-welcome-title">
+                  Bienvenue, {displayName}
+                </h1>
+                <p className="dashboard-welcome-subtitle">
+                  Voici un aperçu de votre espace de travail
+                </p>
+              </div>
 
-            <SideNavigationItem
-              id="settings"
-              text="Paramètres"
-              icon="action-settings"
-              selected={selectedItem === 'settings'}
-            />
-          </SideNavigation>
+              {/* Statistics Grid */}
+              <div className="dashboard-stats-grid">
+                <Card className="dashboard-stat-card">
+                  <div className="dashboard-stat-content">
+                    <div className="dashboard-stat-info">
+                      <p className="dashboard-stat-label">Modules actifs</p>
+                      <h2 className="dashboard-stat-value primary">5</h2>
+                    </div>
+                    <Icon name="puzzle" className="dashboard-stat-icon" />
+                  </div>
+                </Card>
 
-          <div style={{ flex: 1, padding: '2rem', overflow: 'auto', backgroundColor: 'var(--sapBackgroundColor)' }}>
-            <Title level="H3" style={{ marginBottom: '2rem' }}>
-              Bienvenue, {user.username} 👋
-            </Title>
+                <Card className="dashboard-stat-card">
+                  <div className="dashboard-stat-content">
+                    <div className="dashboard-stat-info">
+                      <p className="dashboard-stat-label">Utilisateurs</p>
+                      <h2 className="dashboard-stat-value success">12</h2>
+                    </div>
+                    <Icon name="group" className="dashboard-stat-icon" />
+                  </div>
+                </Card>
 
-            <FlexBox wrap="Wrap" style={{ gap: '1rem', marginBottom: '2rem' }}>
-              <Card
-                header={
-                  <CardHeader
-                    titleText="Statistiques"
-                    subtitleText="Vue d'ensemble"
-                    avatar={<Icon name="chart-table-view" />}
+                <Card className="dashboard-stat-card">
+                  <div className="dashboard-stat-content">
+                    <div className="dashboard-stat-info">
+                      <p className="dashboard-stat-label">Tâches</p>
+                      <h2 className="dashboard-stat-value warning">24</h2>
+                    </div>
+                    <Icon name="task" className="dashboard-stat-icon" />
+                  </div>
+                </Card>
+
+                <Card className="dashboard-stat-card">
+                  <div className="dashboard-stat-content">
+                    <div className="dashboard-stat-info">
+                      <p className="dashboard-stat-label">Notifications</p>
+                      <h2 className="dashboard-stat-value info">8</h2>
+                    </div>
+                    <Icon name="bell" className="dashboard-stat-icon" />
+                  </div>
+                </Card>
+              </div>
+
+              {/* AI Assistant Card */}
+              <Card className="dashboard-ai-card dashboard-actions">
+                <div className="dashboard-ai-content">
+                  <Icon
+                    name="bot"
+                    style={{ fontSize: '3rem', marginBottom: '1rem' }}
                   />
-                }
-                style={{ minWidth: '20rem', flex: '1' }}
-              >
-                <div style={{ padding: '1rem' }}>
-                  <FlexBox direction="Column" style={{ gap: '1rem' }}>
-                    <FlexBox justifyContent="SpaceBetween">
-                      <span>Modules actifs</span>
-                      <span style={{ fontWeight: 'bold', color: 'var(--sapPositiveColor)' }}>5</span>
-                    </FlexBox>
-                    <FlexBox justifyContent="SpaceBetween">
-                      <span>Utilisateurs</span>
-                      <span style={{ fontWeight: 'bold', color: 'var(--sapInformationColor)' }}>12</span>
-                    </FlexBox>
-                    <FlexBox justifyContent="SpaceBetween">
-                      <span>Tâches</span>
-                      <span style={{ fontWeight: 'bold', color: 'var(--sapNeutralColor)' }}>24</span>
-                    </FlexBox>
-                  </FlexBox>
+                  <h3 className="dashboard-ai-title">Assistant IA</h3>
+                  <p className="dashboard-ai-subtitle">
+                    Propulsé par Claude AI, l'assistant intelligent est prêt à
+                    vous aider dans vos tâches quotidiennes.
+                  </p>
+                  <Button
+                    icon="conversation"
+                    className="dashboard-ai-btn"
+                  >
+                    Démarrer une conversation
+                  </Button>
                 </div>
               </Card>
 
+              {/* Quick Actions */}
               <Card
+                className="dashboard-actions"
                 header={
                   <CardHeader
-                    titleText="Activité"
-                    subtitleText="Dernières 24h"
+                    titleText="Actions rapides"
+                    subtitleText="Accédez rapidement aux fonctionnalités principales"
+                    avatar={<Icon name="action" />}
+                  />
+                }
+              >
+                <div className="dashboard-actions-grid">
+                  <Button
+                    design="Emphasized"
+                    icon="add"
+                    className="dashboard-action-btn"
+                  >
+                    Nouveau document
+                  </Button>
+                  <Button
+                    design="Emphasized"
+                    icon="group"
+                    className="dashboard-action-btn"
+                    onClick={() => handleNavigation('users')}
+                  >
+                    Gérer utilisateurs
+                  </Button>
+                  <Button
+                    design="Emphasized"
+                    icon="puzzle"
+                    className="dashboard-action-btn"
+                    onClick={() => handleNavigation('modules')}
+                  >
+                    Installer module
+                  </Button>
+                  <Button
+                    design="Emphasized"
+                    icon="action-settings"
+                    className="dashboard-action-btn"
+                    onClick={() => handleNavigation('settings')}
+                  >
+                    Configuration
+                  </Button>
+                </div>
+              </Card>
+
+              {/* Recent Activity */}
+              <Card
+                className="dashboard-activity"
+                header={
+                  <CardHeader
+                    titleText="Activité récente"
+                    subtitleText="Dernières actions effectuées"
                     avatar={<Icon name="activities" />}
                   />
                 }
-                style={{ minWidth: '20rem', flex: '1' }}
               >
-                <div style={{ padding: '1rem' }}>
-                  <span style={{ color: 'var(--sapNeutralTextColor)' }}>
-                    Aucune activité récente
-                  </span>
-                </div>
-              </Card>
-
-              <Card
-                header={
-                  <CardHeader
-                    titleText="Assistant IA"
-                    subtitleText="Powered by Claude"
-                    avatar={<Icon name="bot" />}
-                  />
-                }
-                style={{ minWidth: '20rem', flex: '1' }}
-              >
-                <div style={{ padding: '1rem' }}>
-                  <div style={{ marginBottom: '1rem' }}>
-                    L'assistant IA est prêt à vous aider
+                <div className="dashboard-activity-list">
+                  <div className="dashboard-activity-empty">
+                    <Icon name="inbox" className="dashboard-activity-empty-icon" />
+                    <p>Aucune activité récente</p>
                   </div>
-                  <Button
-                    design="Emphasized"
-                    icon="conversation"
-                    tooltip="Démarrer une conversation"
-                  />
                 </div>
               </Card>
-            </FlexBox>
-
-            <Card
-              header={
-                <CardHeader
-                  titleText="Actions rapides"
-                  subtitleText="Accédez aux fonctionnalités principales"
-                />
-              }
-            >
-              <div style={{ padding: '1rem' }}>
-                <FlexBox wrap="Wrap" style={{ gap: '1rem' }}>
-                  <Button
-                    design="Emphasized"
-                    icon="settings"
-                    onClick={() => handleNavigation('settings')}
-                    style={{ minWidth: '200px' }}
-                  >
-                    Gérer les paramètres
-                  </Button>
-                </FlexBox>
-              </div>
-            </Card>
+            </div>
           </div>
-        </FlexBox>
+        </div>
       </div>
     </ThemeProvider>
   );
