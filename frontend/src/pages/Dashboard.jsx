@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import {
   ThemeProvider,
   ShellBar,
+  ShellBarItem,
   SideNavigation,
   SideNavigationItem,
   SideNavigationSubItem,
@@ -12,8 +13,7 @@ import {
   FlexBox,
   Icon,
   Avatar,
-  Button,
-  Text
+  Button
 } from '@ui5/webcomponents-react';
 import '@ui5/webcomponents/dist/Assets.js';
 import '@ui5/webcomponents-fiori/dist/Assets.js';
@@ -66,20 +66,16 @@ const Dashboard = () => {
           secondaryTitle="ERP Modulaire"
           logo={<Icon name="business-suite" />}
           profile={
-            <Avatar>
-              <Text>{user.username?.charAt(0).toUpperCase() || 'U'}</Text>
-            </Avatar>
+            <Avatar initials={user.username?.charAt(0).toUpperCase() || 'U'} />
           }
           onProfileClick={handleProfileClick}
           onLogoClick={() => handleNavigation('dashboard')}
         >
-          <Button
+          <ShellBarItem
             icon="log"
-            design="Transparent"
+            text="Déconnexion"
             onClick={handleLogout}
-          >
-            Déconnexion
-          </Button>
+          />
         </ShellBar>
 
         <FlexBox style={{ height: 'calc(100vh - 44px)' }}>
@@ -160,16 +156,16 @@ const Dashboard = () => {
                 <div style={{ padding: '1rem' }}>
                   <FlexBox direction="Column" style={{ gap: '1rem' }}>
                     <FlexBox justifyContent="SpaceBetween">
-                      <Text>Modules actifs</Text>
-                      <Text style={{ fontWeight: 'bold', color: 'var(--sapPositiveColor)' }}>5</Text>
+                      <span>Modules actifs</span>
+                      <span style={{ fontWeight: 'bold', color: 'var(--sapPositiveColor)' }}>5</span>
                     </FlexBox>
                     <FlexBox justifyContent="SpaceBetween">
-                      <Text>Utilisateurs</Text>
-                      <Text style={{ fontWeight: 'bold', color: 'var(--sapInformationColor)' }}>12</Text>
+                      <span>Utilisateurs</span>
+                      <span style={{ fontWeight: 'bold', color: 'var(--sapInformationColor)' }}>12</span>
                     </FlexBox>
                     <FlexBox justifyContent="SpaceBetween">
-                      <Text>Tâches</Text>
-                      <Text style={{ fontWeight: 'bold', color: 'var(--sapNeutralColor)' }}>24</Text>
+                      <span>Tâches</span>
+                      <span style={{ fontWeight: 'bold', color: 'var(--sapNeutralColor)' }}>24</span>
                     </FlexBox>
                   </FlexBox>
                 </div>
@@ -186,9 +182,9 @@ const Dashboard = () => {
                 style={{ minWidth: '20rem', flex: '1' }}
               >
                 <div style={{ padding: '1rem' }}>
-                  <Text style={{ color: 'var(--sapNeutralTextColor)' }}>
+                  <span style={{ color: 'var(--sapNeutralTextColor)' }}>
                     Aucune activité récente
-                  </Text>
+                  </span>
                 </div>
               </Card>
 
@@ -203,12 +199,14 @@ const Dashboard = () => {
                 style={{ minWidth: '20rem', flex: '1' }}
               >
                 <div style={{ padding: '1rem' }}>
-                  <Text style={{ marginBottom: '1rem', display: 'block' }}>
+                  <div style={{ marginBottom: '1rem' }}>
                     L'assistant IA est prêt à vous aider
-                  </Text>
-                  <Button design="Emphasized" icon="conversation">
-                    Nouvelle conversation
-                  </Button>
+                  </div>
+                  <Button
+                    design="Emphasized"
+                    icon="conversation"
+                    tooltip="Démarrer une conversation"
+                  />
                 </div>
               </Card>
             </FlexBox>
@@ -252,12 +250,14 @@ const Dashboard = () => {
                         <Title level="H5" style={{ marginBottom: '0.25rem' }}>
                           {module.title}
                         </Title>
-                        <Text style={{ fontSize: '0.875rem', color: 'var(--sapNeutralTextColor)', marginBottom: '1rem', display: 'block' }}>
+                        <div style={{ fontSize: '0.875rem', color: 'var(--sapNeutralTextColor)', marginBottom: '1rem' }}>
                           {module.desc}
-                        </Text>
-                        <Button design="Transparent" icon="add">
-                          Activer
-                        </Button>
+                        </div>
+                        <Button
+                          design="Transparent"
+                          icon="add"
+                          tooltip="Activer ce module"
+                        />
                       </div>
                     </Card>
                   ))}

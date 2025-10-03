@@ -29,7 +29,8 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target;
+    const name = e.target.getAttribute('name');
+    const value = e.target.value;
     setFormData(prev => ({
       ...prev,
       [name]: value
@@ -57,7 +58,8 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/users/login/`, {
+      const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+      const response = await fetch(`${apiUrl}/api/users/auth/login/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -71,13 +73,25 @@ const Login = () => {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.detail || data.error || 'Identifiants incorrects');
+        const errorMessage = data.error?.message || data.detail || data.error || 'Identifiants incorrects';
+        throw new Error(errorMessage);
       }
 
       if (data.access) {
         localStorage.setItem('access_token', data.access);
         localStorage.setItem('refresh_token', data.refresh);
-        localStorage.setItem('user', JSON.stringify(data.user));
+
+        // Stocker uniquement les données essentielles de l'utilisateur
+        const userToStore = {
+          id: data.user.id,
+          username: data.user.username,
+          email: data.user.email,
+          first_name: data.user.first_name,
+          last_name: data.user.last_name,
+          display_name: data.user.display_name,
+          avatar_url: data.user.avatar_url
+        };
+        localStorage.setItem('user', JSON.stringify(userToStore));
         navigate('/dashboard');
       } else {
         throw new Error('Réponse invalide du serveur');
@@ -153,7 +167,7 @@ const Login = () => {
 
               <Button
                 design="Emphasized"
-                type="submit"
+                onClick={handleSubmit}
                 disabled={loading}
                 style={{ width: '100%', marginTop: '0.5rem' }}
               >
