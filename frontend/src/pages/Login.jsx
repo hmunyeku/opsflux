@@ -15,7 +15,14 @@ import {
   Link,
   CheckBox
 } from '@ui5/webcomponents-react';
-import { FlexBoxJustifyContent, FlexBoxAlignItems, FlexBoxDirection, TitleLevel, MessageStripDesign, ButtonDesign, InputType } from '@ui5/webcomponents-react';
+import {
+  FlexBoxJustifyContent,
+  FlexBoxAlignItems,
+  FlexBoxDirection,
+  MessageStripDesign,
+  ButtonDesign,
+  InputType
+} from '@ui5/webcomponents-react';
 import '@ui5/webcomponents/dist/Assets.js';
 import '@ui5/webcomponents-fiori/dist/Assets.js';
 import '@ui5/webcomponents-icons/dist/AllIcons.js';
@@ -138,7 +145,7 @@ const Login = () => {
                 marginBottom: '1rem'
               }}
             />
-            <Title level={TitleLevel.H1} style={{ marginBottom: '0.5rem' }}>
+            <Title style={{ marginBottom: '0.5rem', fontSize: '2rem', fontWeight: 'bold' }}>
               OpsFlux
             </Title>
             <Text style={{ color: 'var(--sapNeutralTextColor)' }}>
