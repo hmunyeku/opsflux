@@ -10,12 +10,25 @@ import {
   CardHeader,
   Button,
   Icon,
-  Avatar
+  Avatar,
+  FlexBox,
+  Title,
+  Text,
+  ObjectStatus,
+  spacing
+} from '@ui5/webcomponents-react';
+import {
+  FlexBoxDirection,
+  FlexBoxJustifyContent,
+  FlexBoxAlignItems,
+  FlexBoxWrap,
+  TitleLevel,
+  ButtonDesign,
+  ValueState
 } from '@ui5/webcomponents-react';
 import '@ui5/webcomponents/dist/Assets.js';
 import '@ui5/webcomponents-fiori/dist/Assets.js';
 import '@ui5/webcomponents-icons/dist/AllIcons.js';
-import './Dashboard.css';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -63,7 +76,10 @@ const Dashboard = () => {
 
   return (
     <ThemeProvider>
-      <div className="dashboard-container">
+      <FlexBox
+        direction={FlexBoxDirection.Column}
+        style={{ height: '100vh', background: 'var(--sapBackgroundColor)' }}
+      >
         {/* ShellBar Header */}
         <ShellBar
           primaryTitle="OpsFlux"
@@ -91,9 +107,16 @@ const Dashboard = () => {
         </ShellBar>
 
         {/* Layout Principal */}
-        <div className="dashboard-layout">
+        <FlexBox style={{ flex: 1, overflow: 'hidden' }}>
           {/* Sidebar Navigation */}
-          <div className="dashboard-sidebar">
+          <div
+            style={{
+              width: '15rem',
+              borderRight: '1px solid var(--sapGroup_ContentBorderColor)',
+              background: 'var(--sapShell_Background)',
+              overflowY: 'auto'
+            }}
+          >
             <SideNavigation
               onSelectionChange={(e) => handleNavigation(e.detail.item.id)}
             >
@@ -131,85 +154,146 @@ const Dashboard = () => {
           </div>
 
           {/* Content Area */}
-          <div className="dashboard-content">
-            <div className="dashboard-content-inner">
-              {/* Welcome Section */}
-              <div className="dashboard-welcome">
-                <h1 className="dashboard-welcome-title">
+          <FlexBox
+            direction={FlexBoxDirection.Column}
+            style={{ flex: 1, overflowY: 'auto', background: 'var(--sapBackgroundColor)' }}
+          >
+            <div style={spacing.sapUiContentPadding}>
+              {/* Welcome Header */}
+              <FlexBox
+                direction={FlexBoxDirection.Column}
+                style={{ marginBottom: '2rem' }}
+              >
+                <Title level={TitleLevel.H2}>
                   Bienvenue, {displayName}
-                </h1>
-                <p className="dashboard-welcome-subtitle">
+                </Title>
+                <Text style={{ color: 'var(--sapNeutralTextColor)', marginTop: '0.5rem' }}>
                   Voici un aperçu de votre espace de travail
-                </p>
-              </div>
+                </Text>
+              </FlexBox>
 
               {/* Statistics Grid */}
-              <div className="dashboard-stats-grid">
-                <Card className="dashboard-stat-card">
-                  <div className="dashboard-stat-content">
-                    <div className="dashboard-stat-info">
-                      <p className="dashboard-stat-label">Modules actifs</p>
-                      <h2 className="dashboard-stat-value primary">5</h2>
-                    </div>
-                    <Icon name="puzzle" className="dashboard-stat-icon" />
+              <FlexBox
+                wrap={FlexBoxWrap.Wrap}
+                style={{ gap: '1rem', marginBottom: '2rem' }}
+              >
+                {/* Stat Card 1 */}
+                <Card
+                  style={{ minWidth: '18rem', flex: '1' }}
+                  header={
+                    <CardHeader
+                      titleText="Modules actifs"
+                      avatar={<Icon name="puzzle" />}
+                      action={
+                        <ObjectStatus state={ValueState.Information}>
+                          5
+                        </ObjectStatus>
+                      }
+                    />
+                  }
+                >
+                  <div style={spacing.sapUiContentPadding}>
+                    <Text>
+                      Modules installés et opérationnels
+                    </Text>
                   </div>
                 </Card>
 
-                <Card className="dashboard-stat-card">
-                  <div className="dashboard-stat-content">
-                    <div className="dashboard-stat-info">
-                      <p className="dashboard-stat-label">Utilisateurs</p>
-                      <h2 className="dashboard-stat-value success">12</h2>
-                    </div>
-                    <Icon name="group" className="dashboard-stat-icon" />
+                {/* Stat Card 2 */}
+                <Card
+                  style={{ minWidth: '18rem', flex: '1' }}
+                  header={
+                    <CardHeader
+                      titleText="Utilisateurs"
+                      avatar={<Icon name="group" />}
+                      action={
+                        <ObjectStatus state={ValueState.Success}>
+                          12
+                        </ObjectStatus>
+                      }
+                    />
+                  }
+                >
+                  <div style={spacing.sapUiContentPadding}>
+                    <Text>
+                      Utilisateurs actifs dans le système
+                    </Text>
                   </div>
                 </Card>
 
-                <Card className="dashboard-stat-card">
-                  <div className="dashboard-stat-content">
-                    <div className="dashboard-stat-info">
-                      <p className="dashboard-stat-label">Tâches</p>
-                      <h2 className="dashboard-stat-value warning">24</h2>
-                    </div>
-                    <Icon name="task" className="dashboard-stat-icon" />
+                {/* Stat Card 3 */}
+                <Card
+                  style={{ minWidth: '18rem', flex: '1' }}
+                  header={
+                    <CardHeader
+                      titleText="Tâches"
+                      avatar={<Icon name="task" />}
+                      action={
+                        <ObjectStatus state={ValueState.Warning}>
+                          24
+                        </ObjectStatus>
+                      }
+                    />
+                  }
+                >
+                  <div style={spacing.sapUiContentPadding}>
+                    <Text>
+                      Tâches en attente de traitement
+                    </Text>
                   </div>
                 </Card>
 
-                <Card className="dashboard-stat-card">
-                  <div className="dashboard-stat-content">
-                    <div className="dashboard-stat-info">
-                      <p className="dashboard-stat-label">Notifications</p>
-                      <h2 className="dashboard-stat-value info">8</h2>
-                    </div>
-                    <Icon name="bell" className="dashboard-stat-icon" />
+                {/* Stat Card 4 */}
+                <Card
+                  style={{ minWidth: '18rem', flex: '1' }}
+                  header={
+                    <CardHeader
+                      titleText="Notifications"
+                      avatar={<Icon name="bell" />}
+                      action={
+                        <ObjectStatus state={ValueState.Information}>
+                          8
+                        </ObjectStatus>
+                      }
+                    />
+                  }
+                >
+                  <div style={spacing.sapUiContentPadding}>
+                    <Text>
+                      Nouvelles notifications
+                    </Text>
                   </div>
                 </Card>
-              </div>
+              </FlexBox>
 
               {/* AI Assistant Card */}
-              <Card className="dashboard-ai-card dashboard-actions">
-                <div className="dashboard-ai-content">
-                  <Icon
-                    name="bot"
-                    style={{ fontSize: '3rem', marginBottom: '1rem' }}
+              <Card
+                style={{ marginBottom: '2rem' }}
+                header={
+                  <CardHeader
+                    titleText="Assistant IA"
+                    subtitleText="Propulsé par Claude AI"
+                    avatar={<Icon name="bot" />}
                   />
-                  <h3 className="dashboard-ai-title">Assistant IA</h3>
-                  <p className="dashboard-ai-subtitle">
-                    Propulsé par Claude AI, l'assistant intelligent est prêt à
-                    vous aider dans vos tâches quotidiennes.
-                  </p>
-                  <Button
-                    icon="conversation"
-                    className="dashboard-ai-btn"
-                  >
+                }
+              >
+                <FlexBox
+                  direction={FlexBoxDirection.Column}
+                  style={{ ...spacing.sapUiContentPadding, gap: '1rem' }}
+                >
+                  <Text>
+                    L'assistant intelligent est prêt à vous aider dans vos tâches quotidiennes.
+                    Posez vos questions, demandez des analyses ou obtenez des recommandations.
+                  </Text>
+                  <Button design={ButtonDesign.Emphasized} icon="conversation">
                     Démarrer une conversation
                   </Button>
-                </div>
+                </FlexBox>
               </Card>
 
               {/* Quick Actions */}
               <Card
-                className="dashboard-actions"
+                style={{ marginBottom: '2rem' }}
                 header={
                   <CardHeader
                     titleText="Actions rapides"
@@ -218,44 +302,39 @@ const Dashboard = () => {
                   />
                 }
               >
-                <div className="dashboard-actions-grid">
-                  <Button
-                    design="Emphasized"
-                    icon="add"
-                    className="dashboard-action-btn"
-                  >
+                <FlexBox
+                  wrap={FlexBoxWrap.Wrap}
+                  style={{ ...spacing.sapUiContentPadding, gap: '0.5rem' }}
+                >
+                  <Button design={ButtonDesign.Emphasized} icon="add">
                     Nouveau document
                   </Button>
                   <Button
-                    design="Emphasized"
+                    design={ButtonDesign.Emphasized}
                     icon="group"
-                    className="dashboard-action-btn"
                     onClick={() => handleNavigation('users')}
                   >
                     Gérer utilisateurs
                   </Button>
                   <Button
-                    design="Emphasized"
+                    design={ButtonDesign.Emphasized}
                     icon="puzzle"
-                    className="dashboard-action-btn"
                     onClick={() => handleNavigation('modules')}
                   >
                     Installer module
                   </Button>
                   <Button
-                    design="Emphasized"
+                    design={ButtonDesign.Emphasized}
                     icon="action-settings"
-                    className="dashboard-action-btn"
                     onClick={() => handleNavigation('settings')}
                   >
                     Configuration
                   </Button>
-                </div>
+                </FlexBox>
               </Card>
 
               {/* Recent Activity */}
               <Card
-                className="dashboard-activity"
                 header={
                   <CardHeader
                     titleText="Activité récente"
@@ -264,17 +343,22 @@ const Dashboard = () => {
                   />
                 }
               >
-                <div className="dashboard-activity-list">
-                  <div className="dashboard-activity-empty">
-                    <Icon name="inbox" className="dashboard-activity-empty-icon" />
-                    <p>Aucune activité récente</p>
-                  </div>
-                </div>
+                <FlexBox
+                  direction={FlexBoxDirection.Column}
+                  alignItems={FlexBoxAlignItems.Center}
+                  justifyContent={FlexBoxJustifyContent.Center}
+                  style={{ ...spacing.sapUiContentPadding, minHeight: '10rem' }}
+                >
+                  <Icon name="inbox" style={{ fontSize: '3rem', opacity: 0.3, marginBottom: '1rem' }} />
+                  <Text style={{ color: 'var(--sapNeutralTextColor)' }}>
+                    Aucune activité récente
+                  </Text>
+                </FlexBox>
               </Card>
             </div>
-          </div>
-        </div>
-      </div>
+          </FlexBox>
+        </FlexBox>
+      </FlexBox>
     </ThemeProvider>
   );
 };

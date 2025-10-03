@@ -7,12 +7,19 @@ import {
   Button,
   MessageStrip,
   BusyIndicator,
-  Icon
+  Icon,
+  FlexBox,
+  Title,
+  Text,
+  Card,
+  Link,
+  CheckBox,
+  spacing
 } from '@ui5/webcomponents-react';
+import { FlexBoxJustifyContent, FlexBoxAlignItems, FlexBoxDirection, TitleLevel, MessageStripDesign, ButtonDesign, InputType } from '@ui5/webcomponents-react';
 import '@ui5/webcomponents/dist/Assets.js';
 import '@ui5/webcomponents-fiori/dist/Assets.js';
 import '@ui5/webcomponents-icons/dist/AllIcons.js';
-import './Login.css';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -102,109 +109,136 @@ const Login = () => {
 
   return (
     <ThemeProvider>
-      <div className="login-page">
-        <div className="login-container">
-          <div className="login-card">
-            {/* Header avec logo */}
-            <div className="login-header">
-              <div className="login-logo-container">
-                <Icon name="business-suite" className="login-logo-icon" />
-              </div>
-              <h1 className="login-title">OpsFlux</h1>
-              <p className="login-subtitle">Plateforme Entreprise Intelligente</p>
-            </div>
+      <FlexBox
+        justifyContent={FlexBoxJustifyContent.Center}
+        alignItems={FlexBoxAlignItems.Center}
+        style={{
+          minHeight: '100vh',
+          background: 'var(--sapBackgroundColor)',
+          padding: '2rem'
+        }}
+      >
+        <Card
+          style={{
+            width: '100%',
+            maxWidth: '28rem',
+            boxShadow: 'var(--sapContent_Shadow2)'
+          }}
+        >
+          {/* Header */}
+          <FlexBox
+            direction={FlexBoxDirection.Column}
+            alignItems={FlexBoxAlignItems.Center}
+            style={spacing.sapUiContentPadding}
+          >
+            <Icon
+              name="business-suite"
+              style={{
+                fontSize: '4rem',
+                color: 'var(--sapBrandColor)',
+                marginBottom: '1rem'
+              }}
+            />
+            <Title level={TitleLevel.H1} style={{ marginBottom: '0.5rem' }}>
+              OpsFlux
+            </Title>
+            <Text style={{ color: 'var(--sapNeutralTextColor)' }}>
+              Plateforme Entreprise Intelligente
+            </Text>
+          </FlexBox>
 
-            {/* Formulaire */}
-            <div className="login-form">
-              {error && (
-                <div className="login-error">
-                  <MessageStrip
-                    design="Negative"
-                    onClose={() => setError('')}
-                  >
-                    {error}
-                  </MessageStrip>
-                </div>
-              )}
-
-              <form onSubmit={handleSubmit}>
-                <div className="login-form-group">
-                  <Label required className="login-label">
-                    Nom d'utilisateur
-                  </Label>
-                  <div className="login-input-wrapper">
-                    <Input
-                      name="username"
-                      value={formData.username}
-                      onInput={handleInputChange}
-                      placeholder="Entrez votre identifiant"
-                      disabled={loading}
-                      required
-                      className="login-input"
-                    />
-                  </div>
-                </div>
-
-                <div className="login-form-group">
-                  <Label required className="login-label">
-                    Mot de passe
-                  </Label>
-                  <div className="login-input-wrapper">
-                    <Input
-                      name="password"
-                      type={showPassword ? 'Text' : 'Password'}
-                      value={formData.password}
-                      onInput={handleInputChange}
-                      placeholder="Entrez votre mot de passe"
-                      disabled={loading}
-                      required
-                      className="login-input"
-                    />
-                  </div>
-                </div>
-
-                <div className="login-checkbox-wrapper">
-                  <input
-                    type="checkbox"
-                    id="showPassword"
-                    onChange={() => setShowPassword(!showPassword)}
-                    style={{ cursor: 'pointer' }}
-                  />
-                  <label htmlFor="showPassword" className="login-checkbox-label">
-                    Afficher le mot de passe
-                  </label>
-                </div>
-
-                <Button
-                  design="Emphasized"
-                  onClick={handleSubmit}
-                  disabled={loading}
-                  className="login-submit-btn"
-                >
-                  {loading && <BusyIndicator active size="Small" style={{ marginRight: '0.5rem' }} />}
-                  {loading ? 'Connexion en cours...' : 'Se connecter'}
-                </Button>
-              </form>
-            </div>
-
-            {/* Footer */}
-            <div className="login-footer">
-              <a
-                href="http://72.60.188.156:3002"
-                className="login-link"
-                target="_blank"
-                rel="noopener noreferrer"
+          {/* Messages */}
+          {error && (
+            <div style={{ ...spacing.sapUiContentPadding, paddingTop: 0 }}>
+              <MessageStrip
+                design={MessageStripDesign.Negative}
+                onClose={() => setError('')}
               >
-                Découvrir OpsFlux →
-              </a>
+                {error}
+              </MessageStrip>
             </div>
-          </div>
+          )}
 
-          <div className="login-copyright">
-            © 2025 OpsFlux · Plateforme Entreprise Intelligente
-          </div>
-        </div>
-      </div>
+          {/* Formulaire */}
+          <form onSubmit={handleSubmit}>
+            <FlexBox
+              direction={FlexBoxDirection.Column}
+              style={{
+                ...spacing.sapUiContentPadding,
+                gap: '1rem'
+              }}
+            >
+              {/* Username */}
+              <FlexBox direction={FlexBoxDirection.Column} style={{ gap: '0.25rem' }}>
+                <Label required>Nom d'utilisateur</Label>
+                <Input
+                  name="username"
+                  value={formData.username}
+                  onInput={handleInputChange}
+                  placeholder="Entrez votre identifiant"
+                  disabled={loading}
+                  required
+                  style={{ width: '100%' }}
+                />
+              </FlexBox>
+
+              {/* Password */}
+              <FlexBox direction={FlexBoxDirection.Column} style={{ gap: '0.25rem' }}>
+                <Label required>Mot de passe</Label>
+                <Input
+                  name="password"
+                  type={showPassword ? InputType.Text : InputType.Password}
+                  value={formData.password}
+                  onInput={handleInputChange}
+                  placeholder="Entrez votre mot de passe"
+                  disabled={loading}
+                  required
+                  style={{ width: '100%' }}
+                />
+              </FlexBox>
+
+              {/* Show Password */}
+              <CheckBox
+                text="Afficher le mot de passe"
+                checked={showPassword}
+                onChange={() => setShowPassword(!showPassword)}
+              />
+
+              {/* Submit Button */}
+              <Button
+                design={ButtonDesign.Emphasized}
+                onClick={handleSubmit}
+                disabled={loading}
+                style={{ width: '100%', marginTop: '0.5rem' }}
+              >
+                {loading && <BusyIndicator active size="Small" style={{ marginRight: '0.5rem' }} />}
+                {loading ? 'Connexion en cours...' : 'Se connecter'}
+              </Button>
+
+              {/* Link */}
+              <FlexBox justifyContent={FlexBoxJustifyContent.Center} style={{ marginTop: '0.5rem' }}>
+                <Link href="http://72.60.188.156:3002" target="_blank">
+                  Découvrir OpsFlux →
+                </Link>
+              </FlexBox>
+            </FlexBox>
+          </form>
+
+          {/* Footer */}
+          <FlexBox
+            justifyContent={FlexBoxJustifyContent.Center}
+            style={{
+              ...spacing.sapUiContentPadding,
+              paddingTop: '1rem',
+              borderTop: '1px solid var(--sapGroup_ContentBorderColor)'
+            }}
+          >
+            <Text style={{ fontSize: '0.875rem', color: 'var(--sapNeutralTextColor)' }}>
+              © 2025 OpsFlux · Plateforme Entreprise
+            </Text>
+          </FlexBox>
+        </Card>
+      </FlexBox>
     </ThemeProvider>
   );
 };

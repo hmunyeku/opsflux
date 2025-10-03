@@ -17,12 +17,25 @@ import {
   Avatar,
   MessageStrip,
   Label,
-  BusyIndicator
+  BusyIndicator,
+  FlexBox,
+  Title,
+  Text,
+  spacing
+} from '@ui5/webcomponents-react';
+import {
+  FlexBoxDirection,
+  FlexBoxJustifyContent,
+  FlexBoxAlignItems,
+  TitleLevel,
+  ButtonDesign,
+  MessageStripDesign,
+  InputType,
+  AvatarSize
 } from '@ui5/webcomponents-react';
 import '@ui5/webcomponents/dist/Assets.js';
 import '@ui5/webcomponents-fiori/dist/Assets.js';
 import '@ui5/webcomponents-icons/dist/AllIcons.js';
-import './Profile.css';
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -88,7 +101,7 @@ const Profile = () => {
       });
       setLoading(false);
     } catch (error) {
-      setMessage({ type: 'Error', text: error.message });
+      setMessage({ type: MessageStripDesign.Negative, text: error.message });
       setLoading(false);
     }
   };
@@ -119,7 +132,7 @@ const Profile = () => {
 
   const handleUploadAvatar = async () => {
     if (!avatarFile) {
-      setMessage({ type: 'Warning', text: 'Veuillez sélectionner un fichier' });
+      setMessage({ type: MessageStripDesign.Warning, text: 'Veuillez sélectionner un fichier' });
       return;
     }
 
@@ -158,9 +171,9 @@ const Profile = () => {
         avatar_url: userData.avatar_url
       }));
 
-      setMessage({ type: 'Success', text: 'Avatar mis à jour avec succès' });
+      setMessage({ type: MessageStripDesign.Success, text: 'Avatar mis à jour avec succès' });
     } catch (error) {
-      setMessage({ type: 'Error', text: error.message });
+      setMessage({ type: MessageStripDesign.Negative, text: error.message });
     } finally {
       setSaving(false);
     }
@@ -201,9 +214,9 @@ const Profile = () => {
         avatar_url: userData.avatar_url
       }));
 
-      setMessage({ type: 'Success', text: 'Profil mis à jour avec succès' });
+      setMessage({ type: MessageStripDesign.Success, text: 'Profil mis à jour avec succès' });
     } catch (error) {
-      setMessage({ type: 'Error', text: error.message });
+      setMessage({ type: MessageStripDesign.Negative, text: error.message });
     } finally {
       setSaving(false);
     }
@@ -213,7 +226,7 @@ const Profile = () => {
     setMessage(null);
 
     if (passwordForm.new_password !== passwordForm.new_password_confirm) {
-      setMessage({ type: 'Error', text: 'Les mots de passe ne correspondent pas' });
+      setMessage({ type: MessageStripDesign.Negative, text: 'Les mots de passe ne correspondent pas' });
       return;
     }
 
@@ -237,10 +250,10 @@ const Profile = () => {
         throw new Error(errorData.detail || errorData.old_password?.[0] || 'Erreur lors du changement de mot de passe');
       }
 
-      setMessage({ type: 'Success', text: 'Mot de passe modifié avec succès' });
+      setMessage({ type: MessageStripDesign.Success, text: 'Mot de passe modifié avec succès' });
       setPasswordForm({ old_password: '', new_password: '', new_password_confirm: '' });
     } catch (error) {
-      setMessage({ type: 'Error', text: error.message });
+      setMessage({ type: MessageStripDesign.Negative, text: error.message });
     } finally {
       setSaving(false);
     }
@@ -249,10 +262,15 @@ const Profile = () => {
   if (loading || !user) {
     return (
       <ThemeProvider>
-        <div className="profile-loading">
+        <FlexBox
+          direction={FlexBoxDirection.Column}
+          alignItems={FlexBoxAlignItems.Center}
+          justifyContent={FlexBoxJustifyContent.Center}
+          style={{ minHeight: '100vh', gap: '1rem' }}
+        >
           <BusyIndicator active size="Large" />
-          <span className="profile-loading-text">Chargement du profil...</span>
-        </div>
+          <Text>Chargement du profil...</Text>
+        </FlexBox>
       </ThemeProvider>
     );
   }
@@ -262,7 +280,10 @@ const Profile = () => {
 
   return (
     <ThemeProvider>
-      <div className="profile-container">
+      <FlexBox
+        direction={FlexBoxDirection.Column}
+        style={{ height: '100vh', background: 'var(--sapBackgroundColor)' }}
+      >
         <ShellBar
           primaryTitle="OpsFlux"
           secondaryTitle="Mon Profil"
@@ -282,19 +303,22 @@ const Profile = () => {
           />
         </ShellBar>
 
-        <div className="profile-content">
-          <div className="profile-content-inner">
+        <FlexBox
+          direction={FlexBoxDirection.Column}
+          style={{ flex: 1, overflowY: 'auto' }}
+        >
+          <div style={{ maxWidth: '75rem', margin: '0 auto', width: '100%', ...spacing.sapUiContentPadding }}>
             {/* Header */}
-            <div className="profile-header">
-              <h1 className="profile-title">Mon Profil</h1>
-              <p className="profile-subtitle">
+            <FlexBox direction={FlexBoxDirection.Column} style={{ marginBottom: '2rem' }}>
+              <Title level={TitleLevel.H2}>Mon Profil</Title>
+              <Text style={{ color: 'var(--sapNeutralTextColor)', marginTop: '0.5rem' }}>
                 Gérez vos informations personnelles et préférences
-              </p>
-            </div>
+              </Text>
+            </FlexBox>
 
             {/* Messages */}
             {message && (
-              <div className="profile-message">
+              <div style={{ marginBottom: '1rem' }}>
                 <MessageStrip
                   design={message.type}
                   onClose={() => setMessage(null)}
@@ -304,272 +328,250 @@ const Profile = () => {
               </div>
             )}
 
-            {/* Sections */}
-            <div className="profile-sections">
-              {/* Avatar */}
-              <Card
-                className="profile-card"
-                header={
-                  <CardHeader
-                    titleText="Photo de profil"
-                    avatar={<Icon name="camera" />}
-                  />
-                }
+            {/* Avatar Card */}
+            <Card
+              style={{ marginBottom: '1rem' }}
+              header={
+                <CardHeader
+                  titleText="Photo de profil"
+                  avatar={<Icon name="camera" />}
+                />
+              }
+            >
+              <FlexBox
+                alignItems={FlexBoxAlignItems.Center}
+                style={{ ...spacing.sapUiContentPadding, gap: '2rem' }}
               >
-                <div className="profile-card-content">
-                  <div className="profile-avatar-section">
-                    <div className="profile-avatar-preview">
-                      {avatarPreview || user.avatar_url ? (
-                        <img src={avatarPreview || user.avatar_url} alt="Avatar" />
-                      ) : (
-                        <div className="profile-avatar-placeholder">{initials}</div>
-                      )}
-                    </div>
+                <Avatar
+                  size={AvatarSize.XL}
+                  style={{ width: '120px', height: '120px' }}
+                >
+                  {avatarPreview || user.avatar_url ? (
+                    <img src={avatarPreview || user.avatar_url} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  ) : (
+                    <span style={{ fontSize: '3rem' }}>{initials}</span>
+                  )}
+                </Avatar>
 
-                    <div className="profile-avatar-upload">
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleAvatarChange}
-                      />
-                      <p className="profile-avatar-info">
-                        Formats acceptés : JPG, PNG, GIF · Taille max : 2MB
-                      </p>
-                      <div className="profile-avatar-actions">
-                        <Button
-                          design="Emphasized"
-                          onClick={handleUploadAvatar}
-                          disabled={saving || !avatarFile}
-                        >
-                          Enregistrer la photo
-                        </Button>
-                        {avatarPreview && (
-                          <Button onClick={() => { setAvatarFile(null); setAvatarPreview(null); }}>
-                            Annuler
-                          </Button>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </Card>
-
-              {/* Informations personnelles */}
-              <Card
-                className="profile-card"
-                header={
-                  <CardHeader
-                    titleText="Informations personnelles"
-                    avatar={<Icon name="person-placeholder" />}
-                  />
-                }
-              >
-                <div className="profile-card-content">
-                  <div className="profile-form">
-                    <div className="profile-form-item">
-                      <Label className="profile-form-label">Nom d'utilisateur</Label>
-                      <Input value={user.username} disabled className="profile-form-input" />
-                    </div>
-
-                    <div className="profile-form-item">
-                      <Label className="profile-form-label">Prénom</Label>
-                      <Input
-                        value={formData.first_name}
-                        onInput={(e) => handleInputChange(e, 'first_name')}
-                        className="profile-form-input"
-                      />
-                    </div>
-
-                    <div className="profile-form-item">
-                      <Label className="profile-form-label">Nom</Label>
-                      <Input
-                        value={formData.last_name}
-                        onInput={(e) => handleInputChange(e, 'last_name')}
-                        className="profile-form-input"
-                      />
-                    </div>
-
-                    <div className="profile-form-item">
-                      <Label className="profile-form-label">Email</Label>
-                      <Input
-                        type="email"
-                        value={formData.email}
-                        onInput={(e) => handleInputChange(e, 'email')}
-                        className="profile-form-input"
-                      />
-                    </div>
-
-                    <div className="profile-form-item">
-                      <Label className="profile-form-label">Téléphone</Label>
-                      <Input
-                        type="tel"
-                        value={formData.phone}
-                        onInput={(e) => handleInputChange(e, 'phone')}
-                        className="profile-form-input"
-                      />
-                    </div>
-
-                    <div className="profile-form-item">
-                      <Label className="profile-form-label">Mobile</Label>
-                      <Input
-                        type="tel"
-                        value={formData.mobile}
-                        onInput={(e) => handleInputChange(e, 'mobile')}
-                        className="profile-form-input"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="profile-form-actions">
-                    <Button design="Emphasized" onClick={handleSaveProfile} disabled={saving}>
-                      Enregistrer
-                    </Button>
-                  </div>
-                </div>
-              </Card>
-
-              {/* Préférences */}
-              <Card
-                className="profile-card"
-                header={
-                  <CardHeader
-                    titleText="Préférences"
-                    avatar={<Icon name="settings" />}
-                  />
-                }
-              >
-                <div className="profile-card-content">
-                  <div className="profile-form">
-                    <div className="profile-form-item">
-                      <Label className="profile-form-label">Langue</Label>
-                      <Select
-                        value={formData.language}
-                        onChange={(e) => handleInputChange(e, 'language')}
-                        className="profile-form-input"
-                      >
-                        <Option value="fr">Français</Option>
-                        <Option value="en">English</Option>
-                        <Option value="es">Español</Option>
-                      </Select>
-                    </div>
-
-                    <div className="profile-form-item">
-                      <Label className="profile-form-label">Fuseau horaire</Label>
-                      <Select
-                        value={formData.timezone}
-                        onChange={(e) => handleInputChange(e, 'timezone')}
-                        className="profile-form-input"
-                      >
-                        <Option value="UTC">UTC</Option>
-                        <Option value="Europe/Paris">Europe/Paris</Option>
-                        <Option value="America/New_York">America/New_York</Option>
-                        <Option value="Asia/Tokyo">Asia/Tokyo</Option>
-                      </Select>
-                    </div>
-
-                    <div className="profile-form-item">
-                      <Label className="profile-form-label">Thème</Label>
-                      <Select
-                        value={formData.theme}
-                        onChange={(e) => handleInputChange(e, 'theme')}
-                        className="profile-form-input"
-                      >
-                        <Option value="light">Clair</Option>
-                        <Option value="dark">Sombre</Option>
-                        <Option value="auto">Automatique</Option>
-                      </Select>
-                    </div>
-                  </div>
-
-                  <div style={{ marginTop: '1.5rem' }}>
-                    <div className="profile-checkbox-wrapper">
-                      <CheckBox
-                        text="Notifications par email"
-                        checked={formData.email_notifications}
-                        onChange={(e) => handleInputChange(e, 'email_notifications')}
-                      />
-                    </div>
-                    <div className="profile-checkbox-wrapper">
-                      <CheckBox
-                        text="Notifications push navigateur"
-                        checked={formData.push_notifications}
-                        onChange={(e) => handleInputChange(e, 'push_notifications')}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="profile-form-actions">
-                    <Button design="Emphasized" onClick={handleSaveProfile} disabled={saving}>
-                      Enregistrer
-                    </Button>
-                  </div>
-                </div>
-              </Card>
-
-              {/* Changer le mot de passe */}
-              <Card
-                className="profile-card"
-                header={
-                  <CardHeader
-                    titleText="Changer le mot de passe"
-                    avatar={<Icon name="locked" />}
-                  />
-                }
-              >
-                <div className="profile-card-content">
-                  <div className="profile-password-info">
-                    <p className="profile-password-info-text">
-                      Minimum 8 caractères avec lettres et chiffres
-                    </p>
-                  </div>
-
-                  <div className="profile-password-grid">
-                    <div className="profile-form-item">
-                      <Label className="profile-form-label">Mot de passe actuel</Label>
-                      <Input
-                        type="password"
-                        value={passwordForm.old_password}
-                        onInput={(e) => handlePasswordChange(e, 'old_password')}
-                        className="profile-form-input"
-                      />
-                    </div>
-
-                    <div className="profile-form-item">
-                      <Label className="profile-form-label">Nouveau mot de passe</Label>
-                      <Input
-                        type="password"
-                        value={passwordForm.new_password}
-                        onInput={(e) => handlePasswordChange(e, 'new_password')}
-                        className="profile-form-input"
-                      />
-                    </div>
-
-                    <div className="profile-form-item">
-                      <Label className="profile-form-label">Confirmer le nouveau mot de passe</Label>
-                      <Input
-                        type="password"
-                        value={passwordForm.new_password_confirm}
-                        onInput={(e) => handlePasswordChange(e, 'new_password_confirm')}
-                        className="profile-form-input"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="profile-form-actions">
+                <FlexBox direction={FlexBoxDirection.Column} style={{ flex: 1, gap: '0.5rem' }}>
+                  <input type="file" accept="image/*" onChange={handleAvatarChange} />
+                  <Text style={{ fontSize: '0.875rem', color: 'var(--sapNeutralTextColor)' }}>
+                    Formats acceptés : JPG, PNG, GIF · Taille max : 2MB
+                  </Text>
+                  <FlexBox style={{ gap: '0.5rem' }}>
                     <Button
-                      design="Emphasized"
-                      onClick={handleChangePassword}
-                      disabled={saving || !passwordForm.old_password || !passwordForm.new_password}
+                      design={ButtonDesign.Emphasized}
+                      onClick={handleUploadAvatar}
+                      disabled={saving || !avatarFile}
                     >
-                      Changer le mot de passe
+                      Enregistrer
                     </Button>
-                  </div>
-                </div>
-              </Card>
-            </div>
+                    {avatarPreview && (
+                      <Button onClick={() => { setAvatarFile(null); setAvatarPreview(null); }}>
+                        Annuler
+                      </Button>
+                    )}
+                  </FlexBox>
+                </FlexBox>
+              </FlexBox>
+            </Card>
+
+            {/* Personal Info Card */}
+            <Card
+              style={{ marginBottom: '1rem' }}
+              header={
+                <CardHeader
+                  titleText="Informations personnelles"
+                  avatar={<Icon name="person-placeholder" />}
+                />
+              }
+            >
+              <div style={spacing.sapUiContentPadding}>
+                <Form labelSpanM={4} columnsM={2} columnsL={2}>
+                  <FormItem label={<Label>Nom d'utilisateur</Label>}>
+                    <Input value={user.username} disabled style={{ width: '100%' }} />
+                  </FormItem>
+
+                  <FormItem label={<Label>Prénom</Label>}>
+                    <Input
+                      value={formData.first_name}
+                      onInput={(e) => handleInputChange(e, 'first_name')}
+                      style={{ width: '100%' }}
+                    />
+                  </FormItem>
+
+                  <FormItem label={<Label>Nom</Label>}>
+                    <Input
+                      value={formData.last_name}
+                      onInput={(e) => handleInputChange(e, 'last_name')}
+                      style={{ width: '100%' }}
+                    />
+                  </FormItem>
+
+                  <FormItem label={<Label>Email</Label>}>
+                    <Input
+                      type={InputType.Email}
+                      value={formData.email}
+                      onInput={(e) => handleInputChange(e, 'email')}
+                      style={{ width: '100%' }}
+                    />
+                  </FormItem>
+
+                  <FormItem label={<Label>Téléphone</Label>}>
+                    <Input
+                      type={InputType.Tel}
+                      value={formData.phone}
+                      onInput={(e) => handleInputChange(e, 'phone')}
+                      style={{ width: '100%' }}
+                    />
+                  </FormItem>
+
+                  <FormItem label={<Label>Mobile</Label>}>
+                    <Input
+                      type={InputType.Tel}
+                      value={formData.mobile}
+                      onInput={(e) => handleInputChange(e, 'mobile')}
+                      style={{ width: '100%' }}
+                    />
+                  </FormItem>
+                </Form>
+
+                <FlexBox justifyContent={FlexBoxJustifyContent.End} style={{ marginTop: '1rem' }}>
+                  <Button design={ButtonDesign.Emphasized} onClick={handleSaveProfile} disabled={saving}>
+                    Enregistrer
+                  </Button>
+                </FlexBox>
+              </div>
+            </Card>
+
+            {/* Preferences Card */}
+            <Card
+              style={{ marginBottom: '1rem' }}
+              header={
+                <CardHeader
+                  titleText="Préférences"
+                  avatar={<Icon name="settings" />}
+                />
+              }
+            >
+              <div style={spacing.sapUiContentPadding}>
+                <Form labelSpanM={4} columnsM={2} columnsL={3}>
+                  <FormItem label={<Label>Langue</Label>}>
+                    <Select
+                      value={formData.language}
+                      onChange={(e) => handleInputChange(e, 'language')}
+                      style={{ width: '100%' }}
+                    >
+                      <Option value="fr">Français</Option>
+                      <Option value="en">English</Option>
+                      <Option value="es">Español</Option>
+                    </Select>
+                  </FormItem>
+
+                  <FormItem label={<Label>Fuseau horaire</Label>}>
+                    <Select
+                      value={formData.timezone}
+                      onChange={(e) => handleInputChange(e, 'timezone')}
+                      style={{ width: '100%' }}
+                    >
+                      <Option value="UTC">UTC</Option>
+                      <Option value="Europe/Paris">Europe/Paris</Option>
+                      <Option value="America/New_York">America/New_York</Option>
+                      <Option value="Asia/Tokyo">Asia/Tokyo</Option>
+                    </Select>
+                  </FormItem>
+
+                  <FormItem label={<Label>Thème</Label>}>
+                    <Select
+                      value={formData.theme}
+                      onChange={(e) => handleInputChange(e, 'theme')}
+                      style={{ width: '100%' }}
+                    >
+                      <Option value="light">Clair</Option>
+                      <Option value="dark">Sombre</Option>
+                      <Option value="auto">Automatique</Option>
+                    </Select>
+                  </FormItem>
+                </Form>
+
+                <FlexBox direction={FlexBoxDirection.Column} style={{ marginTop: '1rem', gap: '0.5rem' }}>
+                  <CheckBox
+                    text="Notifications par email"
+                    checked={formData.email_notifications}
+                    onChange={(e) => handleInputChange(e, 'email_notifications')}
+                  />
+                  <CheckBox
+                    text="Notifications push navigateur"
+                    checked={formData.push_notifications}
+                    onChange={(e) => handleInputChange(e, 'push_notifications')}
+                  />
+                </FlexBox>
+
+                <FlexBox justifyContent={FlexBoxJustifyContent.End} style={{ marginTop: '1rem' }}>
+                  <Button design={ButtonDesign.Emphasized} onClick={handleSaveProfile} disabled={saving}>
+                    Enregistrer
+                  </Button>
+                </FlexBox>
+              </div>
+            </Card>
+
+            {/* Password Card */}
+            <Card
+              header={
+                <CardHeader
+                  titleText="Changer le mot de passe"
+                  avatar={<Icon name="locked" />}
+                />
+              }
+            >
+              <div style={spacing.sapUiContentPadding}>
+                <MessageStrip design={MessageStripDesign.Information} style={{ marginBottom: '1rem' }}>
+                  Minimum 8 caractères avec lettres et chiffres
+                </MessageStrip>
+
+                <Form labelSpanM={4}>
+                  <FormItem label={<Label>Mot de passe actuel</Label>}>
+                    <Input
+                      type={InputType.Password}
+                      value={passwordForm.old_password}
+                      onInput={(e) => handlePasswordChange(e, 'old_password')}
+                      style={{ width: '100%' }}
+                    />
+                  </FormItem>
+
+                  <FormItem label={<Label>Nouveau mot de passe</Label>}>
+                    <Input
+                      type={InputType.Password}
+                      value={passwordForm.new_password}
+                      onInput={(e) => handlePasswordChange(e, 'new_password')}
+                      style={{ width: '100%' }}
+                    />
+                  </FormItem>
+
+                  <FormItem label={<Label>Confirmer le nouveau mot de passe</Label>}>
+                    <Input
+                      type={InputType.Password}
+                      value={passwordForm.new_password_confirm}
+                      onInput={(e) => handlePasswordChange(e, 'new_password_confirm')}
+                      style={{ width: '100%' }}
+                    />
+                  </FormItem>
+                </Form>
+
+                <FlexBox justifyContent={FlexBoxJustifyContent.End} style={{ marginTop: '1rem' }}>
+                  <Button
+                    design={ButtonDesign.Emphasized}
+                    onClick={handleChangePassword}
+                    disabled={saving || !passwordForm.old_password || !passwordForm.new_password}
+                  >
+                    Changer le mot de passe
+                  </Button>
+                </FlexBox>
+              </div>
+            </Card>
           </div>
-        </div>
-      </div>
+        </FlexBox>
+      </FlexBox>
     </ThemeProvider>
   );
 };
