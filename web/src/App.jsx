@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import {
   ThemeProvider,
   ShellBar,
-  ShellBarItem,
   Card,
   CardHeader,
   Title,
@@ -139,14 +138,9 @@ function App() {
       <ShellBar
         primaryTitle="OpsFlux"
         secondaryTitle="Gestion Intelligente des Flux Métiers"
-        logo={<Icon name="workflow-tasks" />}
         showProductSwitch={false}
         showCoPilot={false}
       >
-        <ShellBarItem icon="home" text="Accueil" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} />
-        <ShellBarItem icon="task" text="Flux" onClick={() => document.getElementById('flows')?.scrollIntoView({ behavior: 'smooth' })} />
-        <ShellBarItem icon="puzzle" text="Modules" onClick={() => document.getElementById('modules')?.scrollIntoView({ behavior: 'smooth' })} />
-        <ShellBarItem icon="chart-table-view" text="Fonctionnalités" onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })} />
         <Button design={ButtonDesign.Emphasized} onClick={() => setShowLogin(true)}>
           Se connecter
         </Button>
