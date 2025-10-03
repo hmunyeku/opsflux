@@ -18,10 +18,7 @@ import {
 import {
   FlexBoxJustifyContent,
   FlexBoxAlignItems,
-  FlexBoxDirection,
-  MessageStripDesign,
-  ButtonDesign,
-  InputType
+  FlexBoxDirection
 } from '@ui5/webcomponents-react';
 import '@ui5/webcomponents/dist/Assets.js';
 import '@ui5/webcomponents-fiori/dist/Assets.js';
@@ -157,7 +154,7 @@ const Login = () => {
           {error && (
             <div style={{ padding: '1rem', paddingTop: 0 }}>
               <MessageStrip
-                design={MessageStripDesign.Negative}
+                design="Negative"
                 onClose={() => setError('')}
               >
                 {error}
@@ -193,7 +190,7 @@ const Login = () => {
                 <Label required>Mot de passe</Label>
                 <Input
                   name="password"
-                  type={showPassword ? InputType.Text : InputType.Password}
+                  type={showPassword ? "Text" : "Password"}
                   value={formData.password}
                   onInput={handleInputChange}
                   placeholder="Entrez votre mot de passe"
@@ -212,7 +209,7 @@ const Login = () => {
 
               {/* Submit Button */}
               <Button
-                design={ButtonDesign.Emphasized}
+                design="Emphasized"
                 onClick={handleSubmit}
                 disabled={loading}
                 style={{ width: '100%', marginTop: '0.5rem' }}

@@ -29,22 +29,14 @@ import {
   BreadcrumbsItem,
   Popover,
   List,
-  StandardListItem,
-  Badge
+  ListItemStandard,
+  Tag
 } from '@ui5/webcomponents-react';
 import {
   FlexBoxDirection,
   FlexBoxJustifyContent,
   FlexBoxAlignItems,
-  FlexBoxWrap,
-  TitleLevel,
-  ButtonDesign,
-  MessageStripDesign,
-  InputType,
-  AvatarSize,
-  ValueState,
-  BarDesign,
-  PopoverPlacementType
+  FlexBoxWrap
 } from '@ui5/webcomponents-react';
 import '@ui5/webcomponents/dist/Assets.js';
 import '@ui5/webcomponents-fiori/dist/Assets.js';
@@ -131,7 +123,7 @@ const Profile = () => {
       });
       setLoading(false);
     } catch (error) {
-      setMessage({ type: MessageStripDesign.Negative, text: error.message });
+      setMessage({ type: "Negative", text: error.message });
       setLoading(false);
     }
   };
@@ -185,9 +177,9 @@ const Profile = () => {
         avatar_url: userData.avatar_url
       }));
 
-      setMessage({ type: MessageStripDesign.Success, text: 'Profil mis à jour avec succès' });
+      setMessage({ type: "Success", text: 'Profil mis à jour avec succès' });
     } catch (error) {
-      setMessage({ type: MessageStripDesign.Negative, text: error.message });
+      setMessage({ type: "Negative", text: error.message });
     } finally {
       setSaving(false);
     }
@@ -231,7 +223,7 @@ const Profile = () => {
       setPasswordForm({ old_password: '', new_password: '', new_password_confirm: '' });
       setMessage({ type: MessageStripDesign.Success, text: 'Mot de passe modifié avec succès' });
     } catch (error) {
-      setMessage({ type: MessageStripDesign.Negative, text: error.message });
+      setMessage({ type: "Negative", text: error.message });
     } finally {
       setSaving(false);
     }
@@ -277,7 +269,7 @@ const Profile = () => {
             <div ref={profileButtonRef}>
               <Avatar
                 initials={initials}
-                size={AvatarSize.XS}
+                size="XS"
                 style={{ cursor: 'pointer' }}
               />
             </div>
@@ -297,16 +289,15 @@ const Profile = () => {
         {/* Profile Popover */}
         <Popover
           ref={profilePopoverRef}
-          placementType={PopoverPlacementType.Bottom}
           headerText={displayName}
         >
           <List>
-            <StandardListItem icon="action-settings" onClick={() => { profilePopoverRef.current?.close(); navigate('/dashboard'); }}>
+            <ListItemStandard icon="action-settings" onClick={() => { profilePopoverRef.current?.close(); navigate('/dashboard'); }}>
               Tableau de bord
-            </StandardListItem>
-            <StandardListItem type="Active" icon="log" onClick={() => { profilePopoverRef.current?.close(); handleLogout(); }}>
+            </ListItemStandard>
+            <ListItemStandard type="Active" icon="log" onClick={() => { profilePopoverRef.current?.close(); handleLogout(); }}>
               Déconnexion
-            </StandardListItem>
+            </ListItemStandard>
           </List>
         </Popover>
 
@@ -330,24 +321,24 @@ const Profile = () => {
                 style={{ padding: '2rem', gap: '2rem', flexWrap: 'wrap' }}
               >
                 <Avatar
-                  size={AvatarSize.XL}
+                  size="XL"
                   initials={initials}
                   style={{ fontSize: '3rem' }}
                 />
                 <FlexBox direction={FlexBoxDirection.Column} style={{ flex: 1, gap: '0.5rem' }}>
-                  <Title level={TitleLevel.H3}>{displayName}</Title>
+                  <Title style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>{displayName}</Title>
                   <Text style={{ color: 'var(--sapNeutralTextColor)' }}>@{user.username}</Text>
                   <FlexBox alignItems={FlexBoxAlignItems.Center} style={{ gap: '1rem', marginTop: '0.5rem' }}>
-                    <ObjectStatus state={ValueState.Success} icon="email">
+                    <ObjectStatus state="Success" icon="email">
                       {user.email}
                     </ObjectStatus>
-                    <ObjectStatus state={isOnline ? ValueState.Success : ValueState.Error} icon={isOnline ? 'connected' : 'disconnected'}>
+                    <ObjectStatus state={isOnline ? "Success" : "Error"} icon={isOnline ? 'connected' : 'disconnected'}>
                       {isOnline ? 'En ligne' : 'Hors ligne'}
                     </ObjectStatus>
                   </FlexBox>
                 </FlexBox>
                 <FlexBox direction={FlexBoxDirection.Column} style={{ gap: '0.5rem' }}>
-                  <Badge colorScheme="8">Utilisateur actif</Badge>
+                  <Tag>Utilisateur actif</Tag>
                   <Text style={{ fontSize: '0.875rem', color: 'var(--sapNeutralTextColor)' }}>
                     Membre depuis 2025
                   </Text>
@@ -374,7 +365,7 @@ const Profile = () => {
               {/* Tab 1: Informations personnelles */}
               <Tab text="Informations personnelles" icon="person-placeholder" selected={selectedTab === 0}>
                 <div style={{ padding: '2rem' }}>
-                  <Title level={TitleLevel.H4} style={{ marginBottom: '1.5rem' }}>
+                  <Title style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '1.5rem' }}>
                     Informations personnelles
                   </Title>
                   <Form labelSpanM={4} columnsM={2} columnsL={2}>
@@ -382,7 +373,7 @@ const Profile = () => {
                       <Input value={user.username} disabled style={{ width: '100%' }} />
                     </FormItem>
                     <FormItem label={<Label>Email</Label>}>
-                      <Input value={formData.email} onInput={(e) => handleInputChange(e, 'email')} type={InputType.Email} style={{ width: '100%' }} />
+                      <Input value={formData.email} onInput={(e) => handleInputChange(e, 'email')} type="Email" style={{ width: '100%' }} />
                     </FormItem>
                     <FormItem label={<Label>Prénom</Label>}>
                       <Input value={formData.first_name} onInput={(e) => handleInputChange(e, 'first_name')} style={{ width: '100%' }} />
@@ -391,15 +382,15 @@ const Profile = () => {
                       <Input value={formData.last_name} onInput={(e) => handleInputChange(e, 'last_name')} style={{ width: '100%' }} />
                     </FormItem>
                     <FormItem label={<Label>Téléphone</Label>}>
-                      <Input value={formData.phone} onInput={(e) => handleInputChange(e, 'phone')} type={InputType.Tel} style={{ width: '100%' }} />
+                      <Input value={formData.phone} onInput={(e) => handleInputChange(e, 'phone')} type="Tel" style={{ width: '100%' }} />
                     </FormItem>
                     <FormItem label={<Label>Mobile</Label>}>
-                      <Input value={formData.mobile} onInput={(e) => handleInputChange(e, 'mobile')} type={InputType.Tel} style={{ width: '100%' }} />
+                      <Input value={formData.mobile} onInput={(e) => handleInputChange(e, 'mobile')} type="Tel" style={{ width: '100%' }} />
                     </FormItem>
                   </Form>
                   <FlexBox justifyContent={FlexBoxJustifyContent.End} style={{ marginTop: '2rem', gap: '0.5rem' }}>
-                    <Button design={ButtonDesign.Transparent} onClick={fetchProfile}>Annuler</Button>
-                    <Button design={ButtonDesign.Emphasized} icon="save" onClick={handleSaveProfile} disabled={saving}>
+                    <Button design="Transparent" onClick={fetchProfile}>Annuler</Button>
+                    <Button design="Emphasized" icon="save" onClick={handleSaveProfile} disabled={saving}>
                       {saving ? 'Enregistrement...' : 'Enregistrer'}
                     </Button>
                   </FlexBox>
@@ -409,7 +400,7 @@ const Profile = () => {
               {/* Tab 2: Sécurité */}
               <Tab text="Sécurité" icon="shield" selected={selectedTab === 1}>
                 <div style={{ padding: '2rem' }}>
-                  <Title level={TitleLevel.H4} style={{ marginBottom: '1.5rem' }}>
+                  <Title style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '1.5rem' }}>
                     Modifier le mot de passe
                   </Title>
                   <Form labelSpanM={4} columnsM={1} columnsL={1} style={{ maxWidth: '600px' }}>
@@ -417,7 +408,7 @@ const Profile = () => {
                       <Input
                         value={passwordForm.old_password}
                         onInput={(e) => handlePasswordChange(e, 'old_password')}
-                        type={InputType.Password}
+                        type="Password"
                         required
                         style={{ width: '100%' }}
                       />
@@ -426,7 +417,7 @@ const Profile = () => {
                       <Input
                         value={passwordForm.new_password}
                         onInput={(e) => handlePasswordChange(e, 'new_password')}
-                        type={InputType.Password}
+                        type="Password"
                         required
                         style={{ width: '100%' }}
                       />
@@ -435,26 +426,26 @@ const Profile = () => {
                       <Input
                         value={passwordForm.new_password_confirm}
                         onInput={(e) => handlePasswordChange(e, 'new_password_confirm')}
-                        type={InputType.Password}
+                        type="Password"
                         required
                         style={{ width: '100%' }}
                       />
                     </FormItem>
                   </Form>
                   <FlexBox justifyContent={FlexBoxJustifyContent.Start} style={{ marginTop: '2rem', gap: '0.5rem' }}>
-                    <Button design={ButtonDesign.Emphasized} icon="locked" onClick={handleChangePassword} disabled={saving}>
+                    <Button design="Emphasized" icon="locked" onClick={handleChangePassword} disabled={saving}>
                       {saving ? 'Modification...' : 'Changer le mot de passe'}
                     </Button>
                   </FlexBox>
 
                   <div style={{ marginTop: '3rem', padding: '1.5rem', background: 'var(--sapInfoBackground)', borderRadius: '0.25rem' }}>
-                    <Title level={TitleLevel.H5} style={{ marginBottom: '1rem' }}>
+                    <Title style={{ fontSize: '1rem', fontWeight: 'bold', marginBottom: '1rem' }}>
                       Authentification à deux facteurs (2FA)
                     </Title>
                     <Text style={{ display: 'block', marginBottom: '1rem' }}>
                       Ajoutez une couche de sécurité supplémentaire à votre compte
                     </Text>
-                    <Button design={ButtonDesign.Default} icon="add" disabled>
+                    <Button design="Default" icon="add" disabled>
                       Activer 2FA (Bientôt disponible)
                     </Button>
                   </div>
@@ -464,7 +455,7 @@ const Profile = () => {
               {/* Tab 3: Préférences */}
               <Tab text="Préférences" icon="action-settings" selected={selectedTab === 2}>
                 <div style={{ padding: '2rem' }}>
-                  <Title level={TitleLevel.H4} style={{ marginBottom: '1.5rem' }}>
+                  <Title style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '1.5rem' }}>
                     Préférences
                   </Title>
                   <Form labelSpanM={4} columnsM={2} columnsL={2}>
@@ -501,7 +492,7 @@ const Profile = () => {
                   </Form>
 
                   <div style={{ marginTop: '2rem' }}>
-                    <Title level={TitleLevel.H5} style={{ marginBottom: '1rem' }}>
+                    <Title style={{ fontSize: '1rem', fontWeight: 'bold', marginBottom: '1rem' }}>
                       Notifications
                     </Title>
                     <FlexBox direction={FlexBoxDirection.Column} style={{ gap: '1rem' }}>
@@ -519,8 +510,8 @@ const Profile = () => {
                   </div>
 
                   <FlexBox justifyContent={FlexBoxJustifyContent.End} style={{ marginTop: '2rem', gap: '0.5rem' }}>
-                    <Button design={ButtonDesign.Transparent} onClick={fetchProfile}>Annuler</Button>
-                    <Button design={ButtonDesign.Emphasized} icon="save" onClick={handleSaveProfile} disabled={saving}>
+                    <Button design="Transparent" onClick={fetchProfile}>Annuler</Button>
+                    <Button design="Emphasized" icon="save" onClick={handleSaveProfile} disabled={saving}>
                       {saving ? 'Enregistrement...' : 'Enregistrer'}
                     </Button>
                   </FlexBox>
@@ -531,7 +522,7 @@ const Profile = () => {
 
           {/* Footer Toolbar */}
           <Bar
-            design={BarDesign.Footer}
+            design="Footer"
             startContent={
               <FlexBox alignItems={FlexBoxAlignItems.Center} style={{ gap: '0.5rem' }}>
                 <Icon name="sys-monitor" />

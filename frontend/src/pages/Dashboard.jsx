@@ -24,7 +24,7 @@ import {
   Badge,
   BusyIndicator,
   List,
-  StandardListItem,
+  ListItemStandard,
   AnalyticalTable,
   IllustratedMessage
 } from '@ui5/webcomponents-react';
@@ -32,13 +32,7 @@ import {
   FlexBoxDirection,
   FlexBoxJustifyContent,
   FlexBoxAlignItems,
-  FlexBoxWrap,
-  TitleLevel,
-  ButtonDesign,
-  ValueState,
-  BarDesign,
-  AvatarSize,
-  IllustrationMessageType
+  FlexBoxWrap
 } from '@ui5/webcomponents-react';
 import '@ui5/webcomponents/dist/Assets.js';
 import '@ui5/webcomponents-fiori/dist/Assets.js';
@@ -132,7 +126,7 @@ const Dashboard = () => {
           profile={
             <Avatar
               initials={initials}
-              size={AvatarSize.XS}
+              size="XS"
               onClick={() => navigate('/profile')}
               style={{ cursor: 'pointer' }}
             />
@@ -146,17 +140,17 @@ const Dashboard = () => {
         >
           <Button
             icon="search"
-            design={ButtonDesign.Transparent}
+            design="Transparent"
             onClick={() => console.log('Search')}
           />
           <Button
             icon={isOnline ? 'connected' : 'disconnected'}
-            design={ButtonDesign.Transparent}
+            design="Transparent"
             tooltip={isOnline ? 'En ligne' : 'Hors ligne'}
           />
           <Button
             icon="menu2"
-            design={ButtonDesign.Transparent}
+            design="Transparent"
             onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
           />
         </ShellBar>
@@ -220,7 +214,7 @@ const Dashboard = () => {
             headerTitle={
               <DynamicPageTitle
                 header={
-                  <Title level={TitleLevel.H2}>
+                  <Title style={{ fontSize: '2rem', fontWeight: 'bold' }}>
                     Bienvenue, {displayName}
                   </Title>
                 }
@@ -231,17 +225,17 @@ const Dashboard = () => {
                 }
                 actions={
                   <>
-                    <Button design={ButtonDesign.Emphasized} icon="refresh">
+                    <Button design="Emphasized" icon="refresh">
                       Actualiser
                     </Button>
-                    <Button design={ButtonDesign.Transparent} icon="action-settings">
+                    <Button design="Transparent" icon="action-settings">
                       Paramètres
                     </Button>
                   </>
                 }
                 navigationActions={
                   <Button
-                    design={ButtonDesign.Transparent}
+                    design="Transparent"
                     icon="full-screen"
                     onClick={() => console.log('Fullscreen')}
                   />
@@ -261,28 +255,28 @@ const Dashboard = () => {
                   {/* KPI Cards */}
                   <FlexBox direction={FlexBoxDirection.Column} style={{ minWidth: '10rem' }}>
                     <Label>Modules actifs</Label>
-                    <Title level={TitleLevel.H3}>{stats.modules}</Title>
-                    <ObjectStatus state={ValueState.Success}>
+                    <Title style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>{stats.modules}</Title>
+                    <ObjectStatus state="Success">
                       +2 ce mois
                     </ObjectStatus>
                   </FlexBox>
                   <FlexBox direction={FlexBoxDirection.Column} style={{ minWidth: '10rem' }}>
                     <Label>Utilisateurs</Label>
                     <Title level={TitleLevel.H3}>{stats.users}</Title>
-                    <ObjectStatus state={ValueState.Information}>
+                    <ObjectStatus state="Information">
                       Actifs
                     </ObjectStatus>
                   </FlexBox>
                   <FlexBox direction={FlexBoxDirection.Column} style={{ minWidth: '10rem' }}>
                     <Label>Tâches en cours</Label>
                     <Title level={TitleLevel.H3}>{stats.tasks}</Title>
-                    <ObjectStatus state={ValueState.Warning}>
+                    <ObjectStatus state="Warning">
                       À traiter
                     </ObjectStatus>
                   </FlexBox>
                   <FlexBox direction={FlexBoxDirection.Column} style={{ minWidth: '10rem' }}>
                     <Label>Statut système</Label>
-                    <ObjectStatus state={isOnline ? ValueState.Success : ValueState.Error} icon={isOnline ? 'connected' : 'disconnected'}>
+                    <ObjectStatus state={isOnline ? "Success" : "Error"} icon={isOnline ? 'connected' : 'disconnected'}>
                       {isOnline ? 'En ligne' : 'Hors ligne'}
                     </ObjectStatus>
                   </FlexBox>
@@ -306,7 +300,7 @@ const Dashboard = () => {
                       subtitleText="Propulsé par Claude AI"
                       avatar={<Icon name="bot" />}
                       action={
-                        <Button design={ButtonDesign.Transparent} icon="overflow">
+                        <Button design="Transparent" icon="overflow">
                           Actions
                         </Button>
                       }
@@ -322,10 +316,10 @@ const Dashboard = () => {
                       Posez vos questions, demandez des analyses ou obtenez des recommandations.
                     </Text>
                     <FlexBox style={{ gap: '0.5rem' }}>
-                      <Button design={ButtonDesign.Emphasized} icon="conversation">
+                      <Button design="Emphasized" icon="conversation">
                         Démarrer une conversation
                       </Button>
-                      <Button design={ButtonDesign.Default} icon="hint">
+                      <Button design="Default" icon="hint">
                         Exemples
                       </Button>
                     </FlexBox>
@@ -347,8 +341,8 @@ const Dashboard = () => {
                       style={{ padding: '2rem', gap: '1rem' }}
                     >
                       <Icon name="add-document" style={{ fontSize: '3rem', color: 'var(--sapBrandColor)' }} />
-                      <Title level={TitleLevel.H5}>Nouveau document</Title>
-                      <Button design={ButtonDesign.Emphasized} icon="add">
+                      <Title style={{ fontSize: '1rem', fontWeight: 'bold' }}>Nouveau document</Title>
+                      <Button design="Emphasized" icon="add">
                         Créer
                       </Button>
                     </FlexBox>
@@ -360,9 +354,9 @@ const Dashboard = () => {
                       style={{ padding: '2rem', gap: '1rem' }}
                     >
                       <Icon name="group" style={{ fontSize: '3rem', color: 'var(--sapBrandColor)' }} />
-                      <Title level={TitleLevel.H5}>Gérer utilisateurs</Title>
+                      <Title style={{ fontSize: '1rem', fontWeight: 'bold' }}>Gérer utilisateurs</Title>
                       <Button
-                        design={ButtonDesign.Emphasized}
+                        design="Emphasized"
                         icon="navigation-right-arrow"
                         onClick={() => navigate('/users')}
                       >
@@ -377,9 +371,9 @@ const Dashboard = () => {
                       style={{ padding: '2rem', gap: '1rem' }}
                     >
                       <Icon name="puzzle" style={{ fontSize: '3rem', color: 'var(--sapBrandColor)' }} />
-                      <Title level={TitleLevel.H5}>Installer module</Title>
+                      <Title style={{ fontSize: '1rem', fontWeight: 'bold' }}>Installer module</Title>
                       <Button
-                        design={ButtonDesign.Emphasized}
+                        design="Emphasized"
                         icon="navigation-right-arrow"
                         onClick={() => navigate('/modules')}
                       >
@@ -413,7 +407,7 @@ const Dashboard = () => {
                       style={{ padding: '3rem' }}
                     >
                       <IllustratedMessage
-                        name={IllustrationMessageType.NoData}
+                        name="NoData"
                         titleText="Aucune activité récente"
                         subtitleText="Les actions effectuées apparaîtront ici"
                       />
@@ -421,14 +415,14 @@ const Dashboard = () => {
                   ) : (
                     <List>
                       {recentActivities.map((activity, index) => (
-                        <StandardListItem
+                        <ListItemStandard
                           key={index}
                           description={activity.description}
                           additionalText={activity.time}
                           icon={activity.icon}
                         >
                           {activity.title}
-                        </StandardListItem>
+                        </ListItemStandard>
                       ))}
                     </List>
                   )}
@@ -440,7 +434,7 @@ const Dashboard = () => {
 
         {/* Footer Bar */}
         <Bar
-          design={BarDesign.Footer}
+          design="Footer"
           startContent={
             <FlexBox alignItems={FlexBoxAlignItems.Center} style={{ gap: '0.5rem' }}>
               <Icon name="sys-monitor" />
