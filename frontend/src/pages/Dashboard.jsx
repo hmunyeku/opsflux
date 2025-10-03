@@ -1,11 +1,15 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   ThemeProvider,
   ShellBar,
-  ShellBarItem,
   SideNavigation,
   SideNavigationItem,
+  DynamicPage,
+  DynamicPageTitle,
+  DynamicPageHeader,
+  ObjectPage,
+  ObjectPageSection,
   Card,
   CardHeader,
   Button,
@@ -15,16 +19,14 @@ import {
   Title,
   Text,
   ObjectStatus,
-  Popover,
+  Bar,
+  Label,
+  Badge,
+  BusyIndicator,
   List,
   StandardListItem,
-  Input,
-  Badge,
-  Breadcrumbs,
-  BreadcrumbsItem,
-  BusyIndicator,
-  Bar,
-  Label
+  AnalyticalTable,
+  IllustratedMessage
 } from '@ui5/webcomponents-react';
 import {
   FlexBoxDirection,
@@ -35,38 +37,34 @@ import {
   ButtonDesign,
   ValueState,
   BarDesign,
-  PopoverPlacementType,
-  AvatarSize
+  AvatarSize,
+  IllustrationMessageType
 } from '@ui5/webcomponents-react';
 import '@ui5/webcomponents/dist/Assets.js';
 import '@ui5/webcomponents-fiori/dist/Assets.js';
 import '@ui5/webcomponents-icons/dist/AllIcons.js';
 
+/**
+ * Dashboard OpsFlux - Pattern UXC Integration
+ * Basé sur la documentation UI5 Web Components v2.15
+ * https://pr-12428--ui5-webcomponents-preview.netlify.app/components/patterns/UXC%20Integration/
+ */
 const Dashboard = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
-  const [selectedItem, setSelectedItem] = useState('dashboard');
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [loading, setLoading] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
-  // Refs for Popovers
-  const profilePopoverRef = useRef(null);
-  const notificationPopoverRef = useRef(null);
-  const searchPopoverRef = useRef(null);
-  const profileButtonRef = useRef(null);
-  const notificationButtonRef = useRef(null);
-  const searchButtonRef = useRef(null);
+  // Mock data - À remplacer par appels API
+  const [stats, setStats] = useState({
+    modules: 5,
+    users: 12,
+    tasks: 24,
+    notifications: 8
+  });
 
-  // Mock notifications
-  const [notifications] = useState([
-    { id: 1, title: 'Nouvelle tâche assignée', description: 'Vous avez été assigné à une nouvelle tâche', time: 'Il y a 5 min', unread: true },
-    { id: 2, title: 'Mise à jour système', description: 'Le système a été mis à jour avec succès', time: 'Il y a 1h', unread: true },
-    { id: 3, title: 'Rapport disponible', description: 'Votre rapport mensuel est prêt', time: 'Il y a 2h', unread: false }
-  ]);
-
-  const unreadCount = notifications.filter(n => n.unread).length;
+  const [recentActivities, setRecentActivities] = useState([]);
 
   useEffect(() => {
     const token = localStorage.getItem('access_token');
@@ -101,38 +99,8 @@ const Dashboard = () => {
     navigate('/login');
   };
 
-  const handleProfileClick = () => {
-    navigate('/profile');
-  };
-
-  const handleNavigation = (itemId) => {
-    setSelectedItem(itemId);
-    if (itemId === 'profile') {
-      navigate('/profile');
-    }
-  };
-
-  const toggleProfilePopover = (e) => {
-    if (profilePopoverRef.current) {
-      profilePopoverRef.current.showAt(e.detail.targetRef || profileButtonRef.current);
-    }
-  };
-
-  const toggleNotificationPopover = (e) => {
-    if (notificationPopoverRef.current) {
-      notificationPopoverRef.current.showAt(e.detail.targetRef || notificationButtonRef.current);
-    }
-  };
-
-  const toggleSearchPopover = (e) => {
-    if (searchPopoverRef.current) {
-      searchPopoverRef.current.showAt(e.detail.targetRef || searchButtonRef.current);
-    }
-  };
-
-  const handleSearch = (e) => {
-    setSearchQuery(e.target.value);
-    // Implement search logic here
+  const handleNavigation = (path) => {
+    navigate(path);
   };
 
   if (!user) {
@@ -156,154 +124,50 @@ const Dashboard = () => {
         direction={FlexBoxDirection.Column}
         style={{ height: '100vh', background: 'var(--sapBackgroundColor)' }}
       >
-        {/* ShellBar Header with all features */}
+        {/* ShellBar - UXC Integration Pattern */}
         <ShellBar
           primaryTitle="OpsFlux"
-          secondaryTitle="Plateforme Entreprise"
+          secondaryTitle="Plateforme Entreprise Intelligente"
           logo={<Icon name="business-suite" />}
           profile={
-            <div ref={profileButtonRef}>
-              <Avatar
-                initials={initials}
-                size={AvatarSize.XS}
-                style={{ cursor: 'pointer' }}
-              />
-            </div>
+            <Avatar
+              initials={initials}
+              size={AvatarSize.XS}
+              onClick={() => navigate('/profile')}
+              style={{ cursor: 'pointer' }}
+            />
           }
-          onProfileClick={toggleProfilePopover}
-          onLogoClick={() => handleNavigation('dashboard')}
+          onLogoClick={() => navigate('/dashboard')}
+          showNotifications
+          notificationsCount={stats.notifications.toString()}
+          onNotificationsClick={() => console.log('Notifications clicked')}
           showProductSwitch={false}
           showCoPilot={false}
         >
-          {/* Search Button */}
-          <ShellBarItem
+          <Button
             icon="search"
-            text="Rechercher"
-            ref={searchButtonRef}
-            onClick={toggleSearchPopover}
+            design={ButtonDesign.Transparent}
+            onClick={() => console.log('Search')}
           />
-
-          {/* Notifications with Badge */}
-          <div ref={notificationButtonRef} style={{ position: 'relative' }}>
-            <ShellBarItem
-              icon="bell"
-              text="Notifications"
-              onClick={toggleNotificationPopover}
-            />
-            {unreadCount > 0 && (
-              <Badge
-                colorScheme="8"
-                style={{
-                  position: 'absolute',
-                  top: '4px',
-                  right: '4px',
-                  pointerEvents: 'none'
-                }}
-              >
-                {unreadCount}
-              </Badge>
-            )}
-          </div>
-
-          {/* Online/Offline Status */}
-          <ShellBarItem
+          <Button
             icon={isOnline ? 'connected' : 'disconnected'}
-            text={isOnline ? 'En ligne' : 'Hors ligne'}
+            design={ButtonDesign.Transparent}
+            tooltip={isOnline ? 'En ligne' : 'Hors ligne'}
           />
-
-          {/* Sidebar Toggle */}
-          <ShellBarItem
-            icon={sidebarCollapsed ? 'open-command-field' : 'close-command-field'}
-            text={sidebarCollapsed ? 'Afficher menu' : 'Masquer menu'}
+          <Button
+            icon="menu2"
+            design={ButtonDesign.Transparent}
             onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
           />
         </ShellBar>
 
-        {/* Profile Popover */}
-        <Popover
-          ref={profilePopoverRef}
-          placementType={PopoverPlacementType.Bottom}
-          headerText={displayName}
-        >
-          <List>
-            <StandardListItem
-              icon="account"
-              onClick={() => {
-                profilePopoverRef.current?.close();
-                handleProfileClick();
-              }}
-            >
-              Mon profil
-            </StandardListItem>
-            <StandardListItem
-              icon="action-settings"
-              onClick={() => {
-                profilePopoverRef.current?.close();
-                handleNavigation('settings');
-              }}
-            >
-              Paramètres
-            </StandardListItem>
-            <StandardListItem
-              type="Active"
-              icon="log"
-              onClick={() => {
-                profilePopoverRef.current?.close();
-                handleLogout();
-              }}
-            >
-              Déconnexion
-            </StandardListItem>
-          </List>
-        </Popover>
-
-        {/* Notification Popover */}
-        <Popover
-          ref={notificationPopoverRef}
-          placementType={PopoverPlacementType.Bottom}
-          headerText="Notifications"
-          style={{ width: '20rem' }}
-        >
-          <List>
-            {notifications.map(notif => (
-              <StandardListItem
-                key={notif.id}
-                description={notif.time}
-                additionalText={notif.description}
-                icon={notif.unread ? 'message-warning' : 'message-information'}
-                onClick={() => notificationPopoverRef.current?.close()}
-              >
-                {notif.title}
-              </StandardListItem>
-            ))}
-          </List>
-        </Popover>
-
-        {/* Search Popover */}
-        <Popover
-          ref={searchPopoverRef}
-          placementType={PopoverPlacementType.Bottom}
-          headerText="Recherche globale"
-          style={{ width: '20rem' }}
-        >
-          <div style={{ padding: '1rem' }}>
-            <Input
-              placeholder="Rechercher..."
-              value={searchQuery}
-              onInput={handleSearch}
-              icon={<Icon name="search" />}
-              style={{ width: '100%' }}
-            />
-          </div>
-        </Popover>
-
-        {/* Layout Principal */}
+        {/* Layout Principal avec SideNavigation */}
         <FlexBox style={{ flex: 1, overflow: 'hidden' }}>
-          {/* Sidebar Navigation - Collapsible */}
+          {/* Side Navigation - UXC Integration Pattern */}
           {!sidebarCollapsed && (
             <div
               style={{
-                width: '15rem',
+                width: '16rem',
                 borderRight: '1px solid var(--sapGroup_ContentBorderColor)',
                 background: 'var(--sapShell_Background)',
                 overflowY: 'auto',
@@ -311,296 +175,290 @@ const Dashboard = () => {
               }}
             >
               <SideNavigation
-                onSelectionChange={(e) => handleNavigation(e.detail.item.id)}
+                onSelectionChange={(e) => {
+                  const itemId = e.detail.item.getAttribute('data-id');
+                  if (itemId) handleNavigation(itemId);
+                }}
               >
                 <SideNavigationItem
-                  id="dashboard"
+                  data-id="/dashboard"
                   text="Tableau de bord"
                   icon="home"
-                  selected={selectedItem === 'dashboard'}
+                  selected
                 />
                 <SideNavigationItem
-                  id="profile"
+                  data-id="/profile"
                   text="Mon profil"
                   icon="account"
-                  selected={selectedItem === 'profile'}
                 />
                 <SideNavigationItem
-                  id="users"
+                  data-id="/users"
                   text="Utilisateurs"
                   icon="group"
-                  selected={selectedItem === 'users'}
                 />
                 <SideNavigationItem
-                  id="modules"
+                  data-id="/modules"
                   text="Modules"
                   icon="puzzle"
-                  selected={selectedItem === 'modules'}
                 />
                 <SideNavigationItem
-                  id="settings"
+                  data-id="/ai"
+                  text="Assistant IA"
+                  icon="bot"
+                />
+                <SideNavigationItem
+                  data-id="/settings"
                   text="Paramètres"
                   icon="action-settings"
-                  selected={selectedItem === 'settings'}
                 />
               </SideNavigation>
             </div>
           )}
 
-          {/* Content Area */}
-          <FlexBox
-            direction={FlexBoxDirection.Column}
-            style={{ flex: 1, background: 'var(--sapBackgroundColor)' }}
-          >
-            {/* Breadcrumbs */}
-            <div style={{ padding: '0.5rem 1rem', borderBottom: '1px solid var(--sapGroup_ContentBorderColor)' }}>
-              <Breadcrumbs>
-                <BreadcrumbsItem href="#" onClick={(e) => { e.preventDefault(); handleNavigation('dashboard'); }}>
-                  Accueil
-                </BreadcrumbsItem>
-                <BreadcrumbsItem>
-                  Tableau de bord
-                </BreadcrumbsItem>
-              </Breadcrumbs>
-            </div>
-
-            {/* Main Content Area with scroll */}
-            <div style={{ flex: 1, overflowY: 'auto', padding: '1rem' }}>
-              {/* Loading Indicator */}
-              {loading && (
-                <FlexBox
-                  justifyContent={FlexBoxJustifyContent.Center}
-                  style={{ padding: '2rem' }}
-                >
-                  <BusyIndicator active size="Medium" text="Chargement en cours..." />
+          {/* DynamicPage - Main Content */}
+          <DynamicPage
+            headerTitle={
+              <DynamicPageTitle
+                header={
+                  <Title level={TitleLevel.H2}>
+                    Bienvenue, {displayName}
+                  </Title>
+                }
+                subHeader={
+                  <Text style={{ color: 'var(--sapNeutralTextColor)' }}>
+                    Vue d'ensemble de votre espace de travail
+                  </Text>
+                }
+                actions={
+                  <>
+                    <Button design={ButtonDesign.Emphasized} icon="refresh">
+                      Actualiser
+                    </Button>
+                    <Button design={ButtonDesign.Transparent} icon="action-settings">
+                      Paramètres
+                    </Button>
+                  </>
+                }
+                navigationActions={
+                  <Button
+                    design={ButtonDesign.Transparent}
+                    icon="full-screen"
+                    onClick={() => console.log('Fullscreen')}
+                  />
+                }
+                breadcrumbs={
+                  <FlexBox alignItems={FlexBoxAlignItems.Center} style={{ gap: '0.5rem' }}>
+                    <Icon name="home" style={{ fontSize: '1rem' }} />
+                    <Text>/</Text>
+                    <Text>Tableau de bord</Text>
+                  </FlexBox>
+                }
+              />
+            }
+            headerContent={
+              <DynamicPageHeader>
+                <FlexBox wrap={FlexBoxWrap.Wrap} style={{ gap: '2rem', padding: '1rem' }}>
+                  {/* KPI Cards */}
+                  <FlexBox direction={FlexBoxDirection.Column} style={{ minWidth: '10rem' }}>
+                    <Label>Modules actifs</Label>
+                    <Title level={TitleLevel.H3}>{stats.modules}</Title>
+                    <ObjectStatus state={ValueState.Success}>
+                      +2 ce mois
+                    </ObjectStatus>
+                  </FlexBox>
+                  <FlexBox direction={FlexBoxDirection.Column} style={{ minWidth: '10rem' }}>
+                    <Label>Utilisateurs</Label>
+                    <Title level={TitleLevel.H3}>{stats.users}</Title>
+                    <ObjectStatus state={ValueState.Information}>
+                      Actifs
+                    </ObjectStatus>
+                  </FlexBox>
+                  <FlexBox direction={FlexBoxDirection.Column} style={{ minWidth: '10rem' }}>
+                    <Label>Tâches en cours</Label>
+                    <Title level={TitleLevel.H3}>{stats.tasks}</Title>
+                    <ObjectStatus state={ValueState.Warning}>
+                      À traiter
+                    </ObjectStatus>
+                  </FlexBox>
+                  <FlexBox direction={FlexBoxDirection.Column} style={{ minWidth: '10rem' }}>
+                    <Label>Statut système</Label>
+                    <ObjectStatus state={isOnline ? ValueState.Success : ValueState.Error} icon={isOnline ? 'connected' : 'disconnected'}>
+                      {isOnline ? 'En ligne' : 'Hors ligne'}
+                    </ObjectStatus>
+                  </FlexBox>
                 </FlexBox>
-              )}
-
-              {/* Welcome Header */}
-              {!loading && (
-                <>
+              </DynamicPageHeader>
+            }
+            style={{ flex: 1 }}
+          >
+            {/* Main Content - ObjectPage Sections */}
+            <ObjectPage>
+              {/* Section 1: Assistant IA */}
+              <ObjectPageSection
+                titleText="Assistant IA"
+                id="section-ai"
+                aria-label="Section Assistant IA"
+              >
+                <Card
+                  header={
+                    <CardHeader
+                      titleText="Assistant Intelligent"
+                      subtitleText="Propulsé par Claude AI"
+                      avatar={<Icon name="bot" />}
+                      action={
+                        <Button design={ButtonDesign.Transparent} icon="overflow">
+                          Actions
+                        </Button>
+                      }
+                    />
+                  }
+                >
                   <FlexBox
                     direction={FlexBoxDirection.Column}
-                    style={{ marginBottom: '2rem' }}
+                    style={{ padding: '1.5rem', gap: '1rem' }}
                   >
-                    <Title level={TitleLevel.H2}>
-                      Bienvenue, {displayName}
-                    </Title>
-                    <Text style={{ color: 'var(--sapNeutralTextColor)', marginTop: '0.5rem' }}>
-                      Voici un aperçu de votre espace de travail
+                    <Text>
+                      L'assistant intelligent est prêt à vous aider dans vos tâches quotidiennes.
+                      Posez vos questions, demandez des analyses ou obtenez des recommandations.
                     </Text>
+                    <FlexBox style={{ gap: '0.5rem' }}>
+                      <Button design={ButtonDesign.Emphasized} icon="conversation">
+                        Démarrer une conversation
+                      </Button>
+                      <Button design={ButtonDesign.Default} icon="hint">
+                        Exemples
+                      </Button>
+                    </FlexBox>
                   </FlexBox>
+                </Card>
+              </ObjectPageSection>
 
-              {/* Statistics Grid */}
-              <FlexBox
-                wrap={FlexBoxWrap.Wrap}
-                style={{ gap: '1rem', marginBottom: '2rem' }}
+              {/* Section 2: Actions Rapides */}
+              <ObjectPageSection
+                titleText="Actions rapides"
+                id="section-actions"
+                aria-label="Section Actions rapides"
               >
-                {/* Stat Card 1 */}
+                <FlexBox wrap={FlexBoxWrap.Wrap} style={{ gap: '1rem' }}>
+                  <Card style={{ minWidth: '15rem', flex: '1' }}>
+                    <FlexBox
+                      direction={FlexBoxDirection.Column}
+                      alignItems={FlexBoxAlignItems.Center}
+                      style={{ padding: '2rem', gap: '1rem' }}
+                    >
+                      <Icon name="add-document" style={{ fontSize: '3rem', color: 'var(--sapBrandColor)' }} />
+                      <Title level={TitleLevel.H5}>Nouveau document</Title>
+                      <Button design={ButtonDesign.Emphasized} icon="add">
+                        Créer
+                      </Button>
+                    </FlexBox>
+                  </Card>
+                  <Card style={{ minWidth: '15rem', flex: '1' }}>
+                    <FlexBox
+                      direction={FlexBoxDirection.Column}
+                      alignItems={FlexBoxAlignItems.Center}
+                      style={{ padding: '2rem', gap: '1rem' }}
+                    >
+                      <Icon name="group" style={{ fontSize: '3rem', color: 'var(--sapBrandColor)' }} />
+                      <Title level={TitleLevel.H5}>Gérer utilisateurs</Title>
+                      <Button
+                        design={ButtonDesign.Emphasized}
+                        icon="navigation-right-arrow"
+                        onClick={() => navigate('/users')}
+                      >
+                        Accéder
+                      </Button>
+                    </FlexBox>
+                  </Card>
+                  <Card style={{ minWidth: '15rem', flex: '1' }}>
+                    <FlexBox
+                      direction={FlexBoxDirection.Column}
+                      alignItems={FlexBoxAlignItems.Center}
+                      style={{ padding: '2rem', gap: '1rem' }}
+                    >
+                      <Icon name="puzzle" style={{ fontSize: '3rem', color: 'var(--sapBrandColor)' }} />
+                      <Title level={TitleLevel.H5}>Installer module</Title>
+                      <Button
+                        design={ButtonDesign.Emphasized}
+                        icon="navigation-right-arrow"
+                        onClick={() => navigate('/modules')}
+                      >
+                        Explorer
+                      </Button>
+                    </FlexBox>
+                  </Card>
+                </FlexBox>
+              </ObjectPageSection>
+
+              {/* Section 3: Activité Récente */}
+              <ObjectPageSection
+                titleText="Activité récente"
+                id="section-activity"
+                aria-label="Section Activité récente"
+              >
                 <Card
-                  style={{ minWidth: '18rem', flex: '1' }}
                   header={
                     <CardHeader
-                      titleText="Modules actifs"
-                      avatar={<Icon name="puzzle" />}
-                      action={
-                        <ObjectStatus state={ValueState.Information}>
-                          5
-                        </ObjectStatus>
-                      }
+                      titleText="Dernières actions"
+                      subtitleText="Activité des dernières 24 heures"
+                      avatar={<Icon name="activities" />}
                     />
                   }
                 >
-                  <div style={{ padding: '1rem' }}>
-                    <Text>
-                      Modules installés et opérationnels
-                    </Text>
-                  </div>
+                  {recentActivities.length === 0 ? (
+                    <FlexBox
+                      direction={FlexBoxDirection.Column}
+                      alignItems={FlexBoxAlignItems.Center}
+                      justifyContent={FlexBoxJustifyContent.Center}
+                      style={{ padding: '3rem' }}
+                    >
+                      <IllustratedMessage
+                        name={IllustrationMessageType.NoData}
+                        titleText="Aucune activité récente"
+                        subtitleText="Les actions effectuées apparaîtront ici"
+                      />
+                    </FlexBox>
+                  ) : (
+                    <List>
+                      {recentActivities.map((activity, index) => (
+                        <StandardListItem
+                          key={index}
+                          description={activity.description}
+                          additionalText={activity.time}
+                          icon={activity.icon}
+                        >
+                          {activity.title}
+                        </StandardListItem>
+                      ))}
+                    </List>
+                  )}
                 </Card>
-
-                {/* Stat Card 2 */}
-                <Card
-                  style={{ minWidth: '18rem', flex: '1' }}
-                  header={
-                    <CardHeader
-                      titleText="Utilisateurs"
-                      avatar={<Icon name="group" />}
-                      action={
-                        <ObjectStatus state={ValueState.Success}>
-                          12
-                        </ObjectStatus>
-                      }
-                    />
-                  }
-                >
-                  <div style={{ padding: '1rem' }}>
-                    <Text>
-                      Utilisateurs actifs dans le système
-                    </Text>
-                  </div>
-                </Card>
-
-                {/* Stat Card 3 */}
-                <Card
-                  style={{ minWidth: '18rem', flex: '1' }}
-                  header={
-                    <CardHeader
-                      titleText="Tâches"
-                      avatar={<Icon name="task" />}
-                      action={
-                        <ObjectStatus state={ValueState.Warning}>
-                          24
-                        </ObjectStatus>
-                      }
-                    />
-                  }
-                >
-                  <div style={{ padding: '1rem' }}>
-                    <Text>
-                      Tâches en attente de traitement
-                    </Text>
-                  </div>
-                </Card>
-
-                {/* Stat Card 4 */}
-                <Card
-                  style={{ minWidth: '18rem', flex: '1' }}
-                  header={
-                    <CardHeader
-                      titleText="Notifications"
-                      avatar={<Icon name="bell" />}
-                      action={
-                        <ObjectStatus state={ValueState.Information}>
-                          8
-                        </ObjectStatus>
-                      }
-                    />
-                  }
-                >
-                  <div style={{ padding: '1rem' }}>
-                    <Text>
-                      Nouvelles notifications
-                    </Text>
-                  </div>
-                </Card>
-              </FlexBox>
-
-              {/* AI Assistant Card */}
-              <Card
-                style={{ marginBottom: '2rem' }}
-                header={
-                  <CardHeader
-                    titleText="Assistant IA"
-                    subtitleText="Propulsé par Claude AI"
-                    avatar={<Icon name="bot" />}
-                  />
-                }
-              >
-                <FlexBox
-                  direction={FlexBoxDirection.Column}
-                  style={{ padding: '1rem', gap: '1rem' }}
-                >
-                  <Text>
-                    L'assistant intelligent est prêt à vous aider dans vos tâches quotidiennes.
-                    Posez vos questions, demandez des analyses ou obtenez des recommandations.
-                  </Text>
-                  <Button design={ButtonDesign.Emphasized} icon="conversation">
-                    Démarrer une conversation
-                  </Button>
-                </FlexBox>
-              </Card>
-
-              {/* Quick Actions */}
-              <Card
-                style={{ marginBottom: '2rem' }}
-                header={
-                  <CardHeader
-                    titleText="Actions rapides"
-                    subtitleText="Accédez rapidement aux fonctionnalités principales"
-                    avatar={<Icon name="action" />}
-                  />
-                }
-              >
-                <FlexBox
-                  wrap={FlexBoxWrap.Wrap}
-                  style={{ padding: '1rem', gap: '0.5rem' }}
-                >
-                  <Button design={ButtonDesign.Emphasized} icon="add">
-                    Nouveau document
-                  </Button>
-                  <Button
-                    design={ButtonDesign.Emphasized}
-                    icon="group"
-                    onClick={() => handleNavigation('users')}
-                  >
-                    Gérer utilisateurs
-                  </Button>
-                  <Button
-                    design={ButtonDesign.Emphasized}
-                    icon="puzzle"
-                    onClick={() => handleNavigation('modules')}
-                  >
-                    Installer module
-                  </Button>
-                  <Button
-                    design={ButtonDesign.Emphasized}
-                    icon="action-settings"
-                    onClick={() => handleNavigation('settings')}
-                  >
-                    Configuration
-                  </Button>
-                </FlexBox>
-              </Card>
-
-              {/* Recent Activity */}
-              <Card
-                header={
-                  <CardHeader
-                    titleText="Activité récente"
-                    subtitleText="Dernières actions effectuées"
-                    avatar={<Icon name="activities" />}
-                  />
-                }
-              >
-                <FlexBox
-                  direction={FlexBoxDirection.Column}
-                  alignItems={FlexBoxAlignItems.Center}
-                  justifyContent={FlexBoxJustifyContent.Center}
-                  style={{ padding: '1rem', minHeight: '10rem' }}
-                >
-                  <Icon name="inbox" style={{ fontSize: '3rem', opacity: 0.3, marginBottom: '1rem' }} />
-                  <Text style={{ color: 'var(--sapNeutralTextColor)' }}>
-                    Aucune activité récente
-                  </Text>
-                </FlexBox>
-              </Card>
-                </>
-              )}
-            </div>
-
-            {/* Footer Toolbar */}
-            <Bar
-              design={BarDesign.Footer}
-              startContent={
-                <FlexBox alignItems={FlexBoxAlignItems.Center} style={{ gap: '0.5rem' }}>
-                  <Icon name="sys-monitor" />
-                  <Label>OpsFlux v1.0.0</Label>
-                </FlexBox>
-              }
-              endContent={
-                <FlexBox alignItems={FlexBoxAlignItems.Center} style={{ gap: '1rem' }}>
-                  <Label>
-                    Statut: {isOnline ? '🟢 En ligne' : '🔴 Hors ligne'}
-                  </Label>
-                  <Label>|</Label>
-                  <Label>Utilisateur: {displayName}</Label>
-                  <Label>|</Label>
-                  <Label>© 2025 OpsFlux</Label>
-                </FlexBox>
-              }
-            />
-          </FlexBox>
+              </ObjectPageSection>
+            </ObjectPage>
+          </DynamicPage>
         </FlexBox>
+
+        {/* Footer Bar */}
+        <Bar
+          design={BarDesign.Footer}
+          startContent={
+            <FlexBox alignItems={FlexBoxAlignItems.Center} style={{ gap: '0.5rem' }}>
+              <Icon name="sys-monitor" />
+              <Label>OpsFlux v1.0.0</Label>
+            </FlexBox>
+          }
+          endContent={
+            <FlexBox alignItems={FlexBoxAlignItems.Center} style={{ gap: '1rem' }}>
+              <Label>
+                Statut: {isOnline ? '🟢 En ligne' : '🔴 Hors ligne'}
+              </Label>
+              <Label>|</Label>
+              <Label>Utilisateur: {displayName}</Label>
+              <Label>|</Label>
+              <Label>© 2025 OpsFlux</Label>
+            </FlexBox>
+          }
+        />
       </FlexBox>
     </ThemeProvider>
   );
