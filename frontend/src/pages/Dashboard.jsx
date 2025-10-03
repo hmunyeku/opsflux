@@ -37,6 +37,7 @@ import {
 import '@ui5/webcomponents/dist/Assets.js';
 import '@ui5/webcomponents-fiori/dist/Assets.js';
 import '@ui5/webcomponents-icons/dist/AllIcons.js';
+import '@ui5/webcomponents-fiori/dist/illustrations/NoData.js';
 
 /**
  * Dashboard OpsFlux - Pattern UXC Integration
