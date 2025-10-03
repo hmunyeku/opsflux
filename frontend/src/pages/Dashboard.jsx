@@ -63,7 +63,7 @@ const Dashboard = () => {
       <div className="dashboard-container">
         <ShellBar
           primaryTitle="OpsFlux"
-          secondaryTitle="ERP Modulaire"
+          secondaryTitle="Plateforme Entreprise"
           logo={<Icon name="business-suite" />}
           profile={
             <Avatar initials={user.username?.charAt(0).toUpperCase() || 'U'} />
@@ -91,49 +91,10 @@ const Dashboard = () => {
             />
 
             <SideNavigationItem
-              id="modules"
-              text="Modules"
-              icon="grid"
-              expanded
-            >
-              <SideNavigationSubItem
-                id="finance"
-                text="Finance"
-                icon="wallet"
-              />
-              <SideNavigationSubItem
-                id="hr"
-                text="RH"
-                icon="employee"
-              />
-              <SideNavigationSubItem
-                id="inventory"
-                text="Stocks"
-                icon="product"
-              />
-              <SideNavigationSubItem
-                id="sales"
-                text="CRM"
-                icon="sales-order"
-              />
-            </SideNavigationItem>
-
-            <SideNavigationItem
-              id="ai"
-              text="Assistant IA"
-              icon="bot"
-            />
-
-            <SideNavigationItem
-              id="reports"
-              text="Rapports"
-              icon="chart-table-view"
-            />
-
-            <SideNavigationItem
               id="settings"
               text="Paramètres"
               icon="action-settings"
+              selected={selectedItem === 'settings'}
             />
           </SideNavigation>
 
@@ -214,53 +175,21 @@ const Dashboard = () => {
             <Card
               header={
                 <CardHeader
-                  titleText="Modules disponibles"
-                  subtitleText="Activez les modules dont vous avez besoin"
+                  titleText="Actions rapides"
+                  subtitleText="Accédez aux fonctionnalités principales"
                 />
               }
             >
               <div style={{ padding: '1rem' }}>
-                <FlexBox wrap="Wrap" style={{ gap: '1.5rem' }}>
-                  {[
-                    { icon: 'wallet', title: 'Comptabilité', desc: 'Gestion financière' },
-                    { icon: 'employee', title: 'RH', desc: 'Ressources humaines' },
-                    { icon: 'product', title: 'Stocks', desc: 'Inventaire' },
-                    { icon: 'sales-order', title: 'CRM', desc: 'Gestion clients' },
-                    { icon: 'factory', title: 'Production', desc: 'Manufacturing' },
-                    { icon: 'business-objects-experience', title: 'Analytics', desc: 'Reporting' }
-                  ].map((module, index) => (
-                    <Card
-                      key={index}
-                      style={{
-                        minWidth: '12rem',
-                        textAlign: 'center',
-                        cursor: 'pointer',
-                        transition: 'transform 0.2s',
-                      }}
-                    >
-                      <div style={{ padding: '1.5rem' }}>
-                        <Icon
-                          name={module.icon}
-                          style={{
-                            fontSize: '2.5rem',
-                            color: 'var(--sapBrandColor)',
-                            marginBottom: '0.75rem'
-                          }}
-                        />
-                        <Title level="H5" style={{ marginBottom: '0.25rem' }}>
-                          {module.title}
-                        </Title>
-                        <div style={{ fontSize: '0.875rem', color: 'var(--sapNeutralTextColor)', marginBottom: '1rem' }}>
-                          {module.desc}
-                        </div>
-                        <Button
-                          design="Transparent"
-                          icon="add"
-                          tooltip="Activer ce module"
-                        />
-                      </div>
-                    </Card>
-                  ))}
+                <FlexBox wrap="Wrap" style={{ gap: '1rem' }}>
+                  <Button
+                    design="Emphasized"
+                    icon="settings"
+                    onClick={() => handleNavigation('settings')}
+                    style={{ minWidth: '200px' }}
+                  >
+                    Gérer les paramètres
+                  </Button>
                 </FlexBox>
               </div>
             </Card>
