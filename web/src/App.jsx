@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import {
   ThemeProvider,
-  ShellBar,
   Card,
   CardHeader,
   Title,
@@ -135,16 +134,23 @@ function App() {
 
   return (
     <ThemeProvider>
-      <ShellBar
-        primaryTitle="OpsFlux"
-        secondaryTitle="Gestion Intelligente des Flux Métiers"
-        showProductSwitch={false}
-        showCoPilot={false}
-      >
-        <Button design={ButtonDesign.Emphasized} onClick={() => setShowLogin(true)}>
-          Se connecter
-        </Button>
-      </ShellBar>
+      {/* Header Bar */}
+      <Bar
+        design={BarDesign.Header}
+        startContent={
+          <FlexBox alignItems={FlexBoxAlignItems.Center} style={{ gap: '0.5rem' }}>
+            <Icon name="workflow-tasks" style={{ fontSize: '1.5rem', color: 'var(--sapBrandColor)' }} />
+            <Title level={TitleLevel.H5} style={{ margin: 0 }}>OpsFlux</Title>
+            <Text style={{ color: 'var(--sapNeutralTextColor)', fontSize: '0.875rem' }}>Gestion Intelligente des Flux Métiers</Text>
+          </FlexBox>
+        }
+        endContent={
+          <Button design={ButtonDesign.Emphasized} onClick={() => setShowLogin(true)}>
+            Se connecter
+          </Button>
+        }
+        style={{ position: 'sticky', top: 0, zIndex: 100 }}
+      />
 
       {/* Hero Section */}
       <FlexBox
