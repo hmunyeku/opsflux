@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   ThemeProvider,
   ShellBar,
@@ -13,7 +13,11 @@ import {
   Badge,
   ObjectStatus,
   Bar,
-  Label
+  Label,
+  Input,
+  Form,
+  FormItem,
+  MessageStrip
 } from '@ui5/webcomponents-react';
 import {
   FlexBoxDirection,
@@ -23,29 +27,127 @@ import {
   TitleLevel,
   ButtonDesign,
   ValueState,
-  BarDesign
+  BarDesign,
+  MessageStripDesign
 } from '@ui5/webcomponents-react';
 import '@ui5/webcomponents/dist/Assets.js';
 import '@ui5/webcomponents-fiori/dist/Assets.js';
 import '@ui5/webcomponents-icons/dist/AllIcons.js';
 
 function App() {
+  const [showLogin, setShowLogin] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+
   const APP_URL = process.env.REACT_APP_FRONTEND_URL || 'http://72.60.188.156:3001';
+
+  const handleLogin = (e) => {
+    e.preventDefault();
+    if (!email || !password) {
+      setError('Veuillez remplir tous les champs');
+      return;
+    }
+    // Redirection vers l'application
+    window.location.href = APP_URL;
+  };
+
+  if (showLogin) {
+    return (
+      <ThemeProvider>
+        <FlexBox
+          direction={FlexBoxDirection.Column}
+          alignItems={FlexBoxAlignItems.Center}
+          justifyContent={FlexBoxJustifyContent.Center}
+          style={{
+            minHeight: '100vh',
+            background: 'linear-gradient(135deg, var(--sapBackgroundColor) 0%, var(--sapShell_Background) 100%)',
+            padding: '2rem'
+          }}
+        >
+          <Card
+            header={
+              <CardHeader
+                titleText="Connexion à OpsFlux"
+                avatar={<Icon name="workflow-tasks" style={{ fontSize: '2.5rem', color: 'var(--sapBrandColor)' }} />}
+              />
+            }
+            style={{ width: '420px', maxWidth: '100%' }}
+          >
+            <FlexBox direction={FlexBoxDirection.Column} style={{ padding: '2rem', gap: '1.5rem' }}>
+              <Text style={{ textAlign: 'center', color: 'var(--sapNeutralTextColor)' }}>
+                Gérez vos flux métiers en toute simplicité
+              </Text>
+
+              {error && (
+                <MessageStrip design={MessageStripDesign.Negative} hideCloseButton>
+                  {error}
+                </MessageStrip>
+              )}
+
+              <Form onSubmit={handleLogin}>
+                <FormItem label="Email">
+                  <Input
+                    type="email"
+                    placeholder="votre.email@entreprise.fr"
+                    value={email}
+                    onInput={(e) => setEmail(e.target.value)}
+                    style={{ width: '100%' }}
+                  />
+                </FormItem>
+                <FormItem label="Mot de passe">
+                  <Input
+                    type="password"
+                    placeholder="••••••••"
+                    value={password}
+                    onInput={(e) => setPassword(e.target.value)}
+                    style={{ width: '100%' }}
+                  />
+                </FormItem>
+              </Form>
+
+              <FlexBox direction={FlexBoxDirection.Column} style={{ gap: '1rem', marginTop: '1rem' }}>
+                <Button
+                  design={ButtonDesign.Emphasized}
+                  icon="log"
+                  onClick={handleLogin}
+                  style={{ width: '100%' }}
+                >
+                  Se connecter
+                </Button>
+                <Button
+                  design={ButtonDesign.Transparent}
+                  onClick={() => setShowLogin(false)}
+                  style={{ width: '100%' }}
+                >
+                  Retour à l'accueil
+                </Button>
+              </FlexBox>
+
+              <Text style={{ textAlign: 'center', fontSize: '0.875rem', color: 'var(--sapNeutralTextColor)' }}>
+                Pas encore de compte ? Contactez votre administrateur système.
+              </Text>
+            </FlexBox>
+          </Card>
+        </FlexBox>
+      </ThemeProvider>
+    );
+  }
 
   return (
     <ThemeProvider>
       <ShellBar
         primaryTitle="OpsFlux"
-        secondaryTitle="ERP Modulaire Intelligent"
-        logo={<Icon name="business-suite" />}
+        secondaryTitle="Gestion Intelligente des Flux Métiers"
+        logo={<Icon name="workflow-tasks" />}
         showProductSwitch={false}
         showCoPilot={false}
       >
         <ShellBarItem icon="home" text="Accueil" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} />
-        <ShellBarItem icon="list" text="Fonctionnalités" onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })} />
+        <ShellBarItem icon="task" text="Flux" onClick={() => document.getElementById('flows')?.scrollIntoView({ behavior: 'smooth' })} />
         <ShellBarItem icon="puzzle" text="Modules" onClick={() => document.getElementById('modules')?.scrollIntoView({ behavior: 'smooth' })} />
-        <ShellBarItem icon="cart" text="Tarifs" onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })} />
-        <Button design={ButtonDesign.Emphasized} onClick={() => window.location.href = APP_URL}>
+        <ShellBarItem icon="chart-table-view" text="Fonctionnalités" onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })} />
+        <Button design={ButtonDesign.Emphasized} onClick={() => setShowLogin(true)}>
           Se connecter
         </Button>
       </ShellBar>
@@ -63,74 +165,60 @@ function App() {
         }}
       >
         <Badge colorScheme="8" style={{ marginBottom: '1rem', fontSize: '0.875rem', padding: '0.5rem 1rem' }}>
-          🚀 Nouveau: Module IA disponible
+          🔄 Automatisez vos processus métiers
         </Badge>
-        <Icon name="business-suite" style={{ fontSize: '6rem', color: 'var(--sapBrandColor)', marginBottom: '2rem' }} />
+        <Icon name="workflow-tasks" style={{ fontSize: '6rem', color: 'var(--sapBrandColor)', marginBottom: '2rem' }} />
         <Title level={TitleLevel.H1} style={{ marginBottom: '1rem', fontSize: '3.5rem', textAlign: 'center' }}>
           OpsFlux
         </Title>
         <Title level={TitleLevel.H3} style={{ marginBottom: '1rem', fontWeight: 'normal', color: 'var(--sapNeutralTextColor)', textAlign: 'center', maxWidth: '800px' }}>
-          Plateforme ERP Modulaire Intelligente propulsée par l'IA
+          Plateforme de gestion et d'automatisation des flux métiers
         </Title>
-        <Text style={{ marginBottom: '3rem', fontSize: '1.125rem', textAlign: 'center', maxWidth: '600px', color: 'var(--sapNeutralTextColor)' }}>
-          Transformez votre entreprise avec une solution complète et moderne qui s'adapte à vos besoins
+        <Text style={{ marginBottom: '3rem', fontSize: '1.125rem', textAlign: 'center', maxWidth: '700px', color: 'var(--sapNeutralTextColor)' }}>
+          Centralisez, automatisez et optimisez tous vos flux opérationnels : données, documents, workflows et processus métiers
         </Text>
         <FlexBox justifyContent={FlexBoxJustifyContent.Center} alignItems={FlexBoxAlignItems.Center} style={{ gap: '1rem', flexWrap: 'wrap' }}>
-          <Button design={ButtonDesign.Emphasized} icon="log" onClick={() => window.location.href = APP_URL}>
-            Démarrer gratuitement
+          <Button design={ButtonDesign.Emphasized} icon="log" onClick={() => setShowLogin(true)}>
+            Accéder à la plateforme
           </Button>
-          <Button design={ButtonDesign.Transparent} icon="play" onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}>
-            Découvrir les fonctionnalités
+          <Button design={ButtonDesign.Transparent} icon="play" onClick={() => document.getElementById('flows')?.scrollIntoView({ behavior: 'smooth' })}>
+            Découvrir les flux
           </Button>
-        </FlexBox>
-
-        {/* Stats */}
-        <FlexBox justifyContent={FlexBoxJustifyContent.Center} wrap={FlexBoxWrap.Wrap} style={{ gap: '3rem', marginTop: '4rem' }}>
-          <FlexBox direction={FlexBoxDirection.Column} alignItems={FlexBoxAlignItems.Center}>
-            <ObjectStatus state={ValueState.Success} style={{ fontSize: '2rem', fontWeight: 'bold' }}>500+</ObjectStatus>
-            <Label>Entreprises actives</Label>
-          </FlexBox>
-          <FlexBox direction={FlexBoxDirection.Column} alignItems={FlexBoxAlignItems.Center}>
-            <ObjectStatus state={ValueState.Information} style={{ fontSize: '2rem', fontWeight: 'bold' }}>15+</ObjectStatus>
-            <Label>Modules disponibles</Label>
-          </FlexBox>
-          <FlexBox direction={FlexBoxDirection.Column} alignItems={FlexBoxAlignItems.Center}>
-            <ObjectStatus state={ValueState.Warning} style={{ fontSize: '2rem', fontWeight: 'bold' }}>99.9%</ObjectStatus>
-            <Label>Disponibilité</Label>
-          </FlexBox>
         </FlexBox>
       </FlexBox>
 
-      {/* Features Section */}
-      <div id="features" style={{ padding: '6rem 2rem', maxWidth: '1200px', margin: '0 auto' }}>
+      {/* Flows Section */}
+      <div id="flows" style={{ padding: '6rem 2rem', maxWidth: '1200px', margin: '0 auto' }}>
         <FlexBox direction={FlexBoxDirection.Column} alignItems={FlexBoxAlignItems.Center} style={{ marginBottom: '3rem' }}>
-          <Badge colorScheme="6" style={{ marginBottom: '1rem' }}>Fonctionnalités</Badge>
+          <Badge colorScheme="6" style={{ marginBottom: '1rem' }}>Flux métiers</Badge>
           <Title level={TitleLevel.H2} style={{ textAlign: 'center', marginBottom: '1rem' }}>
-            Pourquoi choisir OpsFlux ?
+            Gérez tous vos flux en un seul endroit
           </Title>
           <Text style={{ textAlign: 'center', maxWidth: '700px', color: 'var(--sapNeutralTextColor)' }}>
-            Une plateforme complète conçue pour répondre à tous les besoins de votre entreprise avec des technologies de pointe
+            De la capture à l'archivage, suivez et automatisez l'intégralité de vos processus métiers
           </Text>
         </FlexBox>
 
         <FlexBox wrap={FlexBoxWrap.Wrap} justifyContent={FlexBoxJustifyContent.Center} style={{ gap: '2rem' }}>
           {[
-            { icon: 'bot', title: 'Intelligence Artificielle', desc: 'Assistant IA intégré pour automatiser vos tâches quotidiennes et améliorer la productivité', badge: 'IA', state: ValueState.Success },
-            { icon: 'puzzle', title: 'Modulaire', desc: 'Activez uniquement les modules dont vous avez besoin pour une solution sur mesure', badge: 'Flexible', state: ValueState.Information },
-            { icon: 'shield', title: 'Sécurisé', desc: 'Vos données protégées avec les meilleurs standards de sécurité (ISO 27001, RGPD)', badge: 'Certifié', state: ValueState.Success },
-            { icon: 'performance', title: 'Performant', desc: 'Architecture cloud moderne et rapide pour une expérience utilisateur optimale', badge: 'Rapide', state: ValueState.Warning }
-          ].map((feature, index) => (
+            { icon: 'database', title: 'Flux de données', desc: 'Import, export, transformation et synchronisation de données multi-sources', badge: 'ETL', state: ValueState.Success },
+            { icon: 'document', title: 'Flux documentaires', desc: 'Gestion électronique de documents, versioning et workflow de validation', badge: 'GED', state: ValueState.Information },
+            { icon: 'process', title: 'Flux opérationnels', desc: 'Orchestration des processus métiers avec règles automatisées', badge: 'BPM', state: ValueState.Warning },
+            { icon: 'message-information', title: 'Flux de communication', desc: 'Notifications, alertes et échanges inter-systèmes temps réel', badge: 'API', state: ValueState.Success },
+            { icon: 'journey-arrive', title: 'Flux logistiques', desc: 'Traçabilité des mouvements, suivi des expéditions et réceptions', badge: 'SCM', state: ValueState.Information },
+            { icon: 'money-bills', title: 'Flux financiers', desc: 'Validation des factures, paiements et rapprochements bancaires', badge: 'Finance', state: ValueState.Warning }
+          ].map((flow, index) => (
             <Card
               key={index}
               header={
                 <CardHeader
-                  titleText={feature.title}
-                  subtitleText={feature.desc}
-                  avatar={<Icon name={feature.icon} style={{ fontSize: '2rem', color: 'var(--sapBrandColor)' }} />}
-                  action={<ObjectStatus state={feature.state}>{feature.badge}</ObjectStatus>}
+                  titleText={flow.title}
+                  subtitleText={flow.desc}
+                  avatar={<Icon name={flow.icon} style={{ fontSize: '2rem', color: 'var(--sapBrandColor)' }} />}
+                  action={<ObjectStatus state={flow.state}>{flow.badge}</ObjectStatus>}
                 />
               }
-              style={{ width: '320px', minHeight: '180px' }}
+              style={{ width: '360px', minHeight: '180px' }}
             >
             </Card>
           ))}
@@ -141,23 +229,25 @@ function App() {
       <div id="modules" style={{ padding: '6rem 2rem', backgroundColor: 'var(--sapBackgroundColor)' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
           <FlexBox direction={FlexBoxDirection.Column} alignItems={FlexBoxAlignItems.Center} style={{ marginBottom: '3rem' }}>
-            <Badge colorScheme="3" style={{ marginBottom: '1rem' }}>Modules</Badge>
+            <Badge colorScheme="3" style={{ marginBottom: '1rem' }}>Architecture modulaire</Badge>
             <Title level={TitleLevel.H2} style={{ textAlign: 'center', marginBottom: '1rem' }}>
-              15+ Modules métiers disponibles
+              Modules métiers interconnectés
             </Title>
             <Text style={{ textAlign: 'center', maxWidth: '700px', color: 'var(--sapNeutralTextColor)' }}>
-              Choisissez parmi notre catalogue de modules professionnels pour construire votre ERP sur mesure
+              Chaque module gère ses propres flux tout en s'intégrant parfaitement avec l'écosystème
             </Text>
           </FlexBox>
 
           <FlexBox wrap={FlexBoxWrap.Wrap} justifyContent={FlexBoxJustifyContent.Center} style={{ gap: '1.5rem' }}>
             {[
-              { icon: 'wallet', title: 'Comptabilité & Finance', desc: 'Gestion complète de la comptabilité, budgets et trésorerie', status: 'Disponible' },
-              { icon: 'employee', title: 'Ressources Humaines', desc: 'Gestion des employés, paie, congés et recrutement', status: 'Disponible' },
-              { icon: 'product', title: 'Gestion des Stocks', desc: 'Inventaire, warehouse management et traçabilité', status: 'Disponible' },
-              { icon: 'sales-order', title: 'Ventes & CRM', desc: 'Pipeline de vente, gestion clients et opportunités', status: 'Disponible' },
-              { icon: 'factory', title: 'Production & MRP', desc: 'Planification, ordonnancement et suivi production', status: 'Disponible' },
-              { icon: 'chart-table-view', title: 'Business Intelligence', desc: 'Tableaux de bord, reporting et analyses avancées', status: 'Disponible' }
+              { icon: 'customer-order-entry', title: 'Gestion Commerciale', desc: 'Devis, commandes, facturation et suivi client', status: 'Core' },
+              { icon: 'receipt', title: 'Comptabilité', desc: 'Écritures, analytique, reporting et clôtures', status: 'Core' },
+              { icon: 'product', title: 'Gestion de Stock', desc: 'Inventaire, mouvements, valorisation et traçabilité', status: 'Core' },
+              { icon: 'business-card', title: 'Achats & Fournisseurs', desc: 'Demandes d\'achat, commandes et réceptions', status: 'Core' },
+              { icon: 'factory', title: 'Production', desc: 'OF, nomenclatures, gammes et suivi atelier', status: 'Avancé' },
+              { icon: 'customer', title: 'CRM', desc: 'Pipeline commercial, contacts et opportunités', status: 'Avancé' },
+              { icon: 'Chart-Tree-Map', title: 'Business Intelligence', desc: 'Tableaux de bord, KPI et analyses décisionnelles', status: 'Premium' },
+              { icon: 'bot', title: 'IA & Automatisation', desc: 'Workflows intelligents et prédictions métiers', status: 'Premium' }
             ].map((module, index) => (
               <Card
                 key={index}
@@ -166,10 +256,10 @@ function App() {
                     titleText={module.title}
                     subtitleText={module.desc}
                     avatar={<Icon name={module.icon} style={{ fontSize: '2.5rem', color: 'var(--sapBrandColor)' }} />}
-                    status={<ObjectStatus state={ValueState.Success}>{module.status}</ObjectStatus>}
+                    status={<ObjectStatus state={module.status === 'Core' ? ValueState.Success : module.status === 'Avancé' ? ValueState.Information : ValueState.Warning}>{module.status}</ObjectStatus>}
                   />
                 }
-                style={{ width: '380px', minHeight: '160px' }}
+                style={{ width: '320px', minHeight: '160px' }}
               >
               </Card>
             ))}
@@ -177,60 +267,38 @@ function App() {
         </div>
       </div>
 
-      {/* Pricing Section */}
-      <div id="pricing" style={{ padding: '6rem 2rem', maxWidth: '1200px', margin: '0 auto' }}>
+      {/* Features Section */}
+      <div id="features" style={{ padding: '6rem 2rem', maxWidth: '1200px', margin: '0 auto' }}>
         <FlexBox direction={FlexBoxDirection.Column} alignItems={FlexBoxAlignItems.Center} style={{ marginBottom: '3rem' }}>
-          <Badge colorScheme="5" style={{ marginBottom: '1rem' }}>Tarifs</Badge>
+          <Badge colorScheme="5" style={{ marginBottom: '1rem' }}>Fonctionnalités</Badge>
           <Title level={TitleLevel.H2} style={{ textAlign: 'center', marginBottom: '1rem' }}>
-            Tarifs simples et transparents
+            Une plateforme technique moderne
           </Title>
           <Text style={{ textAlign: 'center', maxWidth: '700px', color: 'var(--sapNeutralTextColor)' }}>
-            Choisissez le plan qui correspond à vos besoins. Changez ou annulez à tout moment.
+            Technologies éprouvées et architecture scalable pour votre croissance
           </Text>
         </FlexBox>
 
         <FlexBox wrap={FlexBoxWrap.Wrap} justifyContent={FlexBoxJustifyContent.Center} style={{ gap: '2rem' }}>
           {[
-            { name: 'Starter', price: 'Gratuit', period: 'Pour toujours', features: ['Jusqu\'à 5 utilisateurs', 'Modules de base', '1 Go de stockage', 'Support communautaire'], highlight: false, badge: null },
-            { name: 'Business', price: '49€', period: 'par mois', features: ['Utilisateurs illimités', 'Tous les modules', '100 Go de stockage', 'Support prioritaire', 'IA avancée'], highlight: true, badge: 'Populaire' },
-            { name: 'Enterprise', price: 'Sur mesure', period: 'Contactez-nous', features: ['Tout de Business', 'Stockage illimité', 'Déploiement on-premise', 'Support 24/7', 'SLA garanti'], highlight: false, badge: 'Premium' }
-          ].map((plan, index) => (
+            { icon: 'cloud', title: 'API REST complète', desc: 'Architecture 100% API pour intégrations tierces illimitées' },
+            { icon: 'shield', title: 'Sécurité avancée', desc: 'Authentification multi-facteurs, audit trail et chiffrement' },
+            { icon: 'synchronize', title: 'Temps réel', desc: 'WebSocket, notifications push et synchronisation instantanée' },
+            { icon: 'workflow-tasks', title: 'Workflows flexibles', desc: 'Moteur de workflow visuel avec conditions et actions' },
+            { icon: 'source-code', title: 'Extensible', desc: 'Hooks système, plugins et développement module custom' },
+            { icon: 'history', title: 'Traçabilité', desc: 'Historique complet des modifications et audit trail' }
+          ].map((feature, index) => (
             <Card
               key={index}
-              style={{
-                width: '340px',
-                border: plan.highlight ? '2px solid var(--sapBrandColor)' : '1px solid var(--sapGroup_ContentBorderColor)',
-                boxShadow: plan.highlight ? '0 8px 24px rgba(0,0,0,0.15)' : undefined
-              }}
+              header={
+                <CardHeader
+                  titleText={feature.title}
+                  subtitleText={feature.desc}
+                  avatar={<Icon name={feature.icon} style={{ fontSize: '2rem', color: 'var(--sapBrandColor)' }} />}
+                />
+              }
+              style={{ width: '360px', minHeight: '160px' }}
             >
-              <FlexBox direction={FlexBoxDirection.Column} alignItems={FlexBoxAlignItems.Center} style={{ padding: '2rem', textAlign: 'center' }}>
-                {plan.badge && (
-                  <Badge colorScheme={plan.highlight ? "8" : "6"} style={{ marginBottom: '1rem' }}>
-                    {plan.badge}
-                  </Badge>
-                )}
-                <Title level={TitleLevel.H3} style={{ marginBottom: '0.5rem' }}>{plan.name}</Title>
-                <Title level={TitleLevel.H2} style={{ color: 'var(--sapBrandColor)', marginBottom: '0.25rem', fontSize: '2.5rem' }}>{plan.price}</Title>
-                <Text style={{ marginBottom: '2rem', color: 'var(--sapNeutralTextColor)' }}>{plan.period}</Text>
-
-                <FlexBox direction={FlexBoxDirection.Column} alignItems={FlexBoxAlignItems.Start} style={{ gap: '0.75rem', marginBottom: '2rem', width: '100%' }}>
-                  {plan.features.map((feature, idx) => (
-                    <FlexBox key={idx} alignItems={FlexBoxAlignItems.Center} style={{ gap: '0.5rem' }}>
-                      <ObjectStatus state={ValueState.Success} icon="accept"></ObjectStatus>
-                      <Text>{feature}</Text>
-                    </FlexBox>
-                  ))}
-                </FlexBox>
-
-                <Button
-                  design={plan.highlight ? ButtonDesign.Emphasized : ButtonDesign.Default}
-                  style={{ width: '100%' }}
-                  icon={plan.name === 'Enterprise' ? 'email' : 'log'}
-                  onClick={() => window.location.href = APP_URL}
-                >
-                  {plan.name === 'Enterprise' ? 'Nous contacter' : 'Commencer'}
-                </Button>
-              </FlexBox>
             </Card>
           ))}
         </FlexBox>
@@ -248,21 +316,16 @@ function App() {
           textAlign: 'center'
         }}
       >
-        <Icon name="rocket" style={{ fontSize: '4rem', marginBottom: '2rem', opacity: 0.9 }} />
+        <Icon name="connected" style={{ fontSize: '4rem', marginBottom: '2rem', opacity: 0.9 }} />
         <Title level={TitleLevel.H2} style={{ marginBottom: '1rem', color: 'white' }}>
-          Prêt à transformer votre entreprise ?
+          Prêt à optimiser vos flux métiers ?
         </Title>
         <Text style={{ marginBottom: '2rem', fontSize: '1.125rem', maxWidth: '600px', opacity: 0.95 }}>
-          Rejoignez plus de 500 entreprises qui font confiance à OpsFlux pour gérer leurs opérations
+          Centralisez vos opérations et gagnez en efficacité avec OpsFlux
         </Text>
-        <FlexBox justifyContent={FlexBoxJustifyContent.Center} alignItems={FlexBoxAlignItems.Center} style={{ gap: '1rem' }}>
-          <Button design={ButtonDesign.Emphasized} icon="log" onClick={() => window.location.href = APP_URL} style={{ backgroundColor: 'white', color: 'var(--sapBrandColor)' }}>
-            Commencer gratuitement
-          </Button>
-          <Button design={ButtonDesign.Transparent} icon="email" style={{ color: 'white', borderColor: 'white' }}>
-            Demander une démo
-          </Button>
-        </FlexBox>
+        <Button design={ButtonDesign.Emphasized} icon="log" onClick={() => setShowLogin(true)} style={{ backgroundColor: 'white', color: 'var(--sapBrandColor)' }}>
+          Accéder à la plateforme
+        </Button>
       </FlexBox>
 
       {/* Footer */}
@@ -270,7 +333,7 @@ function App() {
         design={BarDesign.Footer}
         startContent={
           <FlexBox alignItems={FlexBoxAlignItems.Center} style={{ gap: '0.5rem' }}>
-            <Icon name="business-suite" />
+            <Icon name="workflow-tasks" />
             <Label style={{ fontWeight: 'bold' }}>OpsFlux</Label>
             <Label style={{ color: 'var(--sapNeutralTextColor)' }}>v1.0.0</Label>
           </FlexBox>
@@ -281,13 +344,10 @@ function App() {
               Accueil
             </Button>
             <Button design={ButtonDesign.Transparent}>
-              Mentions légales
+              Documentation
             </Button>
             <Button design={ButtonDesign.Transparent}>
-              Confidentialité
-            </Button>
-            <Button design={ButtonDesign.Transparent}>
-              Contact
+              Support
             </Button>
           </FlexBox>
         }

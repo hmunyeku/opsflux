@@ -2,6 +2,15 @@ FROM node:20-alpine
 
 WORKDIR /app
 
+# Copier package.json et package-lock.json
+COPY package*.json ./
+
+# Installer les dépendances
+RUN npm ci --only=production=false
+
+# Copier le reste du code
+COPY . .
+
 # Exposer le port
 EXPOSE 3002
 
@@ -9,5 +18,5 @@ EXPOSE 3002
 ENV PORT=3002
 ENV SKIP_PREFLIGHT_CHECK=true
 
-# Script de démarrage qui installe les dépendances puis lance l'app
-CMD sh -c "npm install && npm start"
+# Commande de démarrage
+CMD ["npm", "start"]
