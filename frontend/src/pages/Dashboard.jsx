@@ -262,14 +262,14 @@ const Dashboard = () => {
                   </FlexBox>
                   <FlexBox direction={FlexBoxDirection.Column} style={{ minWidth: '10rem' }}>
                     <Label>Utilisateurs</Label>
-                    <Title level={TitleLevel.H3}>{stats.users}</Title>
+                    <Title style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>{stats.users}</Title>
                     <ObjectStatus state="Information">
                       Actifs
                     </ObjectStatus>
                   </FlexBox>
                   <FlexBox direction={FlexBoxDirection.Column} style={{ minWidth: '10rem' }}>
                     <Label>Tâches en cours</Label>
-                    <Title level={TitleLevel.H3}>{stats.tasks}</Title>
+                    <Title style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>{stats.tasks}</Title>
                     <ObjectStatus state="Warning">
                       À traiter
                     </ObjectStatus>
