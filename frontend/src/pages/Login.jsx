@@ -13,8 +13,7 @@ import {
   Text,
   Card,
   Link,
-  CheckBox,
-  spacing
+  CheckBox
 } from '@ui5/webcomponents-react';
 import { FlexBoxJustifyContent, FlexBoxAlignItems, FlexBoxDirection, TitleLevel, MessageStripDesign, ButtonDesign, InputType } from '@ui5/webcomponents-react';
 import '@ui5/webcomponents/dist/Assets.js';
@@ -129,7 +128,7 @@ const Login = () => {
           <FlexBox
             direction={FlexBoxDirection.Column}
             alignItems={FlexBoxAlignItems.Center}
-            style={spacing.sapUiContentPadding}
+            style={{ padding: '1rem' }}
           >
             <Icon
               name="business-suite"
@@ -149,7 +148,7 @@ const Login = () => {
 
           {/* Messages */}
           {error && (
-            <div style={{ ...spacing.sapUiContentPadding, paddingTop: 0 }}>
+            <div style={{ padding: '1rem', paddingTop: 0 }}>
               <MessageStrip
                 design={MessageStripDesign.Negative}
                 onClose={() => setError('')}
@@ -164,7 +163,7 @@ const Login = () => {
             <FlexBox
               direction={FlexBoxDirection.Column}
               style={{
-                ...spacing.sapUiContentPadding,
+                padding: '1rem',
                 gap: '1rem'
               }}
             >
@@ -228,7 +227,7 @@ const Login = () => {
           <FlexBox
             justifyContent={FlexBoxJustifyContent.Center}
             style={{
-              ...spacing.sapUiContentPadding,
+              padding: '1rem',
               paddingTop: '1rem',
               borderTop: '1px solid var(--sapGroup_ContentBorderColor)'
             }}

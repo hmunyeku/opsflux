@@ -3,7 +3,6 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Profile from './pages/Profile';
-import './App.css';
 
 // Composant de protection des routes
 const PrivateRoute = ({ children }) => {
@@ -14,35 +13,33 @@ const PrivateRoute = ({ children }) => {
 function App() {
   return (
     <Router>
-      <div className="App">
-        <Routes>
-          {/* Route publique - Login */}
-          <Route path="/login" element={<Login />} />
+      <Routes>
+        {/* Route publique - Login */}
+        <Route path="/login" element={<Login />} />
 
-          {/* Routes protégées */}
-          <Route
-            path="/dashboard"
-            element={
-              <PrivateRoute>
-                <Dashboard />
-              </PrivateRoute>
-            }
-          />
+        {/* Routes protégées */}
+        <Route
+          path="/dashboard"
+          element={
+            <PrivateRoute>
+              <Dashboard />
+            </PrivateRoute>
+          }
+        />
 
-          <Route
-            path="/profile"
-            element={
-              <PrivateRoute>
-                <Profile />
-              </PrivateRoute>
-            }
-          />
+        <Route
+          path="/profile"
+          element={
+            <PrivateRoute>
+              <Profile />
+            </PrivateRoute>
+          }
+        />
 
-          {/* Redirection par défaut */}
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
-          <Route path="*" element={<Navigate to="/dashboard" replace />} />
-        </Routes>
-      </div>
+        {/* Redirection par défaut */}
+        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+        <Route path="*" element={<Navigate to="/dashboard" replace />} />
+      </Routes>
     </Router>
   );
 }
