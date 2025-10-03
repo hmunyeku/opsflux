@@ -250,7 +250,6 @@ services:
       - GENERATE_SOURCEMAP=false
       - DISABLE_ESLINT_PLUGIN=true
     volumes:
-      - ./frontend/src:/app/src
       - ./logs/frontend:/app/logs
       - claude_code_frontend:/opt/claude-code
     ports:
@@ -264,6 +263,16 @@ services:
     stdin_open: true
     tty: true
     labels:
+      - traefik.http.routers.opsflux-all-dg1ntq-8-web.rule=Host(`opsflux-all-dg1ntq-deea8b-72-60-188-156.traefik.me`)
+      - traefik.http.routers.opsflux-all-dg1ntq-8-web.entrypoints=web
+      - traefik.http.services.opsflux-all-dg1ntq-8-web.loadbalancer.server.port=3001
+      - traefik.http.routers.opsflux-all-dg1ntq-8-web.service=opsflux-all-dg1ntq-8-web
+      - traefik.http.routers.opsflux-all-dg1ntq-8-web.middlewares=redirect-to-https@file
+      - traefik.http.routers.opsflux-all-dg1ntq-8-websecure.rule=Host(`opsflux-all-dg1ntq-deea8b-72-60-188-156.traefik.me`)
+      - traefik.http.routers.opsflux-all-dg1ntq-8-websecure.entrypoints=websecure
+      - traefik.http.services.opsflux-all-dg1ntq-8-websecure.loadbalancer.server.port=3001
+      - traefik.http.routers.opsflux-all-dg1ntq-8-websecure.service=opsflux-all-dg1ntq-8-websecure
+      - traefik.http.routers.opsflux-all-dg1ntq-8-websecure.tls.certresolver=letsencrypt
       - traefik.http.routers.opsflux-all-dg1ntq-8-web.rule=Host(`opsflux-all-dg1ntq-deea8b-72-60-188-156.traefik.me`)
       - traefik.http.routers.opsflux-all-dg1ntq-8-web.entrypoints=web
       - traefik.http.services.opsflux-all-dg1ntq-8-web.loadbalancer.server.port=3001
