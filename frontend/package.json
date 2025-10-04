@@ -23,7 +23,7 @@
     "react-router-dom": "^6.21.3",
     "react-scripts": "5.0.1",
     "@ui5/webcomponents": "^2.15.0",
-    "@ui5/webcomponents-react": "^2.15.0",
+    "@ui5/webcomponents-react": "^2.14.1",
     "@ui5/webcomponents-icons": "^2.15.0",
     "@ui5/webcomponents-fiori": "^2.15.0",
     "axios": "^1.6.5",
