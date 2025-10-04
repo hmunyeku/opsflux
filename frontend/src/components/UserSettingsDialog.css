@@ -1,0 +1,41 @@
+/* UserSettingsDialog Styles */
+
+.user-settings-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin: 2rem;
+}
+
+.user-settings-item {
+  display: grid;
+  grid-template-columns: 150px 1fr;
+  align-items: center;
+  gap: 1rem;
+}
+
+.user-settings-item-wide {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  align-items: center;
+  gap: 1rem;
+}
+
+.user-settings-panel {
+  border-top: 2px solid var(--sapGroup_ContentBorderColor);
+  margin: 1rem;
+  padding-top: 1rem;
+}
+
+/* Responsive pour petits écrans */
+@media (max-width: 768px) {
+  .user-settings-item,
+  .user-settings-item-wide {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .user-settings-container {
+    margin: 1rem;
+  }
+}

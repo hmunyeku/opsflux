@@ -1,0 +1,31 @@
+/* ProfilePage avec ObjectPage pattern */
+
+.profile-form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  padding: 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group ui5-label {
+  font-weight: 500;
+}
+
+.form-group ui5-input,
+.form-group ui5-select {
+  width: 100%;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .profile-form-grid {
+    grid-template-columns: 1fr;
+    padding: 1rem;
+  }
+}

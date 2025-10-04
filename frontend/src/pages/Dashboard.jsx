@@ -1,5 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import UserMenu from '../components/UserMenu';
+import UserSettingsDialog from '../components/UserSettingsDialog';
 import './Dashboard.css';
 
 // Import des Web Components natifs UI5 v2.15.0
@@ -60,6 +62,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [preferences, setPreferences] = useState(null);
+  const [settingsDialogOpen, setSettingsDialogOpen] = useState(false);
 
   /**
    * Chargement des préférences utilisateur
@@ -148,29 +151,21 @@ const Dashboard = () => {
       }
     };
 
-    // Gestion du profil
+    // Gestion du profil - Ouvre le UserMenu
     const handleProfileClick = (event) => {
-      if (userMenu) {
-        userMenu.opener = event.detail.targetRef;
-        userMenu.open = true;
+      const menuElement = document.getElementById('dashboardUserMenu');
+      if (menuElement) {
+        menuElement.opener = event.detail.targetRef;
+        menuElement.open = !menuElement.open;
       }
     };
 
     // Gestion de la déconnexion
-    const handleSignOut = (event) => {
-      event.preventDefault();
+    const handleSignOut = () => {
       localStorage.removeItem('access_token');
       localStorage.removeItem('refresh_token');
       localStorage.removeItem('user');
       navigate('/login');
-    };
-
-    // Gestion des items du menu utilisateur
-    const handleUserMenuItem = (event) => {
-      const itemId = event.detail.item?.getAttribute('data-id');
-      if (itemId === 'settings') {
-        navigate('/settings');
-      }
     };
 
     // Gestion de la navigation
@@ -188,10 +183,6 @@ const Dashboard = () => {
     if (shellbar) {
       shellbar.addEventListener('ui5-profile-click', handleProfileClick);
     }
-    if (userMenu) {
-      userMenu.addEventListener('sign-out-click', handleSignOut);
-      userMenu.addEventListener('item-click', handleUserMenuItem);
-    }
     if (navigationLayout) {
       const sideNav = navigationLayout.querySelector('ui5-side-navigation');
       if (sideNav) {
@@ -205,10 +196,6 @@ const Dashboard = () => {
       }
       if (shellbar) {
         shellbar.removeEventListener('ui5-profile-click', handleProfileClick);
-      }
-      if (userMenu) {
-        userMenu.removeEventListener('sign-out-click', handleSignOut);
-        userMenu.removeEventListener('item-click', handleUserMenuItem);
       }
       if (navigationLayout) {
         const sideNav = navigationLayout.querySelector('ui5-side-navigation');
@@ -294,27 +281,21 @@ const Dashboard = () => {
           ></ui5-avatar>
         </ui5-shellbar>
 
-        {/* User Menu */}
-        <ui5-user-menu
-          ref={userMenuRef}
-          show-manage-account={false}
-          show-other-accounts={false}
-        >
-          <ui5-user-menu-account
-            slot="accounts"
-            title-text={displayName}
-            subtitle-text={user.email || ''}
-            description={user.role || 'Utilisateur'}
-            avatar-initials={initials}
-            selected
-          ></ui5-user-menu-account>
+        {/* User Menu Component */}
+        <UserMenu
+          user={user}
+          menuId="dashboardUserMenu"
+          onSettingsClick={() => setSettingsDialogOpen(true)}
+          onProfileClick={() => navigate('/profile')}
+          onLogout={handleSignOut}
+        />
 
-          <ui5-user-menu-item
-            icon="action-settings"
-            text="Paramètres"
-            data-id="settings"
-          ></ui5-user-menu-item>
-        </ui5-user-menu>
+        {/* User Settings Dialog Component */}
+        <UserSettingsDialog
+          open={settingsDialogOpen}
+          onClose={() => setSettingsDialogOpen(false)}
+          user={user}
+        />
 
         {/* Side Navigation */}
         <ui5-side-navigation
