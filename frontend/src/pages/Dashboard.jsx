@@ -21,18 +21,10 @@ import {
   ObjectStatus,
   Bar,
   Label,
-  Badge,
   BusyIndicator,
   List,
   ListItemStandard,
-  AnalyticalTable,
   IllustratedMessage
-} from '@ui5/webcomponents-react';
-import {
-  FlexBoxDirection,
-  FlexBoxJustifyContent,
-  FlexBoxAlignItems,
-  FlexBoxWrap
 } from '@ui5/webcomponents-react';
 import '@ui5/webcomponents/dist/Assets.js';
 import '@ui5/webcomponents-fiori/dist/Assets.js';
@@ -40,27 +32,32 @@ import '@ui5/webcomponents-icons/dist/AllIcons.js';
 import '@ui5/webcomponents-fiori/dist/illustrations/NoData.js';
 
 /**
- * Dashboard OpsFlux - Pattern UXC Integration
- * Basé sur la documentation UI5 Web Components v2.15
- * https://pr-12428--ui5-webcomponents-preview.netlify.app/components/patterns/UXC%20Integration/
+ * Dashboard OpsFlux
+ * Utilise UI5 Web Components v2.15.0 avec React
+ * Architecture: ShellBar + SideNavigation + DynamicPage + ObjectPage
  */
 const Dashboard = () => {
   const navigate = useNavigate();
+
+  // State
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   // Mock data - À remplacer par appels API
-  const [stats, setStats] = useState({
+  const [stats] = useState({
     modules: 5,
     users: 12,
     tasks: 24,
     notifications: 8
   });
 
-  const [recentActivities, setRecentActivities] = useState([]);
+  const [recentActivities] = useState([]);
 
+  /**
+   * Chargement initial et vérification auth
+   */
   useEffect(() => {
     const token = localStorage.getItem('access_token');
     const userData = localStorage.getItem('user');
@@ -71,10 +68,17 @@ const Dashboard = () => {
     }
 
     if (userData) {
-      setUser(JSON.parse(userData));
+      try {
+        setUser(JSON.parse(userData));
+      } catch (e) {
+        console.error('Erreur parsing user data:', e);
+        navigate('/login');
+      }
     }
 
-    // Online/Offline status listener
+    setLoading(false);
+
+    // Gestionnaires online/offline
     const handleOnline = () => setIsOnline(true);
     const handleOffline = () => setIsOnline(false);
 
@@ -87,6 +91,9 @@ const Dashboard = () => {
     };
   }, [navigate]);
 
+  /**
+   * Déconnexion
+   */
   const handleLogout = () => {
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
@@ -94,15 +101,21 @@ const Dashboard = () => {
     navigate('/login');
   };
 
+  /**
+   * Navigation
+   */
   const handleNavigation = (path) => {
     navigate(path);
   };
 
-  if (!user) {
+  /**
+   * Loading state
+   */
+  if (loading || !user) {
     return (
       <FlexBox
-        justifyContent={FlexBoxJustifyContent.Center}
-        alignItems={FlexBoxAlignItems.Center}
+        justifyContent="Center"
+        alignItems="Center"
         style={{ height: '100vh' }}
       >
         <BusyIndicator active size="Large" />
@@ -110,16 +123,16 @@ const Dashboard = () => {
     );
   }
 
-  const displayName = user.display_name || user.username || 'Utilisateur';
-  const initials = user.username?.substring(0, 2).toUpperCase() || 'U';
+  const displayName = user.display_name || `${user.first_name || ''} ${user.last_name || ''}`.trim() || user.username || 'Utilisateur';
+  const initials = (user.first_name?.[0] || '') + (user.last_name?.[0] || '') || user.username?.substring(0, 2).toUpperCase() || 'U';
 
   return (
     <ThemeProvider>
       <FlexBox
-        direction={FlexBoxDirection.Column}
+        direction="Column"
         style={{ height: '100vh', background: 'var(--sapBackgroundColor)' }}
       >
-        {/* ShellBar - UXC Integration Pattern */}
+        {/* ShellBar */}
         <ShellBar
           primaryTitle="OpsFlux"
           secondaryTitle="Plateforme Entreprise Intelligente"
@@ -143,6 +156,7 @@ const Dashboard = () => {
             icon="search"
             design="Transparent"
             onClick={() => console.log('Search')}
+            tooltip="Rechercher"
           />
           <Button
             icon={isOnline ? 'connected' : 'disconnected'}
@@ -153,12 +167,19 @@ const Dashboard = () => {
             icon="menu2"
             design="Transparent"
             onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+            tooltip="Afficher/Masquer menu"
+          />
+          <Button
+            icon="log"
+            design="Transparent"
+            onClick={handleLogout}
+            tooltip="Déconnexion"
           />
         </ShellBar>
 
         {/* Layout Principal avec SideNavigation */}
         <FlexBox style={{ flex: 1, overflow: 'hidden' }}>
-          {/* Side Navigation - UXC Integration Pattern */}
+          {/* Side Navigation */}
           {!sidebarCollapsed && (
             <div
               style={{
@@ -215,7 +236,7 @@ const Dashboard = () => {
             headerTitle={
               <DynamicPageTitle
                 header={
-                  <Title style={{ fontSize: '2rem', fontWeight: 'bold' }}>
+                  <Title level="H2">
                     Bienvenue, {displayName}
                   </Title>
                 }
@@ -242,7 +263,7 @@ const Dashboard = () => {
                   />
                 }
                 breadcrumbs={
-                  <FlexBox alignItems={FlexBoxAlignItems.Center} style={{ gap: '0.5rem' }}>
+                  <FlexBox alignItems="Center" style={{ gap: '0.5rem' }}>
                     <Icon name="home" style={{ fontSize: '1rem' }} />
                     <Text>/</Text>
                     <Text>Tableau de bord</Text>
@@ -252,32 +273,35 @@ const Dashboard = () => {
             }
             headerContent={
               <DynamicPageHeader>
-                <FlexBox wrap={FlexBoxWrap.Wrap} style={{ gap: '2rem', padding: '1rem' }}>
+                <FlexBox wrap="Wrap" style={{ gap: '2rem', padding: '1rem' }}>
                   {/* KPI Cards */}
-                  <FlexBox direction={FlexBoxDirection.Column} style={{ minWidth: '10rem' }}>
+                  <FlexBox direction="Column" style={{ minWidth: '10rem' }}>
                     <Label>Modules actifs</Label>
-                    <Title style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>{stats.modules}</Title>
+                    <Title level="H3">{stats.modules}</Title>
                     <ObjectStatus state="Success">
                       +2 ce mois
                     </ObjectStatus>
                   </FlexBox>
-                  <FlexBox direction={FlexBoxDirection.Column} style={{ minWidth: '10rem' }}>
+                  <FlexBox direction="Column" style={{ minWidth: '10rem' }}>
                     <Label>Utilisateurs</Label>
-                    <Title style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>{stats.users}</Title>
+                    <Title level="H3">{stats.users}</Title>
                     <ObjectStatus state="Information">
                       Actifs
                     </ObjectStatus>
                   </FlexBox>
-                  <FlexBox direction={FlexBoxDirection.Column} style={{ minWidth: '10rem' }}>
+                  <FlexBox direction="Column" style={{ minWidth: '10rem' }}>
                     <Label>Tâches en cours</Label>
-                    <Title style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>{stats.tasks}</Title>
+                    <Title level="H3">{stats.tasks}</Title>
                     <ObjectStatus state="Warning">
                       À traiter
                     </ObjectStatus>
                   </FlexBox>
-                  <FlexBox direction={FlexBoxDirection.Column} style={{ minWidth: '10rem' }}>
+                  <FlexBox direction="Column" style={{ minWidth: '10rem' }}>
                     <Label>Statut système</Label>
-                    <ObjectStatus state={isOnline ? "Success" : "Error"} icon={isOnline ? 'connected' : 'disconnected'}>
+                    <ObjectStatus
+                      state={isOnline ? "Success" : "Error"}
+                      icon={isOnline ? 'connected' : 'disconnected'}
+                    >
                       {isOnline ? 'En ligne' : 'Hors ligne'}
                     </ObjectStatus>
                   </FlexBox>
@@ -309,7 +333,7 @@ const Dashboard = () => {
                   }
                 >
                   <FlexBox
-                    direction={FlexBoxDirection.Column}
+                    direction="Column"
                     style={{ padding: '1.5rem', gap: '1rem' }}
                   >
                     <Text>
@@ -334,15 +358,15 @@ const Dashboard = () => {
                 id="section-actions"
                 aria-label="Section Actions rapides"
               >
-                <FlexBox wrap={FlexBoxWrap.Wrap} style={{ gap: '1rem' }}>
+                <FlexBox wrap="Wrap" style={{ gap: '1rem' }}>
                   <Card style={{ minWidth: '15rem', flex: '1' }}>
                     <FlexBox
-                      direction={FlexBoxDirection.Column}
-                      alignItems={FlexBoxAlignItems.Center}
+                      direction="Column"
+                      alignItems="Center"
                       style={{ padding: '2rem', gap: '1rem' }}
                     >
                       <Icon name="add-document" style={{ fontSize: '3rem', color: 'var(--sapBrandColor)' }} />
-                      <Title style={{ fontSize: '1rem', fontWeight: 'bold' }}>Nouveau document</Title>
+                      <Title level="H5">Nouveau document</Title>
                       <Button design="Emphasized" icon="add">
                         Créer
                       </Button>
@@ -350,12 +374,12 @@ const Dashboard = () => {
                   </Card>
                   <Card style={{ minWidth: '15rem', flex: '1' }}>
                     <FlexBox
-                      direction={FlexBoxDirection.Column}
-                      alignItems={FlexBoxAlignItems.Center}
+                      direction="Column"
+                      alignItems="Center"
                       style={{ padding: '2rem', gap: '1rem' }}
                     >
                       <Icon name="group" style={{ fontSize: '3rem', color: 'var(--sapBrandColor)' }} />
-                      <Title style={{ fontSize: '1rem', fontWeight: 'bold' }}>Gérer utilisateurs</Title>
+                      <Title level="H5">Gérer utilisateurs</Title>
                       <Button
                         design="Emphasized"
                         icon="navigation-right-arrow"
@@ -367,12 +391,12 @@ const Dashboard = () => {
                   </Card>
                   <Card style={{ minWidth: '15rem', flex: '1' }}>
                     <FlexBox
-                      direction={FlexBoxDirection.Column}
-                      alignItems={FlexBoxAlignItems.Center}
+                      direction="Column"
+                      alignItems="Center"
                       style={{ padding: '2rem', gap: '1rem' }}
                     >
                       <Icon name="puzzle" style={{ fontSize: '3rem', color: 'var(--sapBrandColor)' }} />
-                      <Title style={{ fontSize: '1rem', fontWeight: 'bold' }}>Installer module</Title>
+                      <Title level="H5">Installer module</Title>
                       <Button
                         design="Emphasized"
                         icon="navigation-right-arrow"
@@ -402,9 +426,9 @@ const Dashboard = () => {
                 >
                   {recentActivities.length === 0 ? (
                     <FlexBox
-                      direction={FlexBoxDirection.Column}
-                      alignItems={FlexBoxAlignItems.Center}
-                      justifyContent={FlexBoxJustifyContent.Center}
+                      direction="Column"
+                      alignItems="Center"
+                      justifyContent="Center"
                       style={{ padding: '3rem' }}
                     >
                       <IllustratedMessage
@@ -437,13 +461,13 @@ const Dashboard = () => {
         <Bar
           design="Footer"
           startContent={
-            <FlexBox alignItems={FlexBoxAlignItems.Center} style={{ gap: '0.5rem' }}>
+            <FlexBox alignItems="Center" style={{ gap: '0.5rem' }}>
               <Icon name="sys-monitor" />
               <Label>OpsFlux v1.0.0</Label>
             </FlexBox>
           }
           endContent={
-            <FlexBox alignItems={FlexBoxAlignItems.Center} style={{ gap: '1rem' }}>
+            <FlexBox alignItems="Center" style={{ gap: '1rem' }}>
               <Label>
                 Statut: {isOnline ? '🟢 En ligne' : '🔴 Hors ligne'}
               </Label>

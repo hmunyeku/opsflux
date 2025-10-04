@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   ThemeProvider,
@@ -15,17 +15,19 @@ import {
   Link,
   CheckBox
 } from '@ui5/webcomponents-react';
-import {
-  FlexBoxJustifyContent,
-  FlexBoxAlignItems,
-  FlexBoxDirection
-} from '@ui5/webcomponents-react';
 import '@ui5/webcomponents/dist/Assets.js';
 import '@ui5/webcomponents-fiori/dist/Assets.js';
 import '@ui5/webcomponents-icons/dist/AllIcons.js';
 
+/**
+ * Page de connexion OpsFlux
+ * Utilise UI5 Web Components v2.15.0 avec React
+ * Authentification JWT via API backend
+ */
 const Login = () => {
   const navigate = useNavigate();
+
+  // State
   const [formData, setFormData] = useState({
     username: '',
     password: ''
@@ -34,34 +36,62 @@ const Login = () => {
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
+  // Rediriger si déjà authentifié
+  useEffect(() => {
+    const token = localStorage.getItem('access_token');
+    if (token) {
+      navigate('/dashboard');
+    }
+  }, [navigate]);
+
+  /**
+   * Gestion des changements dans les inputs
+   */
   const handleInputChange = (e) => {
-    const name = e.target.getAttribute('name');
+    const name = e.target.name;
     const value = e.target.value;
+
     setFormData(prev => ({
       ...prev,
       [name]: value
     }));
+
+    // Effacer l'erreur lors de la saisie
     if (error) setError('');
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
-
+  /**
+   * Validation du formulaire
+   */
+  const validateForm = () => {
     if (!formData.username.trim()) {
       setError('Le nom d\'utilisateur est requis');
-      return;
+      return false;
     }
     if (!formData.password) {
       setError('Le mot de passe est requis');
-      return;
+      return false;
     }
     if (formData.password.length < 6) {
       setError('Le mot de passe doit contenir au moins 6 caractères');
+      return false;
+    }
+    return true;
+  };
+
+  /**
+   * Soumission du formulaire de connexion
+   */
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // Validation
+    if (!validateForm()) {
       return;
     }
 
     setLoading(true);
+    setError('');
 
     try {
       const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8000';
@@ -71,7 +101,7 @@ const Login = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          username: formData.username,
+          username: formData.username.trim(),
           password: formData.password
         })
       });
@@ -83,11 +113,12 @@ const Login = () => {
         throw new Error(errorMessage);
       }
 
-      if (data.access) {
+      if (data.access && data.refresh) {
+        // Stocker les tokens
         localStorage.setItem('access_token', data.access);
         localStorage.setItem('refresh_token', data.refresh);
 
-        // Stocker uniquement les données essentielles de l'utilisateur
+        // Stocker les données essentielles de l'utilisateur
         const userToStore = {
           id: data.user.id,
           username: data.user.username,
@@ -98,6 +129,8 @@ const Login = () => {
           avatar_url: data.user.avatar_url
         };
         localStorage.setItem('user', JSON.stringify(userToStore));
+
+        // Redirection vers le dashboard
         navigate('/dashboard');
       } else {
         throw new Error('Réponse invalide du serveur');
@@ -113,8 +146,8 @@ const Login = () => {
   return (
     <ThemeProvider>
       <FlexBox
-        justifyContent={FlexBoxJustifyContent.Center}
-        alignItems={FlexBoxAlignItems.Center}
+        justifyContent="Center"
+        alignItems="Center"
         style={{
           minHeight: '100vh',
           background: 'var(--sapBackgroundColor)',
@@ -130,9 +163,9 @@ const Login = () => {
         >
           {/* Header */}
           <FlexBox
-            direction={FlexBoxDirection.Column}
-            alignItems={FlexBoxAlignItems.Center}
-            style={{ padding: '1rem' }}
+            direction="Column"
+            alignItems="Center"
+            style={{ padding: '2rem 2rem 1rem 2rem' }}
           >
             <Icon
               name="business-suite"
@@ -142,17 +175,17 @@ const Login = () => {
                 marginBottom: '1rem'
               }}
             />
-            <Title style={{ marginBottom: '0.5rem', fontSize: '2rem', fontWeight: 'bold' }}>
+            <Title level="H2" style={{ marginBottom: '0.5rem' }}>
               OpsFlux
             </Title>
-            <Text style={{ color: 'var(--sapNeutralTextColor)' }}>
+            <Text style={{ color: 'var(--sapNeutralTextColor)', textAlign: 'center' }}>
               Plateforme Entreprise Intelligente
             </Text>
           </FlexBox>
 
-          {/* Messages */}
+          {/* Message d'erreur */}
           {error && (
-            <div style={{ padding: '1rem', paddingTop: 0 }}>
+            <div style={{ padding: '0 2rem' }}>
               <MessageStrip
                 design="Negative"
                 onClose={() => setError('')}
@@ -165,15 +198,17 @@ const Login = () => {
           {/* Formulaire */}
           <form onSubmit={handleSubmit}>
             <FlexBox
-              direction={FlexBoxDirection.Column}
+              direction="Column"
               style={{
-                padding: '1rem',
+                padding: '1.5rem 2rem 2rem 2rem',
                 gap: '1rem'
               }}
             >
-              {/* Username */}
-              <FlexBox direction={FlexBoxDirection.Column} style={{ gap: '0.25rem' }}>
-                <Label required>Nom d'utilisateur</Label>
+              {/* Champ Username */}
+              <div>
+                <Label required showColon>
+                  Nom d'utilisateur
+                </Label>
                 <Input
                   name="username"
                   value={formData.username}
@@ -181,13 +216,15 @@ const Login = () => {
                   placeholder="Entrez votre identifiant"
                   disabled={loading}
                   required
-                  style={{ width: '100%' }}
+                  style={{ width: '100%', marginTop: '0.25rem' }}
                 />
-              </FlexBox>
+              </div>
 
-              {/* Password */}
-              <FlexBox direction={FlexBoxDirection.Column} style={{ gap: '0.25rem' }}>
-                <Label required>Mot de passe</Label>
+              {/* Champ Password */}
+              <div>
+                <Label required showColon>
+                  Mot de passe
+                </Label>
                 <Input
                   name="password"
                   type={showPassword ? "Text" : "Password"}
@@ -196,31 +233,43 @@ const Login = () => {
                   placeholder="Entrez votre mot de passe"
                   disabled={loading}
                   required
-                  style={{ width: '100%' }}
+                  style={{ width: '100%', marginTop: '0.25rem' }}
                 />
-              </FlexBox>
+              </div>
 
-              {/* Show Password */}
+              {/* Afficher le mot de passe */}
               <CheckBox
                 text="Afficher le mot de passe"
                 checked={showPassword}
                 onChange={() => setShowPassword(!showPassword)}
               />
 
-              {/* Submit Button */}
+              {/* Bouton de connexion */}
               <Button
                 design="Emphasized"
                 onClick={handleSubmit}
                 disabled={loading}
                 style={{ width: '100%', marginTop: '0.5rem' }}
               >
-                {loading && <BusyIndicator active size="Small" style={{ marginRight: '0.5rem' }} />}
+                {loading && (
+                  <BusyIndicator
+                    active
+                    size="Small"
+                    style={{ marginRight: '0.5rem', display: 'inline-block' }}
+                  />
+                )}
                 {loading ? 'Connexion en cours...' : 'Se connecter'}
               </Button>
 
-              {/* Link */}
-              <FlexBox justifyContent={FlexBoxJustifyContent.Center} style={{ marginTop: '0.5rem' }}>
-                <Link href="http://72.60.188.156:3002" target="_blank">
+              {/* Lien vers site vitrine */}
+              <FlexBox
+                justifyContent="Center"
+                style={{ marginTop: '0.5rem' }}
+              >
+                <Link
+                  href={process.env.REACT_APP_WEB_URL || 'http://localhost:3002'}
+                  target="_blank"
+                >
                   Découvrir OpsFlux →
                 </Link>
               </FlexBox>
@@ -229,10 +278,9 @@ const Login = () => {
 
           {/* Footer */}
           <FlexBox
-            justifyContent={FlexBoxJustifyContent.Center}
+            justifyContent="Center"
             style={{
-              padding: '1rem',
-              paddingTop: '1rem',
+              padding: '1rem 2rem',
               borderTop: '1px solid var(--sapGroup_ContentBorderColor)'
             }}
           >
