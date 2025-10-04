@@ -88,3 +88,6 @@ nginx/ssl/*.crt
 .coverage
 htmlcov/
 .pytest_cache/
+
+# Claude session context (volatile, not tracked)
+.claude/SESSION_CONTEXT.md
