@@ -1,36 +1,23 @@
 import React, { useState } from 'react';
-import {
-  ThemeProvider,
-  Card,
-  CardHeader,
-  Title,
-  Text,
-  Button,
-  FlexBox,
-  Icon,
-  Badge,
-  ObjectStatus,
-  Bar,
-  Label,
-  Input,
-  Form,
-  FormItem,
-  MessageStrip
-} from '@ui5/webcomponents-react';
-import {
-  FlexBoxDirection,
-  FlexBoxJustifyContent,
-  FlexBoxAlignItems,
-  FlexBoxWrap,
-  TitleLevel,
-  ButtonDesign,
-  ValueState,
-  BarDesign,
-  MessageStripDesign
-} from '@ui5/webcomponents-react';
-import '@ui5/webcomponents/dist/Assets.js';
-import '@ui5/webcomponents-fiori/dist/Assets.js';
-import '@ui5/webcomponents-icons/dist/AllIcons.js';
+
+// Import des Web Components UI5 natifs v2.15.0
+import '@ui5/webcomponents/dist/Button.js';
+import '@ui5/webcomponents/dist/Title.js';
+import '@ui5/webcomponents/dist/Text.js';
+import '@ui5/webcomponents/dist/Card.js';
+import '@ui5/webcomponents/dist/CardHeader.js';
+import '@ui5/webcomponents/dist/Input.js';
+import '@ui5/webcomponents/dist/Icon.js';
+import '@ui5/webcomponents/dist/Tag.js'; // Tag au lieu de Badge
+import '@ui5/webcomponents/dist/Label.js';
+import '@ui5/webcomponents/dist/MessageStrip.js';
+import '@ui5/webcomponents/dist/Bar.js';
+import '@ui5/webcomponents-icons/dist/workflow-tasks.js';
+import '@ui5/webcomponents-icons/dist/log.js';
+import '@ui5/webcomponents-icons/dist/play.js';
+import '@ui5/webcomponents-icons/dist/database.js';
+import '@ui5/webcomponents-icons/dist/document.js';
+import '@ui5/webcomponents-icons/dist/process.js';
 
 function App() {
   const [showLogin, setShowLogin] = useState(false);
@@ -46,321 +33,186 @@ function App() {
       setError('Veuillez remplir tous les champs');
       return;
     }
-    // Redirection vers l'application
     window.location.href = APP_URL;
   };
 
   if (showLogin) {
     return (
-      <ThemeProvider>
-        <FlexBox
-          direction={FlexBoxDirection.Column}
-          alignItems={FlexBoxAlignItems.Center}
-          justifyContent={FlexBoxJustifyContent.Center}
-          style={{
-            minHeight: '100vh',
-            background: 'linear-gradient(135deg, var(--sapBackgroundColor) 0%, var(--sapShell_Background) 100%)',
-            padding: '2rem'
-          }}
-        >
-          <Card
-            header={
-              <CardHeader
-                titleText="Connexion à OpsFlux"
-                avatar={<Icon name="workflow-tasks" style={{ fontSize: '2.5rem', color: 'var(--sapBrandColor)' }} />}
-              />
-            }
-            style={{ width: '420px', maxWidth: '100%' }}
+      <div style={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'linear-gradient(135deg, var(--sapBackgroundColor) 0%, var(--sapShell_Background) 100%)',
+        padding: '2rem'
+      }}>
+        <ui5-card style={{ width: '420px', maxWidth: '100%' }}>
+          <ui5-card-header
+            slot="header"
+            title-text="Connexion à OpsFlux"
+            subtitle-text="Gérez vos flux métiers en toute simplicité"
           >
-            <FlexBox direction={FlexBoxDirection.Column} style={{ padding: '2rem', gap: '1.5rem' }}>
-              <Text style={{ textAlign: 'center', color: 'var(--sapNeutralTextColor)' }}>
-                Gérez vos flux métiers en toute simplicité
-              </Text>
+            <ui5-icon slot="avatar" name="workflow-tasks" style={{ fontSize: '2.5rem', color: 'var(--sapBrandColor)' }}></ui5-icon>
+          </ui5-card-header>
 
-              {error && (
-                <MessageStrip design={MessageStripDesign.Negative} hideCloseButton>
-                  {error}
-                </MessageStrip>
-              )}
+          <div style={{ padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            {error && (
+              <ui5-message-strip design="Negative" hide-close-button>
+                {error}
+              </ui5-message-strip>
+            )}
 
-              <Form onSubmit={handleLogin}>
-                <FormItem label="Email">
-                  <Input
-                    type="email"
-                    placeholder="votre.email@entreprise.fr"
-                    value={email}
-                    onInput={(e) => setEmail(e.target.value)}
-                    style={{ width: '100%' }}
-                  />
-                </FormItem>
-                <FormItem label="Mot de passe">
-                  <Input
-                    type="password"
-                    placeholder="••••••••"
-                    value={password}
-                    onInput={(e) => setPassword(e.target.value)}
-                    style={{ width: '100%' }}
-                  />
-                </FormItem>
-              </Form>
+            <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <div>
+                <ui5-label for="email">Email</ui5-label>
+                <ui5-input
+                  id="email"
+                  type="Email"
+                  placeholder="votre.email@entreprise.fr"
+                  value={email}
+                  onInput={(e) => setEmail(e.target.value)}
+                  style={{ width: '100%' }}
+                ></ui5-input>
+              </div>
 
-              <FlexBox direction={FlexBoxDirection.Column} style={{ gap: '1rem', marginTop: '1rem' }}>
-                <Button
-                  design={ButtonDesign.Emphasized}
+              <div>
+                <ui5-label for="password">Mot de passe</ui5-label>
+                <ui5-input
+                  id="password"
+                  type="Password"
+                  placeholder="••••••••"
+                  value={password}
+                  onInput={(e) => setPassword(e.target.value)}
+                  style={{ width: '100%' }}
+                ></ui5-input>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '1rem' }}>
+                <ui5-button
+                  design="Emphasized"
                   icon="log"
                   onClick={handleLogin}
                   style={{ width: '100%' }}
                 >
                   Se connecter
-                </Button>
-                <Button
-                  design={ButtonDesign.Transparent}
+                </ui5-button>
+                <ui5-button
+                  design="Transparent"
                   onClick={() => setShowLogin(false)}
                   style={{ width: '100%' }}
                 >
                   Retour à l'accueil
-                </Button>
-              </FlexBox>
+                </ui5-button>
+              </div>
 
-              <Text style={{ textAlign: 'center', fontSize: '0.875rem', color: 'var(--sapNeutralTextColor)' }}>
+              <ui5-text style={{ textAlign: 'center', fontSize: '0.875rem', color: 'var(--sapNeutralTextColor)' }}>
                 Pas encore de compte ? Contactez votre administrateur système.
-              </Text>
-            </FlexBox>
-          </Card>
-        </FlexBox>
-      </ThemeProvider>
+              </ui5-text>
+            </form>
+          </div>
+        </ui5-card>
+      </div>
     );
   }
 
   return (
-    <ThemeProvider>
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       {/* Header Bar */}
-      <Bar
-        design={BarDesign.Header}
-        startContent={
-          <FlexBox alignItems={FlexBoxAlignItems.Center} style={{ gap: '0.5rem' }}>
-            <Icon name="workflow-tasks" style={{ fontSize: '1.5rem', color: 'var(--sapBrandColor)' }} />
-            <Title level={TitleLevel.H5} style={{ margin: 0 }}>OpsFlux</Title>
-            <Text style={{ color: 'var(--sapNeutralTextColor)', fontSize: '0.875rem' }}>Gestion Intelligente des Flux Métiers</Text>
-          </FlexBox>
-        }
-        endContent={
-          <Button design={ButtonDesign.Emphasized} onClick={() => setShowLogin(true)}>
+      <ui5-bar design="Header" style={{ position: 'sticky', top: 0, zIndex: 100 }}>
+        <div slot="startContent" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <ui5-icon name="workflow-tasks" style={{ fontSize: '1.5rem', color: 'var(--sapBrandColor)' }}></ui5-icon>
+          <ui5-title level="H5" style={{ margin: 0 }}>OpsFlux</ui5-title>
+          <ui5-text style={{ color: 'var(--sapNeutralTextColor)', fontSize: '0.875rem' }}>
+            Gestion Intelligente des Flux Métiers
+          </ui5-text>
+        </div>
+        <div slot="endContent">
+          <ui5-button design="Emphasized" onClick={() => setShowLogin(true)}>
             Se connecter
-          </Button>
-        }
-        style={{ position: 'sticky', top: 0, zIndex: 100 }}
-      />
+          </ui5-button>
+        </div>
+      </ui5-bar>
 
       {/* Hero Section */}
-      <FlexBox
-        direction={FlexBoxDirection.Column}
-        alignItems={FlexBoxAlignItems.Center}
-        justifyContent={FlexBoxJustifyContent.Center}
-        style={{
-          padding: '6rem 2rem',
-          minHeight: '70vh',
-          background: 'linear-gradient(135deg, var(--sapBackgroundColor) 0%, var(--sapShell_Background) 100%)',
-          position: 'relative'
-        }}
-      >
-        <Badge colorScheme="8" style={{ marginBottom: '1rem', fontSize: '0.875rem', padding: '0.5rem 1rem' }}>
+      <div style={{
+        padding: '6rem 2rem',
+        minHeight: '70vh',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'linear-gradient(135deg, var(--sapBackgroundColor) 0%, var(--sapShell_Background) 100%)',
+        textAlign: 'center'
+      }}>
+        <ui5-tag color-scheme="8" style={{ marginBottom: '1rem' }}>
           🔄 Automatisez vos processus métiers
-        </Badge>
-        <Icon name="workflow-tasks" style={{ fontSize: '6rem', color: 'var(--sapBrandColor)', marginBottom: '2rem' }} />
-        <Title level={TitleLevel.H1} style={{ marginBottom: '1rem', fontSize: '3.5rem', textAlign: 'center' }}>
+        </ui5-tag>
+        <ui5-icon name="workflow-tasks" style={{ fontSize: '6rem', color: 'var(--sapBrandColor)', marginBottom: '2rem' }}></ui5-icon>
+        <ui5-title level="H1" style={{ marginBottom: '1rem', fontSize: '3.5rem' }}>
           OpsFlux
-        </Title>
-        <Title level={TitleLevel.H3} style={{ marginBottom: '1rem', fontWeight: 'normal', color: 'var(--sapNeutralTextColor)', textAlign: 'center', maxWidth: '800px' }}>
+        </ui5-title>
+        <ui5-title level="H3" style={{ marginBottom: '1rem', fontWeight: 'normal', color: 'var(--sapNeutralTextColor)', maxWidth: '800px' }}>
           Plateforme de gestion et d'automatisation des flux métiers
-        </Title>
-        <Text style={{ marginBottom: '3rem', fontSize: '1.125rem', textAlign: 'center', maxWidth: '700px', color: 'var(--sapNeutralTextColor)' }}>
+        </ui5-title>
+        <ui5-text style={{ marginBottom: '3rem', fontSize: '1.125rem', maxWidth: '700px', color: 'var(--sapNeutralTextColor)' }}>
           Centralisez, automatisez et optimisez tous vos flux opérationnels : données, documents, workflows et processus métiers
-        </Text>
-        <FlexBox justifyContent={FlexBoxJustifyContent.Center} alignItems={FlexBoxAlignItems.Center} style={{ gap: '1rem', flexWrap: 'wrap' }}>
-          <Button design={ButtonDesign.Emphasized} icon="log" onClick={() => setShowLogin(true)}>
+        </ui5-text>
+        <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', justifyContent: 'center' }}>
+          <ui5-button design="Emphasized" icon="log" onClick={() => setShowLogin(true)}>
             Accéder à la plateforme
-          </Button>
-          <Button design={ButtonDesign.Transparent} icon="play" onClick={() => document.getElementById('flows')?.scrollIntoView({ behavior: 'smooth' })}>
+          </ui5-button>
+          <ui5-button design="Transparent" icon="play">
             Découvrir les flux
-          </Button>
-        </FlexBox>
-      </FlexBox>
-
-      {/* Flows Section */}
-      <div id="flows" style={{ padding: '6rem 2rem', maxWidth: '1200px', margin: '0 auto' }}>
-        <FlexBox direction={FlexBoxDirection.Column} alignItems={FlexBoxAlignItems.Center} style={{ marginBottom: '3rem' }}>
-          <Badge colorScheme="6" style={{ marginBottom: '1rem' }}>Flux métiers</Badge>
-          <Title level={TitleLevel.H2} style={{ textAlign: 'center', marginBottom: '1rem' }}>
-            Gérez tous vos flux en un seul endroit
-          </Title>
-          <Text style={{ textAlign: 'center', maxWidth: '700px', color: 'var(--sapNeutralTextColor)' }}>
-            De la capture à l'archivage, suivez et automatisez l'intégralité de vos processus métiers
-          </Text>
-        </FlexBox>
-
-        <FlexBox wrap={FlexBoxWrap.Wrap} justifyContent={FlexBoxJustifyContent.Center} style={{ gap: '2rem' }}>
-          {[
-            { icon: 'database', title: 'Flux de données', desc: 'Import, export, transformation et synchronisation de données multi-sources', badge: 'ETL', state: ValueState.Success },
-            { icon: 'document', title: 'Flux documentaires', desc: 'Gestion électronique de documents, versioning et workflow de validation', badge: 'GED', state: ValueState.Information },
-            { icon: 'process', title: 'Flux opérationnels', desc: 'Orchestration des processus métiers avec règles automatisées', badge: 'BPM', state: ValueState.Warning },
-            { icon: 'message-information', title: 'Flux de communication', desc: 'Notifications, alertes et échanges inter-systèmes temps réel', badge: 'API', state: ValueState.Success },
-            { icon: 'journey-arrive', title: 'Flux logistiques', desc: 'Traçabilité des mouvements, suivi des expéditions et réceptions', badge: 'SCM', state: ValueState.Information },
-            { icon: 'money-bills', title: 'Flux financiers', desc: 'Validation des factures, paiements et rapprochements bancaires', badge: 'Finance', state: ValueState.Warning }
-          ].map((flow, index) => (
-            <Card
-              key={index}
-              header={
-                <CardHeader
-                  titleText={flow.title}
-                  subtitleText={flow.desc}
-                  avatar={<Icon name={flow.icon} style={{ fontSize: '2rem', color: 'var(--sapBrandColor)' }} />}
-                  action={<ObjectStatus state={flow.state}>{flow.badge}</ObjectStatus>}
-                />
-              }
-              style={{ width: '360px', minHeight: '180px' }}
-            >
-            </Card>
-          ))}
-        </FlexBox>
-      </div>
-
-      {/* Modules Section */}
-      <div id="modules" style={{ padding: '6rem 2rem', backgroundColor: 'var(--sapBackgroundColor)' }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-          <FlexBox direction={FlexBoxDirection.Column} alignItems={FlexBoxAlignItems.Center} style={{ marginBottom: '3rem' }}>
-            <Badge colorScheme="3" style={{ marginBottom: '1rem' }}>Architecture modulaire</Badge>
-            <Title level={TitleLevel.H2} style={{ textAlign: 'center', marginBottom: '1rem' }}>
-              Modules métiers interconnectés
-            </Title>
-            <Text style={{ textAlign: 'center', maxWidth: '700px', color: 'var(--sapNeutralTextColor)' }}>
-              Chaque module gère ses propres flux tout en s'intégrant parfaitement avec l'écosystème
-            </Text>
-          </FlexBox>
-
-          <FlexBox wrap={FlexBoxWrap.Wrap} justifyContent={FlexBoxJustifyContent.Center} style={{ gap: '1.5rem' }}>
-            {[
-              { icon: 'customer-order-entry', title: 'Gestion Commerciale', desc: 'Devis, commandes, facturation et suivi client', status: 'Core' },
-              { icon: 'receipt', title: 'Comptabilité', desc: 'Écritures, analytique, reporting et clôtures', status: 'Core' },
-              { icon: 'product', title: 'Gestion de Stock', desc: 'Inventaire, mouvements, valorisation et traçabilité', status: 'Core' },
-              { icon: 'business-card', title: 'Achats & Fournisseurs', desc: 'Demandes d\'achat, commandes et réceptions', status: 'Core' },
-              { icon: 'factory', title: 'Production', desc: 'OF, nomenclatures, gammes et suivi atelier', status: 'Avancé' },
-              { icon: 'customer', title: 'CRM', desc: 'Pipeline commercial, contacts et opportunités', status: 'Avancé' },
-              { icon: 'Chart-Tree-Map', title: 'Business Intelligence', desc: 'Tableaux de bord, KPI et analyses décisionnelles', status: 'Premium' },
-              { icon: 'bot', title: 'IA & Automatisation', desc: 'Workflows intelligents et prédictions métiers', status: 'Premium' }
-            ].map((module, index) => (
-              <Card
-                key={index}
-                header={
-                  <CardHeader
-                    titleText={module.title}
-                    subtitleText={module.desc}
-                    avatar={<Icon name={module.icon} style={{ fontSize: '2.5rem', color: 'var(--sapBrandColor)' }} />}
-                    status={<ObjectStatus state={module.status === 'Core' ? ValueState.Success : module.status === 'Avancé' ? ValueState.Information : ValueState.Warning}>{module.status}</ObjectStatus>}
-                  />
-                }
-                style={{ width: '320px', minHeight: '160px' }}
-              >
-              </Card>
-            ))}
-          </FlexBox>
+          </ui5-button>
         </div>
       </div>
 
-      {/* Features Section */}
-      <div id="features" style={{ padding: '6rem 2rem', maxWidth: '1200px', margin: '0 auto' }}>
-        <FlexBox direction={FlexBoxDirection.Column} alignItems={FlexBoxAlignItems.Center} style={{ marginBottom: '3rem' }}>
-          <Badge colorScheme="5" style={{ marginBottom: '1rem' }}>Fonctionnalités</Badge>
-          <Title level={TitleLevel.H2} style={{ textAlign: 'center', marginBottom: '1rem' }}>
-            Une plateforme technique moderne
-          </Title>
-          <Text style={{ textAlign: 'center', maxWidth: '700px', color: 'var(--sapNeutralTextColor)' }}>
-            Technologies éprouvées et architecture scalable pour votre croissance
-          </Text>
-        </FlexBox>
+      {/* Flows Section */}
+      <div style={{ padding: '6rem 2rem', maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
+        <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
+          <ui5-tag color-scheme="6" style={{ marginBottom: '1rem' }}>Flux métiers</ui5-tag>
+          <ui5-title level="H2" style={{ marginBottom: '1rem' }}>
+            Gérez tous vos flux en un seul endroit
+          </ui5-title>
+          <ui5-text style={{ color: 'var(--sapNeutralTextColor)' }}>
+            De la capture à l'archivage, suivez et automatisez l'intégralité de vos processus métiers
+          </ui5-text>
+        </div>
 
-        <FlexBox wrap={FlexBoxWrap.Wrap} justifyContent={FlexBoxJustifyContent.Center} style={{ gap: '2rem' }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '2rem' }}>
           {[
-            { icon: 'cloud', title: 'API REST complète', desc: 'Architecture 100% API pour intégrations tierces illimitées' },
-            { icon: 'shield', title: 'Sécurité avancée', desc: 'Authentification multi-facteurs, audit trail et chiffrement' },
-            { icon: 'synchronize', title: 'Temps réel', desc: 'WebSocket, notifications push et synchronisation instantanée' },
-            { icon: 'workflow-tasks', title: 'Workflows flexibles', desc: 'Moteur de workflow visuel avec conditions et actions' },
-            { icon: 'source-code', title: 'Extensible', desc: 'Hooks système, plugins et développement module custom' },
-            { icon: 'history', title: 'Traçabilité', desc: 'Historique complet des modifications et audit trail' }
-          ].map((feature, index) => (
-            <Card
-              key={index}
-              header={
-                <CardHeader
-                  titleText={feature.title}
-                  subtitleText={feature.desc}
-                  avatar={<Icon name={feature.icon} style={{ fontSize: '2rem', color: 'var(--sapBrandColor)' }} />}
-                />
-              }
-              style={{ width: '360px', minHeight: '160px' }}
-            >
-            </Card>
+            { icon: 'database', title: 'Flux de données', desc: 'Import, export, transformation et synchronisation de données multi-sources', badge: 'ETL' },
+            { icon: 'document', title: 'Flux documentaires', desc: 'Gestion électronique de documents, versioning et workflow de validation', badge: 'GED' },
+            { icon: 'process', title: 'Flux opérationnels', desc: 'Orchestration des processus métiers avec règles automatisées', badge: 'BPM' }
+          ].map((flow, index) => (
+            <ui5-card key={index} style={{ width: '360px', minHeight: '180px' }}>
+              <ui5-card-header
+                slot="header"
+                title-text={flow.title}
+                subtitle-text={flow.desc}
+              >
+                <ui5-icon slot="avatar" name={flow.icon} style={{ fontSize: '2rem', color: 'var(--sapBrandColor)' }}></ui5-icon>
+                <ui5-tag slot="action" color-scheme="6">{flow.badge}</ui5-tag>
+              </ui5-card-header>
+            </ui5-card>
           ))}
-        </FlexBox>
+        </div>
       </div>
 
-      {/* CTA Section */}
-      <FlexBox
-        direction={FlexBoxDirection.Column}
-        alignItems={FlexBoxAlignItems.Center}
-        justifyContent={FlexBoxJustifyContent.Center}
-        style={{
-          padding: '6rem 2rem',
-          background: 'linear-gradient(135deg, var(--sapBrandColor) 0%, var(--sapHighlightColor) 100%)',
-          color: 'white',
-          textAlign: 'center'
-        }}
-      >
-        <Icon name="connected" style={{ fontSize: '4rem', marginBottom: '2rem', opacity: 0.9 }} />
-        <Title level={TitleLevel.H2} style={{ marginBottom: '1rem', color: 'white' }}>
-          Prêt à optimiser vos flux métiers ?
-        </Title>
-        <Text style={{ marginBottom: '2rem', fontSize: '1.125rem', maxWidth: '600px', opacity: 0.95 }}>
-          Centralisez vos opérations et gagnez en efficacité avec OpsFlux
-        </Text>
-        <Button design={ButtonDesign.Emphasized} icon="log" onClick={() => setShowLogin(true)} style={{ backgroundColor: 'white', color: 'var(--sapBrandColor)' }}>
-          Accéder à la plateforme
-        </Button>
-      </FlexBox>
-
       {/* Footer */}
-      <Bar
-        design={BarDesign.Footer}
-        startContent={
-          <FlexBox alignItems={FlexBoxAlignItems.Center} style={{ gap: '0.5rem' }}>
-            <Icon name="workflow-tasks" />
-            <Label style={{ fontWeight: 'bold' }}>OpsFlux</Label>
-            <Label style={{ color: 'var(--sapNeutralTextColor)' }}>v1.0.0</Label>
-          </FlexBox>
-        }
-        middleContent={
-          <FlexBox alignItems={FlexBoxAlignItems.Center} style={{ gap: '1.5rem' }}>
-            <Button design={ButtonDesign.Transparent} onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-              Accueil
-            </Button>
-            <Button design={ButtonDesign.Transparent}>
-              Documentation
-            </Button>
-            <Button design={ButtonDesign.Transparent}>
-              Support
-            </Button>
-          </FlexBox>
-        }
-        endContent={
-          <FlexBox alignItems={FlexBoxAlignItems.Center} style={{ gap: '0.5rem' }}>
-            <Label style={{ color: 'var(--sapNeutralTextColor)', fontSize: '0.875rem' }}>
-              © 2025 OpsFlux · 3MH-CCAI
-            </Label>
-          </FlexBox>
-        }
-        style={{ marginTop: 'auto' }}
-      />
-    </ThemeProvider>
+      <ui5-bar design="Footer" style={{ marginTop: 'auto' }}>
+        <div slot="startContent" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <ui5-icon name="workflow-tasks"></ui5-icon>
+          <ui5-label style={{ fontWeight: 'bold' }}>OpsFlux</ui5-label>
+          <ui5-label style={{ color: 'var(--sapNeutralTextColor)' }}>v1.0.0</ui5-label>
+        </div>
+        <div slot="endContent">
+          <ui5-label style={{ color: 'var(--sapNeutralTextColor)', fontSize: '0.875rem' }}>
+            © 2025 OpsFlux · 3MH-CCAI
+          </ui5-label>
+        </div>
+      </ui5-bar>
+    </div>
   );
 }
 
