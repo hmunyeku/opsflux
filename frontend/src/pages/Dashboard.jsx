@@ -27,12 +27,12 @@ import '@ui5/webcomponents-icons/dist/home.js';
 import '@ui5/webcomponents-icons/dist/account.js';
 import '@ui5/webcomponents-icons/dist/group.js';
 import '@ui5/webcomponents-icons/dist/puzzle.js';
-import '@ui5/webcomponents-icons/dist/bot.js';
+import '@ui5/webcomponents-icons/dist/conversation.js';
 import '@ui5/webcomponents-icons/dist/action-settings.js';
 import '@ui5/webcomponents-icons/dist/menu2.js';
 import '@ui5/webcomponents-icons/dist/sys-help.js';
 import '@ui5/webcomponents-icons/dist/log.js';
-import '@ui5/webcomponents-icons/dist/business-suite.js';
+import '@ui5/webcomponents-icons/dist/product.js';
 
 /**
  * Dashboard OpsFlux
@@ -197,7 +197,7 @@ const Dashboard = () => {
         >
           <ui5-shellbar-branding slot="branding">
             OpsFlux
-            <ui5-icon slot="logo" name="business-suite"></ui5-icon>
+            <ui5-icon slot="logo" name="product"></ui5-icon>
           </ui5-shellbar-branding>
 
           <ui5-button
@@ -278,7 +278,7 @@ const Dashboard = () => {
 
           <ui5-side-navigation-item
             text="Assistant IA"
-            icon="bot"
+            icon="conversation"
             data-path="/ai"
           ></ui5-side-navigation-item>
 
