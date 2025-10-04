@@ -10,12 +10,13 @@ from django_filters.rest_framework import DjangoFilterBackend
 from django.contrib.auth import login, logout
 from django.utils import timezone
 
-from .models import User, Role, Permission, UserRole
+from .models import User, Role, Permission, UserRole, UIPreference, MenuItem
 from .serializers import (
     UserListSerializer, UserDetailSerializer, UserCreateSerializer,
     UserUpdateSerializer, ChangePasswordSerializer, LoginSerializer,
     ProfileSerializer, RoleSerializer, PermissionSerializer,
-    UserRoleSerializer
+    UserRoleSerializer, UIPreferenceSerializer, MenuItemSerializer,
+    MenuItemListSerializer
 )
 from core.utils import get_client_ip
 from core.ratelimit import api_ratelimit, RateLimits
@@ -288,20 +289,146 @@ def check_permission(request):
     Query params: permission_code
     """
     permission_code = request.query_params.get('permission_code')
-    
+
     if not permission_code:
         return Response({
             'error': 'permission_code requis'
         }, status=status.HTTP_400_BAD_REQUEST)
-    
+
     # Vérifier si l'utilisateur a la permission
     has_permission = Permission.objects.filter(
         code=permission_code,
         roles__user_assignments__user=request.user,
         roles__user_assignments__is_active=True
     ).exists()
-    
+
     return Response({
         'permission_code': permission_code,
         'has_permission': has_permission,
     })
+
+
+class UIPreferenceViewSet(viewsets.ModelViewSet):
+    """ViewSet pour UIPreference"""
+
+    queryset = UIPreference.objects.select_related('user')
+    serializer_class = UIPreferenceSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        """Limite aux préférences de l'utilisateur connecté (sauf admin)"""
+        if self.request.user.is_staff:
+            return super().get_queryset()
+        return self.queryset.filter(user=self.request.user)
+
+    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
+    def my_preferences(self, request):
+        """Retourne les préférences UI de l'utilisateur connecté"""
+        try:
+            preferences = UIPreference.objects.get(user=request.user)
+        except UIPreference.DoesNotExist:
+            # Créer des préférences par défaut si elles n'existent pas
+            preferences = UIPreference.objects.create(user=request.user)
+
+        serializer = UIPreferenceSerializer(preferences)
+        return Response(serializer.data)
+
+    @action(detail=False, methods=['put', 'patch'], permission_classes=[IsAuthenticated])
+    def update_my_preferences(self, request):
+        """Met à jour les préférences UI de l'utilisateur connecté"""
+        try:
+            preferences = UIPreference.objects.get(user=request.user)
+        except UIPreference.DoesNotExist:
+            preferences = UIPreference.objects.create(user=request.user)
+
+        serializer = UIPreferenceSerializer(
+            preferences,
+            data=request.data,
+            partial=True
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(serializer.data)
+
+
+class MenuItemViewSet(viewsets.ModelViewSet):
+    """ViewSet pour MenuItem"""
+
+    queryset = MenuItem.objects.filter(is_deleted=False).select_related(
+        'parent', 'module'
+    ).prefetch_related('required_permissions')
+    permission_classes = [IsAuthenticated]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ['is_active', 'is_system', 'item_type', 'module']
+    search_fields = ['code', 'label']
+    ordering_fields = ['order', 'label', 'created_at']
+    ordering = ['order', 'label']
+
+    def get_serializer_class(self):
+        """Retourne le serializer approprié selon l'action"""
+        if self.action == 'list':
+            return MenuItemListSerializer
+        return MenuItemSerializer
+
+    def get_permissions(self):
+        """Seuls les admins peuvent modifier les éléments de menu"""
+        if self.action in ['create', 'update', 'partial_update', 'destroy']:
+            return [IsAdminUser()]
+        return super().get_permissions()
+
+    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
+    def my_menu(self, request):
+        """
+        Retourne les éléments de menu accessibles à l'utilisateur connecté
+        Construit une hiérarchie complète avec permissions
+        """
+        # Récupérer tous les éléments actifs
+        all_items = MenuItem.objects.filter(
+            is_active=True,
+            is_deleted=False
+        ).select_related('parent', 'module').prefetch_related(
+            'required_permissions'
+        ).order_by('order', 'label')
+
+        # Filtrer par permissions
+        allowed_items = []
+        for item in all_items:
+            if item.has_permission(request.user):
+                allowed_items.append(item)
+
+        # Construire la hiérarchie (seulement les éléments de niveau racine)
+        root_items = [item for item in allowed_items if item.parent is None]
+
+        serializer = MenuItemSerializer(
+            root_items,
+            many=True,
+            context={'request': request}
+        )
+        return Response(serializer.data)
+
+    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
+    def navigation(self, request):
+        """
+        Retourne la structure de navigation complète pour le Dashboard
+        Format optimisé pour ui5-side-navigation
+        """
+        # Récupérer tous les éléments visibles de l'utilisateur
+        all_items = MenuItem.objects.filter(
+            is_active=True,
+            is_deleted=False
+        ).select_related('parent', 'module').prefetch_related(
+            'required_permissions'
+        ).order_by('item_type', 'order', 'label')
+
+        # Filtrer par permissions utilisateur
+        allowed_items = [item for item in all_items if item.has_permission(request.user)]
+
+        # Séparer par type
+        normal_items = [item for item in allowed_items if item.item_type == 'item' and item.parent is None]
+        fixed_items = [item for item in allowed_items if item.item_type == 'fixed']
+
+        return Response({
+            'items': MenuItemSerializer(normal_items, many=True, context={'request': request}).data,
+            'fixed_items': MenuItemSerializer(fixed_items, many=True, context={'request': request}).data,
+        })

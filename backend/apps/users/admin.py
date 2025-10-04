@@ -4,7 +4,7 @@ Configuration Admin Django pour Users
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.utils.html import format_html
-from .models import User, Role, Permission, UserRole
+from .models import User, Role, Permission, UserRole, UIPreference, MenuItem
 
 
 @admin.register(User)
@@ -151,3 +151,81 @@ class UserRoleAdmin(admin.ModelAdmin):
             return f"{from_str} → {to_str}"
         return 'Permanent'
     validity_display.short_description = 'Validité'
+
+
+@admin.register(UIPreference)
+class UIPreferenceAdmin(admin.ModelAdmin):
+    """Admin pour UIPreference"""
+
+    list_display = [
+        'user', 'compact_mode', 'sidebar_collapsed',
+        'show_search', 'show_help', 'default_page_size'
+    ]
+    list_filter = ['compact_mode', 'sidebar_collapsed', 'show_search', 'show_help']
+    search_fields = ['user__username', 'user__email']
+    readonly_fields = ['eid', 'created_at', 'updated_at']
+
+    fieldsets = (
+        ('Utilisateur', {
+            'fields': ('user', 'eid')
+        }),
+        ('Préférences générales', {
+            'fields': ('compact_mode', 'sidebar_collapsed', 'show_tooltips', 'home_page')
+        }),
+        ('Éléments ShellBar', {
+            'fields': ('show_search', 'show_notifications', 'show_help')
+        }),
+        ('Navigation', {
+            'fields': ('visible_menu_items',)
+        }),
+        ('Tableau de bord', {
+            'fields': ('dashboard_layout', 'favorite_widgets')
+        }),
+        ('Préférences tableaux', {
+            'fields': ('default_page_size',)
+        }),
+        ('Raccourcis', {
+            'fields': ('custom_shortcuts',)
+        }),
+        ('Audit', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+
+
+@admin.register(MenuItem)
+class MenuItemAdmin(admin.ModelAdmin):
+    """Admin pour MenuItem"""
+
+    list_display = [
+        'code', 'label', 'icon', 'parent', 'order',
+        'item_type', 'design', 'is_active', 'is_system'
+    ]
+    list_filter = ['is_active', 'is_system', 'item_type', 'design', 'module']
+    search_fields = ['code', 'label', 'path']
+    filter_horizontal = ['required_permissions']
+    readonly_fields = ['eid', 'created_at', 'updated_at']
+    list_editable = ['order']
+
+    fieldsets = (
+        ('Informations de base', {
+            'fields': ('code', 'label', 'icon', 'path', 'eid')
+        }),
+        ('Hiérarchie', {
+            'fields': ('parent', 'order')
+        }),
+        ('Configuration', {
+            'fields': ('design', 'item_type', 'is_active', 'is_system')
+        }),
+        ('Permissions', {
+            'fields': ('required_permissions',)
+        }),
+        ('Module', {
+            'fields': ('module',)
+        }),
+        ('Audit', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )

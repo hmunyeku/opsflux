@@ -4,7 +4,7 @@ Serializers DRF pour l'app Users
 from rest_framework import serializers
 from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth import authenticate
-from .models import User, Role, Permission, UserRole
+from .models import User, Role, Permission, UserRole, UIPreference, MenuItem
 
 
 class PermissionSerializer(serializers.ModelSerializer):
@@ -278,12 +278,12 @@ class LoginSerializer(serializers.Serializer):
 
 class ProfileSerializer(serializers.ModelSerializer):
     """Serializer pour le profil de l'utilisateur connecté"""
-    
+
     full_name = serializers.CharField(source='get_full_name', read_only=True)
     display_name = serializers.CharField(source='get_display_name', read_only=True)
     avatar_url = serializers.CharField(source='get_avatar_url', read_only=True)
     roles = UserRoleSerializer(source='user_roles', many=True, read_only=True)
-    
+
     class Meta:
         model = User
         fields = [
@@ -299,3 +299,76 @@ class ProfileSerializer(serializers.ModelSerializer):
             'eid', 'username', 'full_name', 'display_name',
             'avatar_url', 'last_login', 'date_joined'
         ]
+
+
+class UIPreferenceSerializer(serializers.ModelSerializer):
+    """Serializer pour UIPreference"""
+
+    class Meta:
+        model = UIPreference
+        fields = [
+            'id', 'eid', 'user',
+            'compact_mode', 'sidebar_collapsed', 'show_tooltips',
+            'show_search', 'show_notifications', 'show_help',
+            'visible_menu_items', 'dashboard_layout',
+            'default_page_size', 'custom_shortcuts',
+            'favorite_widgets', 'home_page',
+            'created_at', 'updated_at'
+        ]
+        read_only_fields = ['eid', 'created_at', 'updated_at']
+
+
+class MenuItemSerializer(serializers.ModelSerializer):
+    """Serializer pour MenuItem avec hiérarchie"""
+
+    children = serializers.SerializerMethodField()
+    has_permission = serializers.SerializerMethodField()
+    parent_code = serializers.CharField(source='parent.code', read_only=True)
+    module_code = serializers.CharField(source='module.code', read_only=True)
+
+    class Meta:
+        model = MenuItem
+        fields = [
+            'id', 'eid', 'code', 'label', 'icon', 'path',
+            'parent', 'parent_code', 'order', 'design', 'item_type',
+            'required_permissions', 'is_active', 'is_system',
+            'module', 'module_code', 'children', 'has_permission',
+            'created_at', 'updated_at'
+        ]
+        read_only_fields = ['eid', 'created_at', 'updated_at']
+
+    def get_children(self, obj):
+        """Récupère les enfants de cet élément de menu"""
+        if hasattr(obj, 'children'):
+            children = obj.children.filter(is_active=True).order_by('order')
+            return MenuItemSerializer(children, many=True, context=self.context).data
+        return []
+
+    def get_has_permission(self, obj):
+        """Vérifie si l'utilisateur actuel a la permission de voir cet élément"""
+        request = self.context.get('request')
+        if request and hasattr(request, 'user') and request.user.is_authenticated:
+            return obj.has_permission(request.user)
+        return False
+
+
+class MenuItemListSerializer(serializers.ModelSerializer):
+    """Serializer simplifié pour liste de MenuItems"""
+
+    parent_code = serializers.CharField(source='parent.code', read_only=True)
+    has_permission = serializers.SerializerMethodField()
+
+    class Meta:
+        model = MenuItem
+        fields = [
+            'id', 'eid', 'code', 'label', 'icon', 'path',
+            'parent', 'parent_code', 'order', 'design',
+            'item_type', 'is_active', 'has_permission'
+        ]
+
+    def get_has_permission(self, obj):
+        """Vérifie si l'utilisateur actuel a la permission de voir cet élément"""
+        request = self.context.get('request')
+        if request and hasattr(request, 'user') and request.user.is_authenticated:
+            return obj.has_permission(request.user)
+        return False

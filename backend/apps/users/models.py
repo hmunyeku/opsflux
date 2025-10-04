@@ -391,3 +391,238 @@ class UserRole(models.Model):
     
     def __str__(self):
         return f"{self.user} - {self.role}"
+
+
+class UIPreference(AbstractBaseModel):
+    """
+    Modèle UIPreference - Préférences d'interface utilisateur
+    Contrôle quels éléments UI sont visibles pour chaque utilisateur
+    """
+
+    user = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE,
+        related_name='ui_preferences',
+        verbose_name=_("Utilisateur")
+    )
+
+    # Préférences générales UI
+    compact_mode = models.BooleanField(
+        _("Mode compact"),
+        default=False,
+        help_text=_("Affichage compact de l'interface")
+    )
+
+    sidebar_collapsed = models.BooleanField(
+        _("Barre latérale réduite"),
+        default=False
+    )
+
+    show_tooltips = models.BooleanField(
+        _("Afficher les infobulles"),
+        default=True
+    )
+
+    # Éléments visibles dans la ShellBar
+    show_search = models.BooleanField(
+        _("Afficher la recherche"),
+        default=True
+    )
+
+    show_notifications = models.BooleanField(
+        _("Afficher les notifications"),
+        default=True
+    )
+
+    show_help = models.BooleanField(
+        _("Afficher l'aide"),
+        default=True
+    )
+
+    # Éléments visibles dans la navigation
+    visible_menu_items = models.JSONField(
+        _("Éléments de menu visibles"),
+        default=list,
+        blank=True,
+        help_text=_("Liste des codes d'éléments de menu à afficher")
+    )
+
+    # Préférences du tableau de bord
+    dashboard_layout = models.JSONField(
+        _("Disposition du tableau de bord"),
+        default=dict,
+        blank=True,
+        help_text=_("Configuration des widgets et leur position")
+    )
+
+    # Préférences des tableaux
+    default_page_size = models.PositiveIntegerField(
+        _("Taille de page par défaut"),
+        default=20,
+        help_text=_("Nombre d'éléments par page dans les tableaux")
+    )
+
+    # Raccourcis personnalisés
+    custom_shortcuts = models.JSONField(
+        _("Raccourcis personnalisés"),
+        default=list,
+        blank=True,
+        help_text=_("Raccourcis clavier personnalisés")
+    )
+
+    # Widgets favoris
+    favorite_widgets = models.JSONField(
+        _("Widgets favoris"),
+        default=list,
+        blank=True,
+        help_text=_("Liste des widgets à afficher en priorité")
+    )
+
+    # Page d'accueil par défaut
+    home_page = models.CharField(
+        _("Page d'accueil"),
+        max_length=100,
+        default="/dashboard",
+        help_text=_("URL de la page d'accueil par défaut")
+    )
+
+    class Meta:
+        verbose_name = _("Préférence d'interface")
+        verbose_name_plural = _("Préférences d'interface")
+
+    def __str__(self):
+        return f"Préférences UI - {self.user}"
+
+
+class MenuItem(AbstractBaseModel):
+    """
+    Modèle MenuItem - Éléments de menu configurables
+    Système de navigation dynamique avec permissions
+    """
+
+    code = models.CharField(
+        _("Code"),
+        max_length=50,
+        unique=True,
+        db_index=True
+    )
+
+    label = models.CharField(
+        _("Libellé"),
+        max_length=100
+    )
+
+    icon = models.CharField(
+        _("Icône"),
+        max_length=50,
+        blank=True,
+        default="",
+        help_text=_("Nom de l'icône UI5")
+    )
+
+    path = models.CharField(
+        _("Chemin"),
+        max_length=200,
+        blank=True,
+        default="",
+        help_text=_("URL ou route")
+    )
+
+    # Hiérarchie
+    parent = models.ForeignKey(
+        'self',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='children',
+        verbose_name=_("Parent")
+    )
+
+    order = models.PositiveIntegerField(
+        _("Ordre"),
+        default=0
+    )
+
+    # Design
+    DESIGN_CHOICES = [
+        ('Default', _("Par défaut")),
+        ('Action', _("Action")),
+    ]
+
+    design = models.CharField(
+        _("Design"),
+        max_length=20,
+        choices=DESIGN_CHOICES,
+        default='Default'
+    )
+
+    # Type d'élément
+    TYPE_CHOICES = [
+        ('item', _("Élément normal")),
+        ('fixed', _("Élément fixe")),
+        ('separator', _("Séparateur")),
+    ]
+
+    item_type = models.CharField(
+        _("Type"),
+        max_length=20,
+        choices=TYPE_CHOICES,
+        default='item'
+    )
+
+    # Permissions requises
+    required_permissions = models.ManyToManyField(
+        'Permission',
+        blank=True,
+        related_name='menu_items',
+        verbose_name=_("Permissions requises"),
+        help_text=_("Permissions nécessaires pour voir cet élément")
+    )
+
+    # Disponibilité
+    is_active = models.BooleanField(
+        _("Actif"),
+        default=True
+    )
+
+    is_system = models.BooleanField(
+        _("Élément système"),
+        default=False,
+        help_text=_("Élément système non modifiable")
+    )
+
+    # Module associé
+    module = models.ForeignKey(
+        'modules.Module',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='menu_items',
+        verbose_name=_("Module"),
+        help_text=_("Module qui fournit cet élément")
+    )
+
+    class Meta:
+        verbose_name = _("Élément de menu")
+        verbose_name_plural = _("Éléments de menu")
+        ordering = ['order', 'label']
+
+    def __str__(self):
+        return f"{self.code} - {self.label}"
+
+    def has_permission(self, user):
+        """Vérifie si l'utilisateur a les permissions pour voir cet élément"""
+        if not self.required_permissions.exists():
+            return True
+
+        # Récupérer toutes les permissions de l'utilisateur via ses rôles
+        user_permissions = Permission.objects.filter(
+            roles__user_assignments__user=user,
+            roles__user_assignments__is_active=True
+        ).distinct()
+
+        # L'utilisateur doit avoir TOUTES les permissions requises
+        required_perm_ids = set(self.required_permissions.values_list('id', flat=True))
+        user_perm_ids = set(user_permissions.values_list('id', flat=True))
+
+        return required_perm_ids.issubset(user_perm_ids)

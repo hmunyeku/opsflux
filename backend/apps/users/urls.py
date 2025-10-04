@@ -13,6 +13,8 @@ router.register(r'users', views.UserViewSet, basename='user')
 router.register(r'roles', views.RoleViewSet, basename='role')
 router.register(r'permissions', views.PermissionViewSet, basename='permission')
 router.register(r'user-roles', views.UserRoleViewSet, basename='userrole')
+router.register(r'ui-preferences', views.UIPreferenceViewSet, basename='uipreference')
+router.register(r'menu-items', views.MenuItemViewSet, basename='menuitem')
 
 urlpatterns = [
     # Router URLs
