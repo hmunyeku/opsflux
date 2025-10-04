@@ -288,7 +288,7 @@ const Dashboard = () => {
           user={user}
           menuId="dashboardUserMenu"
           onSettingsClick={() => setSettingsDialogOpen(true)}
-          onProfileClick={() => navigate('/profile')}
+          onProfileClick={() => setSettingsDialogOpen(true)}
           onLogout={handleSignOut}
         />
 
