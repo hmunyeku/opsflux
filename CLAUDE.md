@@ -20,18 +20,18 @@ PAS d'ARTEFACT, CODE DIRECTEMENT
 
 
 ## ARCHITECTURE GLOBALE
-```
+
 OpsFlux/
-├── frontend/       # React + UI5 Web Components
+├── frontend/       # React + UI5 Web Components (lastest version is v2.15.0 please look at https://ui5.github.io/webcomponents/)
 ├── backend/        # Django REST API
 ├── modules/        # Modules installables
-├── web/           # Pages publiques
+├── web/           # Pages publiques en React + UI5 Web Components (lastest version is v2.15.0 please look at https://ui5.github.io/webcomponents/)
 ├── scripts/       # Scripts administration CLI
 ├── backups/       # Archives
 └── logs/          # Journaux
 
 Chaque module suit la même architecture.
-```
+
 
 ## SERVEURS VIRTUELS (Apache/Nginx)
 - app.DOMAIN → Frontend application
@@ -136,7 +136,7 @@ Business Intelligence:
 - **Conformité** totale (RGPD, HIPAA, PCI DSS, ISO 27001, SOX)
 
 ## ARCHITECTURE MODULE
-```
+
 module_name/
 ├── frontend/      # Components React du module
 ├── backend/       # Models, views, serializers
@@ -144,7 +144,7 @@ module_name/
 ├── install.py     # Script installation
 ├── uninstall.py   # Script désinstallation
 └── migrations/    # Migrations spécifiques
-```
+
 
 Un module peut :
 - Hériter des modèles core
@@ -175,7 +175,7 @@ Si limite mémoire atteinte, génère un contexte de continuité avec :
 - Prochaines étapes
 
 Commence par [TÂCHE SPÉCIFIQUE].
-```
+
 
 ### Infrastructure
 - **Serveur**: Dokploy
