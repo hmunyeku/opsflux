@@ -33,7 +33,8 @@ function App() {
           path="/profile"
           element={
             <PrivateRoute>
-              <ProfilePage />
+              {/* TODO: ProfilePage nécessite ObjectPage components qui n'existent pas dans UI5 v2.15.0 */}
+              <Navigate to="/dashboard" replace />
             </PrivateRoute>
           }
         />

@@ -1,27 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  ThemeProvider,
-  Label,
-  Input,
-  Button,
-  MessageStrip,
-  BusyIndicator,
-  Icon,
-  FlexBox,
-  Title,
-  Text,
-  Card,
-  Link,
-  CheckBox
-} from '@ui5/webcomponents-react';
-import '@ui5/webcomponents/dist/Assets.js';
-import '@ui5/webcomponents-fiori/dist/Assets.js';
-import '@ui5/webcomponents-icons/dist/AllIcons.js';
+
+// Import des Web Components UI5 natifs v2.15.0
+import '@ui5/webcomponents/dist/Label.js';
+import '@ui5/webcomponents/dist/MessageStrip.js';
+import '@ui5/webcomponents/dist/BusyIndicator.js';
+import '@ui5/webcomponents/dist/Icon.js';
+import '@ui5/webcomponents/dist/Title.js';
+import '@ui5/webcomponents/dist/Text.js';
+import '@ui5/webcomponents/dist/Card.js';
+import '@ui5/webcomponents/dist/Link.js';
+import '@ui5/webcomponents-icons/dist/product.js';
+
+// Import des wrappers UI5 pour React
+import UI5Input from '../components/UI5Input';
+import UI5Button from '../components/UI5Button';
+import UI5CheckBox from '../components/UI5CheckBox';
 
 /**
  * Page de connexion OpsFlux
- * Utilise UI5 Web Components v2.15.0 avec React
+ * Utilise UI5 Web Components natifs v2.15.0
  * Authentification JWT via API backend
  */
 const Login = () => {
@@ -144,153 +142,148 @@ const Login = () => {
   };
 
   return (
-    <ThemeProvider>
-      <FlexBox
-        justifyContent="Center"
-        alignItems="Center"
-        style={{
-          minHeight: '100vh',
-          background: 'var(--sapBackgroundColor)',
-          padding: '2rem'
-        }}
-      >
-        <Card
-          style={{
-            width: '100%',
-            maxWidth: '28rem',
-            boxShadow: 'var(--sapContent_Shadow2)'
-          }}
-        >
-          {/* Header */}
-          <FlexBox
-            direction="Column"
-            alignItems="Center"
-            style={{ padding: '2rem 2rem 1rem 2rem' }}
-          >
-            <Icon
-              name="business-suite"
-              style={{
-                fontSize: '4rem',
-                color: 'var(--sapBrandColor)',
-                marginBottom: '1rem'
-              }}
-            />
-            <Title level="H2" style={{ marginBottom: '0.5rem' }}>
-              OpsFlux
-            </Title>
-            <Text style={{ color: 'var(--sapNeutralTextColor)', textAlign: 'center' }}>
-              Plateforme Entreprise Intelligente
-            </Text>
-          </FlexBox>
-
-          {/* Message d'erreur */}
-          {error && (
-            <div style={{ padding: '0 2rem' }}>
-              <MessageStrip
-                design="Negative"
-                onClose={() => setError('')}
-              >
-                {error}
-              </MessageStrip>
-            </div>
-          )}
-
-          {/* Formulaire */}
-          <form onSubmit={handleSubmit}>
-            <FlexBox
-              direction="Column"
-              style={{
-                padding: '1.5rem 2rem 2rem 2rem',
-                gap: '1rem'
-              }}
-            >
-              {/* Champ Username */}
-              <div>
-                <Label required showColon>
-                  Nom d'utilisateur
-                </Label>
-                <Input
-                  name="username"
-                  value={formData.username}
-                  onInput={handleInputChange}
-                  placeholder="Entrez votre identifiant"
-                  disabled={loading}
-                  required
-                  style={{ width: '100%', marginTop: '0.25rem' }}
-                />
-              </div>
-
-              {/* Champ Password */}
-              <div>
-                <Label required showColon>
-                  Mot de passe
-                </Label>
-                <Input
-                  name="password"
-                  type={showPassword ? "Text" : "Password"}
-                  value={formData.password}
-                  onInput={handleInputChange}
-                  placeholder="Entrez votre mot de passe"
-                  disabled={loading}
-                  required
-                  style={{ width: '100%', marginTop: '0.25rem' }}
-                />
-              </div>
-
-              {/* Afficher le mot de passe */}
-              <CheckBox
-                text="Afficher le mot de passe"
-                checked={showPassword}
-                onChange={() => setShowPassword(!showPassword)}
-              />
-
-              {/* Bouton de connexion */}
-              <Button
-                design="Emphasized"
-                onClick={handleSubmit}
-                disabled={loading}
-                style={{ width: '100%', marginTop: '0.5rem' }}
-              >
-                {loading && (
-                  <BusyIndicator
-                    active
-                    size="Small"
-                    style={{ marginRight: '0.5rem', display: 'inline-block' }}
-                  />
-                )}
-                {loading ? 'Connexion en cours...' : 'Se connecter'}
-              </Button>
-
-              {/* Lien vers site vitrine */}
-              <FlexBox
-                justifyContent="Center"
-                style={{ marginTop: '0.5rem' }}
-              >
-                <Link
-                  href={process.env.REACT_APP_WEB_URL || 'http://localhost:3002'}
-                  target="_blank"
-                >
-                  Découvrir OpsFlux →
-                </Link>
-              </FlexBox>
-            </FlexBox>
-          </form>
-
-          {/* Footer */}
-          <FlexBox
-            justifyContent="Center"
+    <div style={{
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      minHeight: '100vh',
+      background: 'var(--sapBackgroundColor)',
+      padding: '2rem'
+    }}>
+      <ui5-card style={{
+        width: '100%',
+        maxWidth: '28rem',
+        boxShadow: 'var(--sapContent_Shadow2)'
+      }}>
+        {/* Header */}
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          padding: '2rem 2rem 1rem 2rem'
+        }}>
+          <ui5-icon
+            name="product"
             style={{
-              padding: '1rem 2rem',
-              borderTop: '1px solid var(--sapGroup_ContentBorderColor)'
+              fontSize: '4rem',
+              color: 'var(--sapBrandColor)',
+              marginBottom: '1rem'
             }}
-          >
-            <Text style={{ fontSize: '0.875rem', color: 'var(--sapNeutralTextColor)' }}>
-              © 2025 OpsFlux · Plateforme Entreprise
-            </Text>
-          </FlexBox>
-        </Card>
-      </FlexBox>
-    </ThemeProvider>
+          ></ui5-icon>
+          <ui5-title level="H2" style={{ marginBottom: '0.5rem' }}>
+            OpsFlux
+          </ui5-title>
+          <ui5-text style={{ color: 'var(--sapNeutralTextColor)', textAlign: 'center' }}>
+            Plateforme Entreprise Intelligente
+          </ui5-text>
+        </div>
+
+        {/* Message d'erreur */}
+        {error && (
+          <div style={{ padding: '0 2rem' }}>
+            <ui5-message-strip
+              design="Negative"
+              onClose={() => setError('')}
+            >
+              {error}
+            </ui5-message-strip>
+          </div>
+        )}
+
+        {/* Formulaire */}
+        <form onSubmit={handleSubmit}>
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            padding: '1.5rem 2rem 2rem 2rem',
+            gap: '1rem'
+          }}>
+            {/* Champ Username */}
+            <div>
+              <ui5-label required show-colon>
+                Nom d'utilisateur
+              </ui5-label>
+              <UI5Input
+                name="username"
+                value={formData.username}
+                disabled={loading}
+                onInput={handleInputChange}
+                placeholder="Entrez votre identifiant"
+                required={true}
+                style={{ width: '100%', marginTop: '0.25rem' }}
+              />
+            </div>
+
+            {/* Champ Password */}
+            <div>
+              <ui5-label required show-colon>
+                Mot de passe
+              </ui5-label>
+              <UI5Input
+                name="password"
+                value={formData.password}
+                disabled={loading}
+                type={showPassword ? "Text" : "Password"}
+                onInput={handleInputChange}
+                placeholder="Entrez votre mot de passe"
+                required={true}
+                style={{ width: '100%', marginTop: '0.25rem' }}
+              />
+            </div>
+
+            {/* Afficher le mot de passe */}
+            <UI5CheckBox
+              text="Afficher le mot de passe"
+              checked={showPassword}
+              onChange={() => setShowPassword(!showPassword)}
+            />
+
+            {/* Bouton de connexion */}
+            <UI5Button
+              design="Emphasized"
+              disabled={loading}
+              onClick={handleSubmit}
+              style={{ width: '100%', marginTop: '0.5rem' }}
+            >
+              {loading && (
+                <ui5-busy-indicator
+                  active
+                  size="Small"
+                  style={{ marginRight: '0.5rem', display: 'inline-block' }}
+                ></ui5-busy-indicator>
+              )}
+              {loading ? 'Connexion en cours...' : 'Se connecter'}
+            </UI5Button>
+
+            {/* Lien vers site vitrine */}
+            <div style={{
+              display: 'flex',
+              justifyContent: 'center',
+              marginTop: '0.5rem'
+            }}>
+              <ui5-link
+                href={process.env.REACT_APP_WEB_URL || 'http://localhost:3002'}
+                target="_blank"
+              >
+                Découvrir OpsFlux →
+              </ui5-link>
+            </div>
+          </div>
+        </form>
+
+        {/* Footer */}
+        <div style={{
+          display: 'flex',
+          justifyContent: 'center',
+          padding: '1rem 2rem',
+          borderTop: '1px solid var(--sapGroup_ContentBorderColor)'
+        }}>
+          <ui5-text style={{ fontSize: '0.875rem', color: 'var(--sapNeutralTextColor)' }}>
+            © 2025 OpsFlux · Plateforme Entreprise
+          </ui5-text>
+        </div>
+      </ui5-card>
+    </div>
   );
 };
 

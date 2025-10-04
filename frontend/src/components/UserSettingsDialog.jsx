@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import '@ui5/webcomponents-fiori/dist/UserSettingsView.js';
 import '@ui5/webcomponents-fiori/dist/UserSettingsItem.js';
 import '@ui5/webcomponents-fiori/dist/UserSettingsDialog.js';
@@ -15,13 +15,15 @@ import '@ui5/webcomponents/dist/CheckBox.js';
 import '@ui5/webcomponents/dist/Toast.js';
 import '@ui5/webcomponents/dist/List.js';
 import '@ui5/webcomponents/dist/ListItemStandard.js';
-import '@ui5/webcomponents/dist/Input.js';
 import '@ui5/webcomponents-icons/dist/user-settings.js';
 import '@ui5/webcomponents-icons/dist/person-placeholder.js';
 import '@ui5/webcomponents-icons/dist/palette.js';
 import '@ui5/webcomponents-icons/dist/bell.js';
 import '@ui5/webcomponents-icons/dist/reset.js';
 import '@ui5/webcomponents-icons/dist/locked.js';
+import UI5Input from './UI5Input';
+import UI5Button from './UI5Button';
+import UI5CheckBox from './UI5CheckBox';
 import './UserSettingsDialog.css';
 
 /**
@@ -30,6 +32,8 @@ import './UserSettingsDialog.css';
  * Suit le pattern SAP Fiori UserSettings
  */
 const UserSettingsDialog = ({ open, onClose, user }) => {
+  const dialogRef = useRef(null);
+
   const [formData, setFormData] = useState({
     first_name: '',
     last_name: '',
@@ -48,6 +52,13 @@ const UserSettingsDialog = ({ open, onClose, user }) => {
     new_password: '',
     new_password_confirm: ''
   });
+
+  // Gérer la propriété open du dialog
+  useEffect(() => {
+    if (dialogRef.current) {
+      dialogRef.current.open = open;
+    }
+  }, [open]);
 
   const [saving, setSaving] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
@@ -190,8 +201,8 @@ const UserSettingsDialog = ({ open, onClose, user }) => {
   return (
     <>
       <ui5-user-settings-dialog
+        ref={dialogRef}
         id="userSettingsDialog"
-        open={open}
         header-text="Paramètres"
         show-search-field
       >
@@ -221,28 +232,28 @@ const UserSettingsDialog = ({ open, onClose, user }) => {
               </div>
               <div className="user-settings-item">
                 <ui5-label>Prénom :</ui5-label>
-                <ui5-input
+                <UI5Input
                   value={formData.first_name}
                   onInput={(e) => setFormData({ ...formData, first_name: e.target.value })}
                 />
               </div>
               <div className="user-settings-item">
                 <ui5-label>Nom :</ui5-label>
-                <ui5-input
+                <UI5Input
                   value={formData.last_name}
                   onInput={(e) => setFormData({ ...formData, last_name: e.target.value })}
                 />
               </div>
               <div className="user-settings-item">
                 <ui5-label>Téléphone :</ui5-label>
-                <ui5-input
+                <UI5Input
                   value={formData.phone}
                   onInput={(e) => setFormData({ ...formData, phone: e.target.value })}
                 />
               </div>
               <div className="user-settings-item">
                 <ui5-label>Mobile :</ui5-label>
-                <ui5-input
+                <UI5Input
                   value={formData.mobile}
                   onInput={(e) => setFormData({ ...formData, mobile: e.target.value })}
                 />
@@ -250,13 +261,13 @@ const UserSettingsDialog = ({ open, onClose, user }) => {
             </div>
 
             <div style={{ marginTop: '2rem', textAlign: 'right' }}>
-              <ui5-button
+              <UI5Button
                 design="Emphasized"
                 onClick={handleSaveProfile}
                 disabled={saving}
               >
                 {saving ? 'Enregistrement...' : 'Enregistrer'}
-              </ui5-button>
+              </UI5Button>
             </div>
           </ui5-user-settings-view>
         </ui5-user-settings-item>
@@ -292,14 +303,14 @@ const UserSettingsDialog = ({ open, onClose, user }) => {
                 Sombre (SAP Evening Horizon)
               </ui5-li>
             </ui5-list>
-            <ui5-button
+            <UI5Button
               design="Emphasized"
               onClick={handleSaveProfile}
               disabled={saving}
               style={{ marginTop: '1rem' }}
             >
               Appliquer le thème
-            </ui5-button>
+            </UI5Button>
           </ui5-user-settings-view>
         </ui5-user-settings-item>
 
@@ -343,13 +354,13 @@ const UserSettingsDialog = ({ open, onClose, user }) => {
             </ui5-panel>
 
             <div style={{ marginTop: '2rem', textAlign: 'right' }}>
-              <ui5-button
+              <UI5Button
                 design="Emphasized"
                 onClick={handleSaveProfile}
                 disabled={saving}
               >
                 Enregistrer
-              </ui5-button>
+              </UI5Button>
             </div>
           </ui5-user-settings-view>
         </ui5-user-settings-item>
@@ -363,12 +374,12 @@ const UserSettingsDialog = ({ open, onClose, user }) => {
         >
           <ui5-user-settings-view slot="pages">
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', margin: '1rem' }}>
-              <ui5-checkbox
+              <UI5CheckBox
                 text="Recevoir les notifications par email"
                 checked={formData.email_notifications}
                 onChange={(e) => setFormData({ ...formData, email_notifications: e.target.checked })}
               />
-              <ui5-checkbox
+              <UI5CheckBox
                 text="Recevoir les notifications push dans le navigateur"
                 checked={formData.push_notifications}
                 onChange={(e) => setFormData({ ...formData, push_notifications: e.target.checked })}
@@ -382,13 +393,13 @@ const UserSettingsDialog = ({ open, onClose, user }) => {
             </ui5-panel>
 
             <div style={{ marginTop: '2rem', textAlign: 'right', marginRight: '1rem' }}>
-              <ui5-button
+              <UI5Button
                 design="Emphasized"
                 onClick={handleSaveProfile}
                 disabled={saving}
               >
                 Enregistrer
-              </ui5-button>
+              </UI5Button>
             </div>
           </ui5-user-settings-view>
         </ui5-user-settings-item>
@@ -405,7 +416,7 @@ const UserSettingsDialog = ({ open, onClose, user }) => {
             <div className="user-settings-container" style={{ maxWidth: '600px' }}>
               <div className="user-settings-item-wide">
                 <ui5-label required>Mot de passe actuel :</ui5-label>
-                <ui5-input
+                <UI5Input
                   type="Password"
                   value={passwordForm.old_password}
                   onInput={(e) => setPasswordForm({ ...passwordForm, old_password: e.target.value })}
@@ -414,7 +425,7 @@ const UserSettingsDialog = ({ open, onClose, user }) => {
               </div>
               <div className="user-settings-item-wide">
                 <ui5-label required>Nouveau mot de passe :</ui5-label>
-                <ui5-input
+                <UI5Input
                   type="Password"
                   value={passwordForm.new_password}
                   onInput={(e) => setPasswordForm({ ...passwordForm, new_password: e.target.value })}
@@ -423,7 +434,7 @@ const UserSettingsDialog = ({ open, onClose, user }) => {
               </div>
               <div className="user-settings-item-wide">
                 <ui5-label required>Confirmer le mot de passe :</ui5-label>
-                <ui5-input
+                <UI5Input
                   type="Password"
                   value={passwordForm.new_password_confirm}
                   onInput={(e) => setPasswordForm({ ...passwordForm, new_password_confirm: e.target.value })}
@@ -439,22 +450,22 @@ const UserSettingsDialog = ({ open, onClose, user }) => {
             </ui5-panel>
 
             <div style={{ marginTop: '2rem' }}>
-              <ui5-button
+              <UI5Button
                 design="Emphasized"
                 icon="locked"
                 onClick={handleChangePassword}
                 disabled={saving}
               >
                 {saving ? 'Modification...' : 'Changer le mot de passe'}
-              </ui5-button>
+              </UI5Button>
             </div>
           </ui5-user-settings-view>
 
           <ui5-user-settings-view text="Authentification 2FA">
             <ui5-text>Ajoutez une couche de sécurité supplémentaire à votre compte.</ui5-text>
-            <ui5-button design="Default" icon="add" disabled style={{ marginTop: '1rem' }}>
+            <UI5Button design="Default" icon="add" disabled style={{ marginTop: '1rem' }}>
               Activer 2FA (Bientôt disponible)
-            </ui5-button>
+            </UI5Button>
             <ui5-panel fixed style={{ marginTop: '1rem' }}>
               <ui5-label>
                 L'authentification à deux facteurs protège votre compte avec un code de vérification en plus de votre mot de passe.
@@ -475,13 +486,13 @@ const UserSettingsDialog = ({ open, onClose, user }) => {
             <ui5-text>
               Cette action réinitialisera toutes vos préférences personnelles (thème, langue, notifications, etc.).
             </ui5-text>
-            <ui5-button
+            <UI5Button
               design="Negative"
               onClick={() => showToast('Fonctionnalité de réinitialisation bientôt disponible')}
               style={{ marginTop: '1rem' }}
             >
               Réinitialiser les préférences
-            </ui5-button>
+            </UI5Button>
           </ui5-user-settings-view>
         </ui5-user-settings-item>
       </ui5-user-settings-dialog>

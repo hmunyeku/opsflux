@@ -3,9 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import '@ui5/webcomponents-fiori/dist/ShellBar.js';
 import '@ui5/webcomponents-fiori/dist/ShellBarBranding.js';
 import '@ui5/webcomponents-fiori/dist/ShellBarItem.js';
-import '@ui5/webcomponents-fiori/dist/ObjectPage.js';
-import '@ui5/webcomponents-fiori/dist/ObjectPageSection.js';
-import '@ui5/webcomponents-fiori/dist/ObjectPageSubSection.js';
+// ObjectPage components n'existent pas encore dans UI5 v2.15.0
+// import '@ui5/webcomponents-fiori/dist/ObjectPage.js';
+// import '@ui5/webcomponents-fiori/dist/ObjectPageSection.js';
+// import '@ui5/webcomponents-fiori/dist/ObjectPageSubSection.js';
 import '@ui5/webcomponents/dist/Avatar.js';
 import '@ui5/webcomponents/dist/Button.js';
 import '@ui5/webcomponents/dist/Input.js';
@@ -26,7 +27,7 @@ import '@ui5/webcomponents/dist/BreadcrumbsItem.js';
 import '@ui5/webcomponents-icons/dist/person-placeholder.js';
 import '@ui5/webcomponents-icons/dist/email.js';
 import '@ui5/webcomponents-icons/dist/phone.js';
-import '@ui5/webcomponents-icons/dist/mobile.js';
+import '@ui5/webcomponents-icons/dist/iphone.js'; // mobile n'existe pas, utiliser iphone
 import '@ui5/webcomponents-icons/dist/palette.js';
 import '@ui5/webcomponents-icons/dist/globe.js';
 import '@ui5/webcomponents-icons/dist/bell.js';

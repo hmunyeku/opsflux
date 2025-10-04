@@ -50,7 +50,8 @@
     "eslint": "^8.56.0",
     "eslint-config-react-app": "^7.0.1",
     "prettier": "^3.2.4",
-    "source-map-explorer": "^2.5.3"
+    "source-map-explorer": "^2.5.3",
+    "http-proxy-middleware": "^2.0.6"
   },
   "eslintConfig": {
     "extends": [
@@ -69,6 +70,5 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "proxy": "http://backend:8000"
+  }
 }

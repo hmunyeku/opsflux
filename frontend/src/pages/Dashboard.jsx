@@ -94,6 +94,16 @@ const Dashboard = () => {
   };
 
   /**
+   * Gestion de la déconnexion
+   */
+  const handleSignOut = () => {
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    localStorage.removeItem('user');
+    navigate('/login');
+  };
+
+  /**
    * Chargement initial et vérification auth
    */
   useEffect(() => {
@@ -158,14 +168,6 @@ const Dashboard = () => {
         menuElement.opener = event.detail.targetRef;
         menuElement.open = !menuElement.open;
       }
-    };
-
-    // Gestion de la déconnexion
-    const handleSignOut = () => {
-      localStorage.removeItem('access_token');
-      localStorage.removeItem('refresh_token');
-      localStorage.removeItem('user');
-      navigate('/login');
     };
 
     // Gestion de la navigation
