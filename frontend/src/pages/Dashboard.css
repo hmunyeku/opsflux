@@ -1,0 +1,10 @@
+/* Dashboard OpsFlux - Styles UI5 v2.15.0 */
+
+.sideNavigation:not([collapsed]):not([is-phone]) {
+  width: 18rem;
+}
+
+.mainContent {
+  padding: var(--sapContent_Gap);
+  background: var(--sapBackgroundColor);
+}

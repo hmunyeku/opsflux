@@ -1,59 +1,53 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  ThemeProvider,
-  ShellBar,
-  SideNavigation,
-  SideNavigationItem,
-  DynamicPage,
-  DynamicPageTitle,
-  DynamicPageHeader,
-  ObjectPage,
-  ObjectPageSection,
-  Card,
-  CardHeader,
-  Button,
-  Icon,
-  Avatar,
-  FlexBox,
-  Title,
-  Text,
-  ObjectStatus,
-  Bar,
-  Label,
-  BusyIndicator,
-  List,
-  ListItemStandard,
-  IllustratedMessage
-} from '@ui5/webcomponents-react';
-import '@ui5/webcomponents/dist/Assets.js';
-import '@ui5/webcomponents-fiori/dist/Assets.js';
-import '@ui5/webcomponents-icons/dist/AllIcons.js';
-import '@ui5/webcomponents-fiori/dist/illustrations/NoData.js';
+import './Dashboard.css';
+
+// Import des Web Components natifs UI5 v2.15.0
+import '@ui5/webcomponents/dist/Avatar.js';
+import '@ui5/webcomponents/dist/Button.js';
+import '@ui5/webcomponents/dist/Title.js';
+import '@ui5/webcomponents/dist/Text.js';
+import '@ui5/webcomponents/dist/Card.js';
+import '@ui5/webcomponents/dist/CardHeader.js';
+import '@ui5/webcomponents/dist/BusyIndicator.js';
+import '@ui5/webcomponents/dist/Tag.js';
+
+import '@ui5/webcomponents-fiori/dist/ShellBar.js';
+import '@ui5/webcomponents-fiori/dist/ShellBarBranding.js';
+import '@ui5/webcomponents-fiori/dist/ShellBarItem.js';
+import '@ui5/webcomponents-fiori/dist/NavigationLayout.js';
+import '@ui5/webcomponents-fiori/dist/SideNavigation.js';
+import '@ui5/webcomponents-fiori/dist/SideNavigationItem.js';
+import '@ui5/webcomponents-fiori/dist/SideNavigationSubItem.js';
+import '@ui5/webcomponents-fiori/dist/UserMenu.js';
+import '@ui5/webcomponents-fiori/dist/UserMenuAccount.js';
+import '@ui5/webcomponents-fiori/dist/UserMenuItem.js';
+
+import '@ui5/webcomponents-icons/dist/home.js';
+import '@ui5/webcomponents-icons/dist/account.js';
+import '@ui5/webcomponents-icons/dist/group.js';
+import '@ui5/webcomponents-icons/dist/puzzle.js';
+import '@ui5/webcomponents-icons/dist/bot.js';
+import '@ui5/webcomponents-icons/dist/action-settings.js';
+import '@ui5/webcomponents-icons/dist/menu2.js';
+import '@ui5/webcomponents-icons/dist/sys-help.js';
+import '@ui5/webcomponents-icons/dist/log.js';
+import '@ui5/webcomponents-icons/dist/business-suite.js';
 
 /**
  * Dashboard OpsFlux
- * Utilise UI5 Web Components v2.15.0 avec React
- * Architecture: ShellBar + SideNavigation + DynamicPage + ObjectPage
+ * Utilise UI5 Web Components natifs v2.15.0
+ * Architecture: NavigationLayout + ShellBar + SideNavigation
  */
 const Dashboard = () => {
   const navigate = useNavigate();
+  const navigationLayoutRef = useRef(null);
+  const shellbarRef = useRef(null);
+  const userMenuRef = useRef(null);
+  const menuButtonRef = useRef(null);
 
-  // State
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [isOnline, setIsOnline] = useState(navigator.onLine);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-
-  // Mock data - À remplacer par appels API
-  const [stats] = useState({
-    modules: 5,
-    users: 12,
-    tasks: 24,
-    notifications: 8
-  });
-
-  const [recentActivities] = useState([]);
 
   /**
    * Chargement initial et vérification auth
@@ -73,413 +67,303 @@ const Dashboard = () => {
       } catch (e) {
         console.error('Erreur parsing user data:', e);
         navigate('/login');
+        return;
       }
     }
 
     setLoading(false);
-
-    // Gestionnaires online/offline
-    const handleOnline = () => setIsOnline(true);
-    const handleOffline = () => setIsOnline(false);
-
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
-
-    return () => {
-      window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', handleOffline);
-    };
   }, [navigate]);
 
   /**
-   * Déconnexion
+   * Configuration des event listeners après le montage
    */
-  const handleLogout = () => {
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('refresh_token');
-    localStorage.removeItem('user');
-    navigate('/login');
-  };
+  useEffect(() => {
+    if (!user) return;
 
-  /**
-   * Navigation
-   */
-  const handleNavigation = (path) => {
-    navigate(path);
-  };
+    const navigationLayout = navigationLayoutRef.current;
+    const shellbar = shellbarRef.current;
+    const userMenu = userMenuRef.current;
+    const menuButton = menuButtonRef.current;
 
-  /**
-   * Loading state
-   */
+    // Gestion du bouton menu
+    const handleMenuClick = () => {
+      if (navigationLayout) {
+        navigationLayout.mode = navigationLayout.isSideCollapsed() ? 'Expanded' : 'Collapsed';
+      }
+    };
+
+    // Gestion du profil
+    const handleProfileClick = (event) => {
+      if (userMenu) {
+        userMenu.opener = event.detail.targetRef;
+        userMenu.open = true;
+      }
+    };
+
+    // Gestion de la déconnexion
+    const handleSignOut = (event) => {
+      event.preventDefault();
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('refresh_token');
+      localStorage.removeItem('user');
+      navigate('/login');
+    };
+
+    // Gestion des items du menu utilisateur
+    const handleUserMenuItem = (event) => {
+      const itemId = event.detail.item?.getAttribute('data-id');
+      if (itemId === 'settings') {
+        navigate('/settings');
+      }
+    };
+
+    // Gestion de la navigation
+    const handleNavigation = (event) => {
+      const item = event.detail.item;
+      const path = item?.getAttribute('data-path');
+      if (path) {
+        navigate(path);
+      }
+    };
+
+    if (menuButton) {
+      menuButton.addEventListener('click', handleMenuClick);
+    }
+    if (shellbar) {
+      shellbar.addEventListener('ui5-profile-click', handleProfileClick);
+    }
+    if (userMenu) {
+      userMenu.addEventListener('sign-out-click', handleSignOut);
+      userMenu.addEventListener('item-click', handleUserMenuItem);
+    }
+    if (navigationLayout) {
+      const sideNav = navigationLayout.querySelector('ui5-side-navigation');
+      if (sideNav) {
+        sideNav.addEventListener('selection-change', handleNavigation);
+      }
+    }
+
+    return () => {
+      if (menuButton) {
+        menuButton.removeEventListener('click', handleMenuClick);
+      }
+      if (shellbar) {
+        shellbar.removeEventListener('ui5-profile-click', handleProfileClick);
+      }
+      if (userMenu) {
+        userMenu.removeEventListener('sign-out-click', handleSignOut);
+        userMenu.removeEventListener('item-click', handleUserMenuItem);
+      }
+      if (navigationLayout) {
+        const sideNav = navigationLayout.querySelector('ui5-side-navigation');
+        if (sideNav) {
+          sideNav.removeEventListener('selection-change', handleNavigation);
+        }
+      }
+    };
+  }, [user, navigate]);
+
   if (loading || !user) {
     return (
-      <FlexBox
-        justifyContent="Center"
-        alignItems="Center"
-        style={{ height: '100vh' }}
-      >
-        <BusyIndicator active size="Large" />
-      </FlexBox>
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
+        background: 'var(--sapBackgroundColor)'
+      }}>
+        <ui5-busy-indicator active size="Large"></ui5-busy-indicator>
+      </div>
     );
   }
 
-  const displayName = user.display_name || `${user.first_name || ''} ${user.last_name || ''}`.trim() || user.username || 'Utilisateur';
-  const initials = (user.first_name?.[0] || '') + (user.last_name?.[0] || '') || user.username?.substring(0, 2).toUpperCase() || 'U';
+  const displayName = user.display_name ||
+    `${user.first_name || ''} ${user.last_name || ''}`.trim() ||
+    user.username || 'Utilisateur';
+
+  const initials = (user.first_name?.[0] || '') + (user.last_name?.[0] || '') ||
+    user.username?.substring(0, 2).toUpperCase() || 'U';
 
   return (
-    <ThemeProvider>
-      <FlexBox
-        direction="Column"
-        style={{ height: '100vh', background: 'var(--sapBackgroundColor)' }}
-      >
+    <div style={{ height: '100vh', background: 'var(--sapBackgroundColor)' }}>
+      <ui5-navigation-layout ref={navigationLayoutRef}>
         {/* ShellBar */}
-        <ShellBar
-          primaryTitle="OpsFlux"
-          secondaryTitle="Plateforme Entreprise Intelligente"
-          logo={<Icon name="business-suite" />}
-          profile={
-            <Avatar
-              initials={initials}
-              size="XS"
-              onClick={() => navigate('/profile')}
-              style={{ cursor: 'pointer' }}
-            />
-          }
-          onLogoClick={() => navigate('/dashboard')}
-          showNotifications
-          notificationsCount={stats.notifications.toString()}
-          onNotificationsClick={() => console.log('Notifications clicked')}
-          showProductSwitch={false}
-          showCoPilot={false}
+        <ui5-shellbar
+          ref={shellbarRef}
+          slot="header"
+          notifications-count="0"
+          show-notifications={false}
+          show-product-switch={false}
         >
-          <Button
-            icon="search"
-            design="Transparent"
-            onClick={() => console.log('Search')}
-            tooltip="Rechercher"
-          />
-          <Button
-            icon={isOnline ? 'connected' : 'disconnected'}
-            design="Transparent"
-            tooltip={isOnline ? 'En ligne' : 'Hors ligne'}
-          />
-          <Button
+          <ui5-shellbar-branding slot="branding">
+            OpsFlux
+            <ui5-icon slot="logo" name="business-suite"></ui5-icon>
+          </ui5-shellbar-branding>
+
+          <ui5-button
+            ref={menuButtonRef}
             icon="menu2"
-            design="Transparent"
-            onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+            slot="startButton"
             tooltip="Afficher/Masquer menu"
-          />
-          <Button
-            icon="log"
-            design="Transparent"
-            onClick={handleLogout}
-            tooltip="Déconnexion"
-          />
-        </ShellBar>
+          ></ui5-button>
 
-        {/* Layout Principal avec SideNavigation */}
-        <FlexBox style={{ flex: 1, overflow: 'hidden' }}>
-          {/* Side Navigation */}
-          {!sidebarCollapsed && (
-            <div
-              style={{
-                width: '16rem',
-                borderRight: '1px solid var(--sapGroup_ContentBorderColor)',
-                background: 'var(--sapShell_Background)',
-                overflowY: 'auto',
-                transition: 'width 0.3s ease'
-              }}
-            >
-              <SideNavigation
-                onSelectionChange={(e) => {
-                  const itemId = e.detail.item.getAttribute('data-id');
-                  if (itemId) handleNavigation(itemId);
-                }}
-              >
-                <SideNavigationItem
-                  data-id="/dashboard"
-                  text="Tableau de bord"
-                  icon="home"
-                  selected
-                />
-                <SideNavigationItem
-                  data-id="/profile"
-                  text="Mon profil"
-                  icon="account"
-                />
-                <SideNavigationItem
-                  data-id="/users"
-                  text="Utilisateurs"
-                  icon="group"
-                />
-                <SideNavigationItem
-                  data-id="/modules"
-                  text="Modules"
-                  icon="puzzle"
-                />
-                <SideNavigationItem
-                  data-id="/ai"
-                  text="Assistant IA"
-                  icon="bot"
-                />
-                <SideNavigationItem
-                  data-id="/settings"
-                  text="Paramètres"
-                  icon="action-settings"
-                />
-              </SideNavigation>
-            </div>
-          )}
+          <ui5-tag design="Set2" color-scheme="7" slot="content">
+            v1.0.0
+          </ui5-tag>
 
-          {/* DynamicPage - Main Content */}
-          <DynamicPage
-            headerTitle={
-              <DynamicPageTitle
-                header={
-                  <Title level="H2">
-                    Bienvenue, {displayName}
-                  </Title>
-                }
-                subHeader={
-                  <Text style={{ color: 'var(--sapNeutralTextColor)' }}>
-                    Vue d'ensemble de votre espace de travail
-                  </Text>
-                }
-                actions={
-                  <>
-                    <Button design="Emphasized" icon="refresh">
-                      Actualiser
-                    </Button>
-                    <Button design="Transparent" icon="action-settings">
-                      Paramètres
-                    </Button>
-                  </>
-                }
-                navigationActions={
-                  <Button
-                    design="Transparent"
-                    icon="full-screen"
-                    onClick={() => console.log('Fullscreen')}
-                  />
-                }
-                breadcrumbs={
-                  <FlexBox alignItems="Center" style={{ gap: '0.5rem' }}>
-                    <Icon name="home" style={{ fontSize: '1rem' }} />
-                    <Text>/</Text>
-                    <Text>Tableau de bord</Text>
-                  </FlexBox>
-                }
-              />
-            }
-            headerContent={
-              <DynamicPageHeader>
-                <FlexBox wrap="Wrap" style={{ gap: '2rem', padding: '1rem' }}>
-                  {/* KPI Cards */}
-                  <FlexBox direction="Column" style={{ minWidth: '10rem' }}>
-                    <Label>Modules actifs</Label>
-                    <Title level="H3">{stats.modules}</Title>
-                    <ObjectStatus state="Success">
-                      +2 ce mois
-                    </ObjectStatus>
-                  </FlexBox>
-                  <FlexBox direction="Column" style={{ minWidth: '10rem' }}>
-                    <Label>Utilisateurs</Label>
-                    <Title level="H3">{stats.users}</Title>
-                    <ObjectStatus state="Information">
-                      Actifs
-                    </ObjectStatus>
-                  </FlexBox>
-                  <FlexBox direction="Column" style={{ minWidth: '10rem' }}>
-                    <Label>Tâches en cours</Label>
-                    <Title level="H3">{stats.tasks}</Title>
-                    <ObjectStatus state="Warning">
-                      À traiter
-                    </ObjectStatus>
-                  </FlexBox>
-                  <FlexBox direction="Column" style={{ minWidth: '10rem' }}>
-                    <Label>Statut système</Label>
-                    <ObjectStatus
-                      state={isOnline ? "Success" : "Error"}
-                      icon={isOnline ? 'connected' : 'disconnected'}
-                    >
-                      {isOnline ? 'En ligne' : 'Hors ligne'}
-                    </ObjectStatus>
-                  </FlexBox>
-                </FlexBox>
-              </DynamicPageHeader>
-            }
-            style={{ flex: 1 }}
-          >
-            {/* Main Content - ObjectPage Sections */}
-            <ObjectPage>
-              {/* Section 1: Assistant IA */}
-              <ObjectPageSection
-                titleText="Assistant IA"
-                id="section-ai"
-                aria-label="Section Assistant IA"
-              >
-                <Card
-                  header={
-                    <CardHeader
-                      titleText="Assistant Intelligent"
-                      subtitleText="Propulsé par Claude AI"
-                      avatar={<Icon name="bot" />}
-                      action={
-                        <Button design="Transparent" icon="overflow">
-                          Actions
-                        </Button>
-                      }
-                    />
-                  }
-                >
-                  <FlexBox
-                    direction="Column"
-                    style={{ padding: '1.5rem', gap: '1rem' }}
-                  >
-                    <Text>
-                      L'assistant intelligent est prêt à vous aider dans vos tâches quotidiennes.
-                      Posez vos questions, demandez des analyses ou obtenez des recommandations.
-                    </Text>
-                    <FlexBox style={{ gap: '0.5rem' }}>
-                      <Button design="Emphasized" icon="conversation">
-                        Démarrer une conversation
-                      </Button>
-                      <Button design="Default" icon="hint">
-                        Exemples
-                      </Button>
-                    </FlexBox>
-                  </FlexBox>
-                </Card>
-              </ObjectPageSection>
+          <ui5-shellbar-item
+            icon="sys-help"
+            text="Aide"
+            slot="content"
+          ></ui5-shellbar-item>
 
-              {/* Section 2: Actions Rapides */}
-              <ObjectPageSection
-                titleText="Actions rapides"
-                id="section-actions"
-                aria-label="Section Actions rapides"
-              >
-                <FlexBox wrap="Wrap" style={{ gap: '1rem' }}>
-                  <Card style={{ minWidth: '15rem', flex: '1' }}>
-                    <FlexBox
-                      direction="Column"
-                      alignItems="Center"
-                      style={{ padding: '2rem', gap: '1rem' }}
-                    >
-                      <Icon name="add-document" style={{ fontSize: '3rem', color: 'var(--sapBrandColor)' }} />
-                      <Title level="H5">Nouveau document</Title>
-                      <Button design="Emphasized" icon="add">
-                        Créer
-                      </Button>
-                    </FlexBox>
-                  </Card>
-                  <Card style={{ minWidth: '15rem', flex: '1' }}>
-                    <FlexBox
-                      direction="Column"
-                      alignItems="Center"
-                      style={{ padding: '2rem', gap: '1rem' }}
-                    >
-                      <Icon name="group" style={{ fontSize: '3rem', color: 'var(--sapBrandColor)' }} />
-                      <Title level="H5">Gérer utilisateurs</Title>
-                      <Button
-                        design="Emphasized"
-                        icon="navigation-right-arrow"
-                        onClick={() => navigate('/users')}
-                      >
-                        Accéder
-                      </Button>
-                    </FlexBox>
-                  </Card>
-                  <Card style={{ minWidth: '15rem', flex: '1' }}>
-                    <FlexBox
-                      direction="Column"
-                      alignItems="Center"
-                      style={{ padding: '2rem', gap: '1rem' }}
-                    >
-                      <Icon name="puzzle" style={{ fontSize: '3rem', color: 'var(--sapBrandColor)' }} />
-                      <Title level="H5">Installer module</Title>
-                      <Button
-                        design="Emphasized"
-                        icon="navigation-right-arrow"
-                        onClick={() => navigate('/modules')}
-                      >
-                        Explorer
-                      </Button>
-                    </FlexBox>
-                  </Card>
-                </FlexBox>
-              </ObjectPageSection>
+          <ui5-avatar
+            slot="profile"
+            initials={initials}
+          ></ui5-avatar>
+        </ui5-shellbar>
 
-              {/* Section 3: Activité Récente */}
-              <ObjectPageSection
-                titleText="Activité récente"
-                id="section-activity"
-                aria-label="Section Activité récente"
-              >
-                <Card
-                  header={
-                    <CardHeader
-                      titleText="Dernières actions"
-                      subtitleText="Activité des dernières 24 heures"
-                      avatar={<Icon name="activities" />}
-                    />
-                  }
-                >
-                  {recentActivities.length === 0 ? (
-                    <FlexBox
-                      direction="Column"
-                      alignItems="Center"
-                      justifyContent="Center"
-                      style={{ padding: '3rem' }}
-                    >
-                      <IllustratedMessage
-                        name="NoData"
-                        titleText="Aucune activité récente"
-                        subtitleText="Les actions effectuées apparaîtront ici"
-                      />
-                    </FlexBox>
-                  ) : (
-                    <List>
-                      {recentActivities.map((activity, index) => (
-                        <ListItemStandard
-                          key={index}
-                          description={activity.description}
-                          additionalText={activity.time}
-                          icon={activity.icon}
-                        >
-                          {activity.title}
-                        </ListItemStandard>
-                      ))}
-                    </List>
-                  )}
-                </Card>
-              </ObjectPageSection>
-            </ObjectPage>
-          </DynamicPage>
-        </FlexBox>
+        {/* User Menu */}
+        <ui5-user-menu
+          ref={userMenuRef}
+          show-manage-account={false}
+          show-other-accounts={false}
+        >
+          <ui5-user-menu-account
+            slot="accounts"
+            title-text={displayName}
+            subtitle-text={user.email || ''}
+            description={user.role || 'Utilisateur'}
+            avatar-initials={initials}
+            selected
+          ></ui5-user-menu-account>
 
-        {/* Footer Bar */}
-        <Bar
-          design="Footer"
-          startContent={
-            <FlexBox alignItems="Center" style={{ gap: '0.5rem' }}>
-              <Icon name="sys-monitor" />
-              <Label>OpsFlux v1.0.0</Label>
-            </FlexBox>
-          }
-          endContent={
-            <FlexBox alignItems="Center" style={{ gap: '1rem' }}>
-              <Label>
-                Statut: {isOnline ? '🟢 En ligne' : '🔴 Hors ligne'}
-              </Label>
-              <Label>|</Label>
-              <Label>Utilisateur: {displayName}</Label>
-              <Label>|</Label>
-              <Label>© 2025 OpsFlux</Label>
-            </FlexBox>
-          }
-        />
-      </FlexBox>
-    </ThemeProvider>
+          <ui5-user-menu-item
+            icon="action-settings"
+            text="Paramètres"
+            data-id="settings"
+          ></ui5-user-menu-item>
+        </ui5-user-menu>
+
+        {/* Side Navigation */}
+        <ui5-side-navigation
+          slot="sideContent"
+          accessible-name="Navigation principale"
+          className="sideNavigation"
+        >
+          <ui5-side-navigation-item
+            text="Tableau de bord"
+            icon="home"
+            data-path="/dashboard"
+            selected
+          ></ui5-side-navigation-item>
+
+          <ui5-side-navigation-item
+            text="Mon profil"
+            icon="account"
+            data-path="/profile"
+          ></ui5-side-navigation-item>
+
+          <ui5-side-navigation-item
+            text="Utilisateurs"
+            icon="group"
+            data-path="/users"
+          ></ui5-side-navigation-item>
+
+          <ui5-side-navigation-item
+            text="Modules"
+            icon="puzzle"
+            data-path="/modules"
+          ></ui5-side-navigation-item>
+
+          <ui5-side-navigation-item
+            text="Assistant IA"
+            icon="bot"
+            data-path="/ai"
+          ></ui5-side-navigation-item>
+
+          <ui5-side-navigation-item
+            slot="fixedItems"
+            text="Paramètres"
+            icon="action-settings"
+            data-path="/settings"
+          ></ui5-side-navigation-item>
+        </ui5-side-navigation>
+
+        {/* Main Content */}
+        <div className="mainContent">
+          <ui5-title level="H2">Bienvenue, {displayName}</ui5-title>
+          <br />
+          <ui5-text>
+            Vue d'ensemble de votre espace de travail OpsFlux
+          </ui5-text>
+          <br /><br />
+
+          {/* KPI Cards */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+            gap: '1rem',
+            marginBottom: '2rem'
+          }}>
+            <ui5-card>
+              <ui5-card-header
+                slot="header"
+                title-text="Modules actifs"
+                subtitle-text="Nombre de modules installés"
+              ></ui5-card-header>
+              <div style={{ padding: '1rem' }}>
+                <ui5-title level="H3">5</ui5-title>
+                <ui5-text>+2 ce mois</ui5-text>
+              </div>
+            </ui5-card>
+
+            <ui5-card>
+              <ui5-card-header
+                slot="header"
+                title-text="Utilisateurs"
+                subtitle-text="Utilisateurs actifs"
+              ></ui5-card-header>
+              <div style={{ padding: '1rem' }}>
+                <ui5-title level="H3">12</ui5-title>
+                <ui5-text>Actifs</ui5-text>
+              </div>
+            </ui5-card>
+
+            <ui5-card>
+              <ui5-card-header
+                slot="header"
+                title-text="Tâches en cours"
+                subtitle-text="Tâches assignées"
+              ></ui5-card-header>
+              <div style={{ padding: '1rem' }}>
+                <ui5-title level="H3">24</ui5-title>
+                <ui5-text>À traiter</ui5-text>
+              </div>
+            </ui5-card>
+          </div>
+
+          {/* Actions rapides */}
+          <ui5-title level="H3">Actions rapides</ui5-title>
+          <br />
+          <div style={{
+            display: 'flex',
+            gap: '1rem',
+            flexWrap: 'wrap'
+          }}>
+            <ui5-button design="Emphasized" icon="add">
+              Nouveau document
+            </ui5-button>
+            <ui5-button design="Default" icon="group" onClick={() => navigate('/users')}>
+              Gérer utilisateurs
+            </ui5-button>
+            <ui5-button design="Default" icon="puzzle" onClick={() => navigate('/modules')}>
+              Installer module
+            </ui5-button>
+          </div>
+        </div>
+      </ui5-navigation-layout>
+    </div>
   );
 };
 
