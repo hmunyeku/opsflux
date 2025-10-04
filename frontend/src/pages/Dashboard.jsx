@@ -27,7 +27,7 @@ import '@ui5/webcomponents-icons/dist/home.js';
 import '@ui5/webcomponents-icons/dist/account.js';
 import '@ui5/webcomponents-icons/dist/group.js';
 import '@ui5/webcomponents-icons/dist/puzzle.js';
-import '@ui5/webcomponents-icons/dist/conversation.js';
+import '@ui5/webcomponents-icons/dist/message-information.js';
 import '@ui5/webcomponents-icons/dist/action-settings.js';
 import '@ui5/webcomponents-icons/dist/menu2.js';
 import '@ui5/webcomponents-icons/dist/sys-help.js';
@@ -278,7 +278,7 @@ const Dashboard = () => {
 
           <ui5-side-navigation-item
             text="Assistant IA"
-            icon="conversation"
+            icon="message-information"
             data-path="/ai"
           ></ui5-side-navigation-item>
 
