@@ -1,0 +1,59 @@
+/* Setup Wizard - Styles UI5 v2.15.0 */
+
+.setup-wizard-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 2rem;
+  background: var(--sapBackgroundColor);
+}
+
+.setup-wizard-content {
+  width: 100%;
+  max-width: 800px;
+  background: var(--sapGroup_TitleBackground);
+  padding: 2rem;
+  border-radius: 0.5rem;
+  box-shadow: var(--sapContent_Shadow0);
+}
+
+.setup-title {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.wizard-step-content {
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.step-description {
+  color: var(--sapContent_LabelColor);
+  margin-bottom: 1rem;
+}
+
+.wizard-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.wizard-field ui5-label {
+  font-weight: 600;
+}
+
+.wizard-field ui5-input,
+.wizard-field ui5-select {
+  width: 100%;
+  max-width: 400px;
+}
+
+.wizard-step-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+  justify-content: flex-end;
+}

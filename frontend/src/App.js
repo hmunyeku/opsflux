@@ -3,6 +3,8 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Profile from './pages/Profile';
+import Settings from './pages/Settings';
+import SetupWizard from './pages/SetupWizard';
 
 // Composant de protection des routes
 const PrivateRoute = ({ children }) => {
@@ -32,6 +34,24 @@ function App() {
           element={
             <PrivateRoute>
               <Profile />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/settings"
+          element={
+            <PrivateRoute>
+              <Settings />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/setup"
+          element={
+            <PrivateRoute>
+              <SetupWizard />
             </PrivateRoute>
           }
         />

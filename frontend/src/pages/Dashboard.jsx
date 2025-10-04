@@ -59,6 +59,36 @@ const Dashboard = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const [preferences, setPreferences] = useState(null);
+
+  /**
+   * Chargement des préférences utilisateur
+   */
+  const loadPreferences = async () => {
+    try {
+      const token = localStorage.getItem('access_token');
+      const response = await fetch('http://localhost:8000/api/users/ui-preferences/my_preferences/', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setPreferences(data);
+      }
+    } catch (error) {
+      console.error('Erreur lors du chargement des préférences:', error);
+      // Utiliser des préférences par défaut en cas d'erreur
+      setPreferences({
+        show_search: true,
+        show_notifications: true,
+        show_help: true,
+        sidebar_collapsed: false
+      });
+    }
+  };
 
   /**
    * Chargement initial et vérification auth
@@ -81,6 +111,9 @@ const Dashboard = () => {
         return;
       }
     }
+
+    // Charger les préférences
+    loadPreferences();
 
     setLoading(false);
 
@@ -240,16 +273,20 @@ const Dashboard = () => {
 
           <ui5-shellbar-spacer slot="content"></ui5-shellbar-spacer>
 
-          <ui5-shellbar-search
-            slot="searchField"
-            show-clear-icon
-            placeholder="Rechercher..."
-          ></ui5-shellbar-search>
+          {preferences?.show_search !== false && (
+            <ui5-shellbar-search
+              slot="searchField"
+              show-clear-icon
+              placeholder="Rechercher..."
+            ></ui5-shellbar-search>
+          )}
 
-          <ui5-shellbar-item
-            icon="sys-help"
-            text="Aide"
-          ></ui5-shellbar-item>
+          {preferences?.show_help !== false && (
+            <ui5-shellbar-item
+              icon="sys-help"
+              text="Aide"
+            ></ui5-shellbar-item>
+          )}
 
           <ui5-avatar
             slot="profile"

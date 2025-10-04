@@ -1,0 +1,48 @@
+/* Settings Page - Styles UI5 v2.15.0 */
+
+.settings-page {
+  padding: var(--sapContent_Gap);
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.settings-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.settings-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  font-size: 1.5rem;
+}
+
+.settings-tabs {
+  width: 100%;
+}
+
+.settings-section {
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.settings-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.settings-field ui5-label {
+  font-weight: 600;
+}
+
+.settings-field ui5-input,
+.settings-field ui5-select {
+  max-width: 400px;
+}
