@@ -11,10 +11,15 @@ import '@ui5/webcomponents/dist/Card.js';
 import '@ui5/webcomponents/dist/CardHeader.js';
 import '@ui5/webcomponents/dist/BusyIndicator.js';
 import '@ui5/webcomponents/dist/Tag.js';
+import '@ui5/webcomponents/dist/Bar.js';
+import '@ui5/webcomponents/dist/Label.js';
+import '@ui5/webcomponents/dist/Icon.js';
 
 import '@ui5/webcomponents-fiori/dist/ShellBar.js';
 import '@ui5/webcomponents-fiori/dist/ShellBarBranding.js';
 import '@ui5/webcomponents-fiori/dist/ShellBarItem.js';
+import '@ui5/webcomponents-fiori/dist/ShellBarSpacer.js';
+import '@ui5/webcomponents-fiori/dist/ShellBarSearch.js';
 import '@ui5/webcomponents-fiori/dist/NavigationLayout.js';
 import '@ui5/webcomponents-fiori/dist/SideNavigation.js';
 import '@ui5/webcomponents-fiori/dist/SideNavigationItem.js';
@@ -29,15 +34,20 @@ import '@ui5/webcomponents-icons/dist/group.js';
 import '@ui5/webcomponents-icons/dist/puzzle.js';
 import '@ui5/webcomponents-icons/dist/message-information.js';
 import '@ui5/webcomponents-icons/dist/action-settings.js';
+import '@ui5/webcomponents-icons/dist/settings.js';
 import '@ui5/webcomponents-icons/dist/menu2.js';
 import '@ui5/webcomponents-icons/dist/sys-help.js';
 import '@ui5/webcomponents-icons/dist/log.js';
 import '@ui5/webcomponents-icons/dist/product.js';
+import '@ui5/webcomponents-icons/dist/add.js';
+import '@ui5/webcomponents-icons/dist/search.js';
+import '@ui5/webcomponents-icons/dist/sys-monitor.js';
+import '@ui5/webcomponents-icons/dist/customer-and-supplier.js';
 
 /**
  * Dashboard OpsFlux
  * Utilise UI5 Web Components natifs v2.15.0
- * Architecture: NavigationLayout + ShellBar + SideNavigation
+ * Architecture complète: NavigationLayout + ShellBar + SideNavigation + Footer
  */
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -48,6 +58,7 @@ const Dashboard = () => {
 
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
 
   /**
    * Chargement initial et vérification auth
@@ -72,6 +83,18 @@ const Dashboard = () => {
     }
 
     setLoading(false);
+
+    // Gestionnaires online/offline
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
   }, [navigate]);
 
   /**
@@ -207,14 +230,25 @@ const Dashboard = () => {
             tooltip="Afficher/Masquer menu"
           ></ui5-button>
 
-          <ui5-tag design="Set2" color-scheme="7" slot="content">
+          <ui5-tag design="Set2" color-scheme="7" slot="content" data-hide-order="2">
             v1.0.0
           </ui5-tag>
+
+          <ui5-text slot="content" data-hide-order="1">
+            {isOnline ? 'En ligne' : 'Hors ligne'}
+          </ui5-text>
+
+          <ui5-shellbar-spacer slot="content"></ui5-shellbar-spacer>
+
+          <ui5-shellbar-search
+            slot="searchField"
+            show-clear-icon
+            placeholder="Rechercher..."
+          ></ui5-shellbar-search>
 
           <ui5-shellbar-item
             icon="sys-help"
             text="Aide"
-            slot="content"
           ></ui5-shellbar-item>
 
           <ui5-avatar
@@ -265,21 +299,33 @@ const Dashboard = () => {
           ></ui5-side-navigation-item>
 
           <ui5-side-navigation-item
-            text="Utilisateurs"
-            icon="group"
-            data-path="/users"
-          ></ui5-side-navigation-item>
-
-          <ui5-side-navigation-item
-            text="Modules"
-            icon="puzzle"
-            data-path="/modules"
-          ></ui5-side-navigation-item>
+            text="Gestion"
+            icon="customer-and-supplier"
+            expanded
+            unselectable
+          >
+            <ui5-side-navigation-sub-item
+              text="Utilisateurs"
+              data-path="/users"
+            ></ui5-side-navigation-sub-item>
+            <ui5-side-navigation-sub-item
+              text="Modules"
+              data-path="/modules"
+            ></ui5-side-navigation-sub-item>
+          </ui5-side-navigation-item>
 
           <ui5-side-navigation-item
             text="Assistant IA"
             icon="message-information"
             data-path="/ai"
+          ></ui5-side-navigation-item>
+
+          <ui5-side-navigation-item
+            slot="fixedItems"
+            text="Créer"
+            icon="add"
+            design="Action"
+            unselectable
           ></ui5-side-navigation-item>
 
           <ui5-side-navigation-item
@@ -349,7 +395,8 @@ const Dashboard = () => {
           <div style={{
             display: 'flex',
             gap: '1rem',
-            flexWrap: 'wrap'
+            flexWrap: 'wrap',
+            marginBottom: '2rem'
           }}>
             <ui5-button design="Emphasized" icon="add">
               Nouveau document
@@ -362,6 +409,23 @@ const Dashboard = () => {
             </ui5-button>
           </div>
         </div>
+
+        {/* Footer Bar */}
+        <ui5-bar slot="footer" design="Footer">
+          <div slot="startContent" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <ui5-icon name="sys-monitor"></ui5-icon>
+            <ui5-label>OpsFlux v1.0.0</ui5-label>
+          </div>
+          <div slot="endContent" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <ui5-label>
+              Statut: {isOnline ? '🟢 En ligne' : '🔴 Hors ligne'}
+            </ui5-label>
+            <ui5-label>|</ui5-label>
+            <ui5-label>Utilisateur: {displayName}</ui5-label>
+            <ui5-label>|</ui5-label>
+            <ui5-label>© 2025 OpsFlux</ui5-label>
+          </div>
+        </ui5-bar>
       </ui5-navigation-layout>
     </div>
   );
