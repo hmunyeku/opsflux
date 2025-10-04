@@ -4,6 +4,7 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import ProfilePage from './pages/ProfilePage';
 import Settings from './pages/Settings';
+import AppSettings from './pages/AppSettings';
 import SetupWizard from './pages/SetupWizard';
 
 // Composant de protection des routes
@@ -44,6 +45,15 @@ function App() {
           element={
             <PrivateRoute>
               <Settings />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/app-settings"
+          element={
+            <PrivateRoute>
+              <AppSettings />
             </PrivateRoute>
           }
         />

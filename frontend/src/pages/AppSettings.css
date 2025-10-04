@@ -1,0 +1,68 @@
+.app-settings-page {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--sapBackgroundColor);
+}
+
+.settings-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid var(--sapGroup_ContentBorderColor);
+  background: var(--sapObjectHeader_Background);
+}
+
+.settings-container {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.settings-sidebar {
+  width: 250px;
+  border-right: 1px solid var(--sapGroup_ContentBorderColor);
+  background: var(--sapGroup_ContentBackground);
+  overflow-y: auto;
+}
+
+.settings-main {
+  flex: 1;
+  overflow-y: auto;
+  padding: 2rem;
+}
+
+.settings-content {
+  max-width: 800px;
+}
+
+.settings-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 1.5rem;
+}
+
+.settings-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.settings-item ui5-label {
+  font-weight: 600;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .settings-container {
+    flex-direction: column;
+  }
+
+  .settings-sidebar {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid var(--sapGroup_ContentBorderColor);
+  }
+}

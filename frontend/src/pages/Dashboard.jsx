@@ -350,9 +350,9 @@ const Dashboard = () => {
 
           <ui5-side-navigation-item
             slot="fixedItems"
-            text="Paramètres"
+            text="Paramètres App"
             icon="action-settings"
-            data-path="/settings"
+            data-path="/app-settings"
           ></ui5-side-navigation-item>
         </ui5-side-navigation>
 
